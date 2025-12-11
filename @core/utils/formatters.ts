@@ -1,4 +1,3 @@
-import { isToday } from './helpers'
 
 export const avatarText = (value: string) => {
   if (!value)
@@ -35,6 +34,17 @@ export const formatDate = (value: string, formatting: Intl.DateTimeFormatOptions
  * @param {string} value date to format
  * @param {boolean} toTimeForCurrentDay Shall convert to time if day is today/current
  */
+
+// 👉 IsToday
+const isToday = (date: any) => {
+  const today = new Date()
+  
+  return (date.getDate() === today.getDate()
+        && date.getMonth() === today.getMonth()
+        && date.getFullYear() === today.getFullYear())
+}
+
+
 export const formatDateToMonthShort = (value: string, toTimeForCurrentDay = true) => {
   const date = new Date(value)
   let formatting: Record<string, string> = { month: 'short', day: 'numeric' }
