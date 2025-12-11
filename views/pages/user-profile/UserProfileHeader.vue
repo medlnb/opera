@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { db } from "@/fake-db/pages/profile/index"
-import type { ProfileHeader } from '@db/pages/profile/types'
+import { db } from "@/fake-db/pages/profile/index";
+import type { ProfileHeader } from '@db/pages/profile/types';
 
 const userData = db.data.profileHeader
 const profileHeaderData = ref<ProfileHeader>()
@@ -70,9 +70,14 @@ profileHeaderData.value = userData
             </span>
           </div>
 
-          <VBtn prepend-icon="tabler-check">
-            Connected
-          </VBtn>
+          <div class="d-flex gap-2">
+            <VBtn prepend-icon="tabler-shopping-cart" color="primary" :to="{ name: 'user-profile-tab', params: { tab: 'cart' } }">
+              Cart
+            </VBtn>
+            <VBtn prepend-icon="tabler-check">
+              Connected
+            </VBtn>
+          </div>
         </div>
       </div>
     </VCardText>

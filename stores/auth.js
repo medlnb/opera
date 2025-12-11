@@ -1,4 +1,3 @@
-// stores/auth.js
 import { defineStore } from "pinia"
 
 export const useAuthStore = defineStore("auth", {
@@ -7,18 +6,21 @@ export const useAuthStore = defineStore("auth", {
     user: null,
   }),
   actions: {
-    async setToken({ token }) {
-      this.token= token
+    setToken(payload) {
+      this.token = payload
+    },
+    setUser(user) {
+      this.user = user
     },
     patchUser(newProps) {
       this.user = { ...this.user, ...newProps }
     },
-    async logout() {
+    logout() {
       this.token = null
       this.user = null
-      return true
     },
   },
   persist: true,
 })
+
 

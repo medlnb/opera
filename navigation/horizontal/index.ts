@@ -1,30 +1,80 @@
-export default [
-  {
-    title: 'Home',
-    to: { name: 'index' },
-    icon: { icon: 'tabler-smart-home' },
-  },
-  {
-    title: 'asdas',
-    to: { name: 'second-page' },
-    icon: { icon: 'tabler-file' },
-  },
-  {
-    title: 'Products',
-    icon: { icon: 'tabler-paint' },
-    children:[
+import { useAuthStore } from '@/stores/auth';
+export  function useNavItems() {
+  return computed(() => {
+    const { user } = useAuthStore()
+    return [
       {
-        title: 'Interior Wall Paint',
-        to: { name: 'products-type', params: { type: 'interior' } },
+        title: 'Home',
+        to: { name: 'index' },
+        icon: { icon: 'tabler-smart-home' },
       },
       {
-        title: 'Exterior Wall Paint',
-        to: { name: 'products-type', params: { type: 'exterior' } },
+        title: 'Colors',
+        to: { name: 'colors' },
+        icon: { icon: 'tabler-palette' },
       },
       {
-        title: 'Tools & Hardeners',
-        to: { name: 'products-type', params: { type: 'tools' } },
-      }
-    ]
-  },
-]
+        title: 'Products',
+        icon: { icon: 'tabler-paint' },
+        children:[
+          {
+            title: 'Decor',
+            to: { name: 'products-type', params: { type: 'decor' } },
+          },
+          {
+            title: 'Buildings',
+            to: { name: 'products-type', params: { type: 'buildings' } },
+          },
+          {
+            title: 'Coating',
+            to: { name: 'products-type', params: { type: 'coating' } },
+          }
+        ]
+      },
+      {
+        title: 'Tips',
+        to: { name: 'tips' },
+        icon: { icon: 'tabler-bulb' },
+      },
+      {
+        title: 'Inspirations',
+        to: { name: 'inspirations' },
+        icon: { icon: 'tabler-sparkles' },
+      },
+      (user as any)?.role as string ==="admin" && {
+        title: 'Management',
+        icon: { icon: 'tabler-user-shield' },
+        children:[
+          {
+            title: 'Dashboard',
+            to: { name: 'management-dashboard'},
+          },
+          {
+            title: 'Products',
+            to: { name: 'management'},
+          },
+          {
+            title: 'New Product',
+            to: { name: 'management-product'},
+          },
+          {
+            title: 'Articles',
+            to: { name: 'management-articles'},
+          },
+          {
+            title: 'New Article',
+            to: { name: 'management-newArticle'},
+          },
+          {
+            title: 'Orders',
+            to: { name: 'management-orders'},
+          },
+          {
+            title: 'Users',
+            to: { name: 'management-users'},
+          },
+        ]
+      },
+    ].filter(Boolean)
+  });
+}

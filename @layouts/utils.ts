@@ -1,8 +1,8 @@
-import type { Router } from 'vue-router'
 import { layoutConfig } from '@layouts/config'
 import { AppContentLayoutNav } from '@layouts/enums'
 import { useLayoutConfigStore } from '@layouts/stores/config'
 import type { NavGroup, NavLink, NavLinkProps } from '@layouts/types'
+import type { Router } from 'vue-router'
 
 export const openGroups = ref<string[]>([])
 
@@ -56,9 +56,25 @@ export const isNavLinkActive = (link: NavLink, router: Router) => {
   if (!resolveRoutedName)
     return false
 
-  return matchedRoutes.some(route => {
+  const isNameMatch = matchedRoutes.some(route => {
     return route.name === resolveRoutedName || route.meta.navActiveLink === resolveRoutedName
   })
+
+  if (!isNameMatch)
+    return false
+
+  // If link has params, verify they match current route params
+  if (link.to && typeof link.to === 'object' && link.to.params) {
+    const currentParams = router.currentRoute.value.params
+    const linkParams = link.to.params as Record<string, string>
+
+    for (const key of Object.keys(linkParams)) {
+      if (currentParams[key] !== linkParams[key])
+        return false
+    }
+  }
+
+  return true
 }
 
 /**

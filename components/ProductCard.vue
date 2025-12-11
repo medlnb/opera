@@ -1,15 +1,62 @@
 <script lang="ts" setup>
 import paint_Product from "@/assets/images/paint_Product.png";
-import { defineProps } from 'vue';
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
+const config = useRuntimeConfig();
 
 const props = defineProps({
   _id: { type: String, required: true },
   imgSrc: { type: String, required: true },
+  avatar: { type: String, default: '' },
   title: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
-  finishing: { type: null }
+  destination: { type: null },
+  isFavorite: { type: Boolean, default: false }
 })
+
+// Use avatar from props if provided, otherwise fallback to static image
+const avatarSrc = computed(() => 
+  props.avatar 
+    ? `${config.public.apiBaseUrl}/api/image?id=${props.avatar}` 
+    : paint_Product
+)
+
+const emit = defineEmits(['toggle-favorite'])
+
+const favoriteLoading = ref(false)
+const localIsFavorite = ref(props.isFavorite)
+
+watch(() => props.isFavorite, (val) => {
+  localIsFavorite.value = val
+})
+
+async function toggleFavorite() {
+  if (!authStore.token) {
+    return navigateTo('/login')
+  }
+
+  try {
+    favoriteLoading.value = true
+    const method = localIsFavorite.value ? 'DELETE' : 'POST'
+    const res = await fetch(`${config.public.apiBaseUrl}/api/favorites/${props._id}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+    })
+    if (!res.ok) throw new Error('Failed to update favorite')
+    localIsFavorite.value = !localIsFavorite.value
+    emit('toggle-favorite', { _id: props._id, isFavorite: localIsFavorite.value })
+  } catch (err) {
+    console.error(err)
+    alert('Failed to update favorites')
+  } finally {
+    favoriteLoading.value = false
+  }
+}
 
 </script>
 
@@ -21,7 +68,7 @@ const props = defineProps({
   >
     <VCard elevation="16" :to="`/product?id=${_id}`" class="h-100">
     <VImg
-      :src="`http://localhost:8888/api/image?id=${imgSrc}`"
+      :src="`${config.public.apiBaseUrl}/api/image?id=${imgSrc}`"
       height="200"
       width="100%"
       cover
@@ -41,7 +88,7 @@ const props = defineProps({
           height="75"
           width="75"
           class="avatar-center"
-          :src="paint_Product"
+          :src="avatarSrc"
         />
         
         <VCardItem class="px-3 pb-0 pt-3">
@@ -58,12 +105,13 @@ const props = defineProps({
 
         <VCardActions class="justify-space-between px-3">
           <div>
-            <VChip v-for="value in finishing" :key="value" class="mr-1 mb-1" size="x-small">{{ value }}</VChip>
+            <VChip v-for="value in destination" :key="value" class="mr-1 mb-1" size="x-small">{{ value }}</VChip>
           </div>
           <IconBtn
-            color="secondary"
-            icon="tabler-heart"
-            @click.stop="()=> {console.log('asfdds')}"
+            :color="localIsFavorite ? 'error' : 'secondary'"
+            :icon="localIsFavorite ? 'tabler-heart-filled' : 'tabler-heart'"
+            :loading="favoriteLoading"
+            @click.stop.prevent="toggleFavorite"
           />
         </VCardActions>
       </VCardText>

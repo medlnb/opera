@@ -1,14 +1,16 @@
-import { defu } from 'defu'
-import type { UseFetchOptions } from 'nuxt/app'
+import { useAuthStore } from "@/stores/auth";
+import { defu } from 'defu';
+import type { UseFetchOptions } from 'nuxt/app';
 
 export const useApi: typeof useFetch = <T>(url: MaybeRefOrGetter<string>, options: UseFetchOptions<T> = {}) => {
   const config = useRuntimeConfig()
-  const accessToken = useCookie('accessToken')
+  const authStore = useAuthStore();
+  const accessToken = authStore.token
 
   const defaults: UseFetchOptions<T> = {
-    baseURL: config.public.apiBaseUrl,
+    baseURL: config.public.apiBaseUrl ?? 'http://localhost:8888',
     key: toValue(url),
-    headers: accessToken.value ? { Authorization: `Bearer ${accessToken.value}` } : {},
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   }
 
   // for nice deep defaults, please use unjs/defu

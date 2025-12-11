@@ -1,35 +1,38 @@
 <script setup>
-import { useAuthStore } from "@core/stores/auth.js";
-import avatar1 from '@images/avatars/avatar-1.png';
-
-
+import { useAuthStore } from "@/stores/auth.js";
 
 const authStore = useAuthStore();
 
-
-const saveToken = () => {
-  authStore.setToken({ token: authStore.token });
-}
-
-const showToken = () => {
-  console.log(authStore.token)
-}
-
-
 const items = [    
-  { title: 'My Orders', to: { name: 'account/orders' }, icon: { icon: 'tabler-shopping-cart' } },
-  { title: 'My Reviews', to: { name: 'account/reviews' }, icon: { icon: 'tabler-star' } },
-  { title: 'My Wallet', to: { name: 'account/wallet' }, icon: { icon: 'tabler-wallet' } },
-  { title: 'My Favorites', to: { name: 'account/favorites' }, icon: { icon: 'tabler-heart' } },
-  { title: 'My Addresses', to: { name: 'account/addresses' }, icon: { icon: 'tabler-map-pin' } },
-  { title: 'Personal', to: { name: 'account' }, icon: { icon: 'tabler-user' } },
+  { title: 'My Orders', to: { name: '/account/orders' }, icon: { icon: 'tabler-shopping-cart' } },
+  { title: 'My Cart', to: { name: '/account/cart' }, icon: { icon: 'tabler-shopping-bag' } },
+  { title: 'My Favorites', to: { name: '/account/favorites' }, icon: { icon: 'tabler-heart' } },
+  { title: 'Account', to: { name: '/settings/account' }, icon: { icon: 'tabler-user' } },
 ]
+
+const logout = () => {
+  authStore.logout()
+  // Refresh current page instead of redirecting to login
+  window.location.reload()
+}
 </script>
 
 <template>
-  <VBtn @click="showToken">Show Token</VBtn>
-  <VBtn @click="saveToken">Save Token</VBtn>
+  <!-- Show login/signup buttons when not logged in -->
+  <template v-if="!authStore.token">
+    <VBtn
+      variant="text"
+      color="primary"
+      to="/login"
+      prepend-icon="tabler-user"
+    >
+      Log in
+    </VBtn>
+  </template>
+
+  <!-- Show user profile menu when logged in -->
   <VBadge
+    v-else
     dot
     location="bottom right"
     offset-x="3"
@@ -42,8 +45,10 @@ const items = [
       color="primary"
       variant="tonal"
     >
-      <VImg :src="avatar1" />
-
+      <VImg 
+        :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`" 
+        cover
+      />
       <!-- SECTION Menu -->
       <VMenu
         activator="parent"
@@ -67,16 +72,16 @@ const items = [
                     color="primary"
                     variant="tonal"
                   >
-                    <VImg :src="avatar1" />
+                    <VImg :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`" />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{ `${authStore.user?.firstName || ''} ${authStore.user?.lastName || ''}` }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle>{{ authStore.user?.phone ? authStore.user.phone.slice(0, 4) + ' ' + authStore.user.phone.slice(4, 20) : '' }}</VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />
@@ -98,7 +103,7 @@ const items = [
           <VDivider class="my-2" />
 
           <!-- 👉 Logout -->
-          <VListItem to="/login">
+          <VListItem @click="logout">
             <template #prepend>
               <VIcon
                 class="me-2"

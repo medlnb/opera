@@ -3,10 +3,15 @@ import vuetify from 'vite-plugin-vuetify'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8888',
+    },
+  },
+
   app: {
     head: {
-      titleTemplate: '%s - NuxtJS Admin Template',
-      title: 'Vuexy',
+      title: 'Opera Peinture',
 
       link: [{
         rel: 'icon',
@@ -47,7 +52,7 @@ export default defineNuxtConfig({
   },
 
   hooks: {},
-
+  ssr: false,
   experimental: {
     typedPages: true,
     inlineSSRStyles: false,

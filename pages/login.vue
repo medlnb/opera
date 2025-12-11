@@ -1,15 +1,16 @@
 <script setup>
+import logo from "@/assets/images/logo-v2.svg"
 import { useAuthStore } from '@/stores/auth'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
+import { useValidators } from '@/utils/validators'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
-import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+
+const config = useRuntimeConfig()
 
 definePageMeta({
   layout: 'blank',
-
 })
 
 const loading = ref(false)
@@ -23,13 +24,18 @@ const form = ref({
 const isPasswordVisible = ref(false)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 
+const snackbar = ref({ show: false, message: '', color: 'success' })
+const showSnackbar = (message, color = 'success') => {
+  snackbar.value = { show: true, message, color }
+}
+
 const submit = async () => {
   try {
     loading.value = true
     if (!form.value.phone || !form.value.password) 
-      return alert('Phone and password are required')
+      return showSnackbar('Phone and password are required', 'error')
       
-    const res = await fetch('http://localhost:8888/api/auth/login', {
+    const res = await fetch(`${config.public.apiBaseUrl}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: "+213"+form.value.phone, password: form.value.password }),
@@ -39,17 +45,19 @@ const submit = async () => {
       throw new Error(msg || 'Login failed')
     }
     const data = await res.json()
-    if (data?.token) authStore.setToken({ token: data.token })
+    if (data?.token) authStore.setToken(data.token)
     if (data?.user) authStore.patchUser(data.user)
     
     await navigateTo('/')
   } catch (err) {
     console.error(err)
-    alert('Invalid credentials')
+    showSnackbar('Invalid credentials', 'error')
   } finally {
     loading.value = false
   }
 }
+
+const { phoneValidator } = useValidators()
 </script>
 
 <template>
@@ -62,12 +70,14 @@ const submit = async () => {
       class="d-none d-md-flex"
     >
       <div class="position-relative bg-background rounded-lg w-100 ma-8 me-0">
-        <div class="d-flex align-center justify-center w-100 h-100">
-          <!-- <VImg
-            max-width="505"
-            :src="authThemeImg"
-            class="auth-illustration mt-16 mb-2"
-          /> -->
+        <div class="d-flex align-center justify-center w-100 h-100 pa-8">
+          <NuxtLink to="/">
+            <VImg
+              width="350"
+              :src="logo"
+              class="auth-illustration"
+            />
+          </NuxtLink>
         </div>
 
         <VImg
@@ -88,12 +98,8 @@ const submit = async () => {
         class="mt-12 mt-sm-0 pa-4"
       >
         <VCardText>
-          <VNodeRenderer
-            :nodes="themeConfig.app.logo"
-            class="mb-6"
-          />
           <h4 class="text-h4 mb-1">
-            Welcome to <span class="text-capitalize">{{ themeConfig.app.title }}</span>! 👋🏻
+            Welcome to <NuxtLink to="/" class="text-capitalize">{{ themeConfig.app.title }}</NuxtLink>! 👋🏻
           </h4>
           <p class="mb-0">
             Please sign-in to your account and start the adventure
@@ -102,14 +108,14 @@ const submit = async () => {
         <VCardText>
           <VForm @submit.prevent="submit">
             <VRow>
-              <VCol
-                cols="12"
-              >
+              <VCol cols="12">
                 <AppTextField
                   v-model="form.phone"
                   label="Phone Number"
                   placeholder="X XX XX XX XX"
                   maxlength="9"
+                  :rules="[phoneValidator]"
+                  @input="form.phone = form.phone.replace(/\D/g, '')"
                 >
                   <template #prepend-inner>
                     <p class="mb-0" style="margin-top: 1px;">0</p>
@@ -129,16 +135,13 @@ const submit = async () => {
                 />
 
                 <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  <VCheckbox
-                    v-model="form.remember"
-                    label="Remember me"
-                  />
-                  <a
+                  <div />
+                  <NuxtLink
                     class="text-primary ms-2 mb-1"
-                    href="#"
+                    to="/forgot-password"
                   >
                     Forgot Password?
-                  </a>
+                  </NuxtLink>
                 </div>
 
                 <VBtn block type="submit" :loading="loading">Login</VBtn>
@@ -150,31 +153,12 @@ const submit = async () => {
               >
                 <span>New on our platform?</span>
 
-                <a
+                <NuxtLink
                   class="text-primary ms-2"
-                  href="#"
+                  href="/signup"
                 >
                   Create an account
-                </a>
-              </VCol>
-
-              <VCol
-                cols="12"
-                class="d-flex align-center"
-              >
-                <VDivider />
-
-                <span class="mx-4">or</span>
-
-                <VDivider />
-              </VCol>
-
-              <!-- auth providers -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <AuthProvider />
+                </NuxtLink>
               </VCol>
             </VRow>
           </VForm>
@@ -182,6 +166,15 @@ const submit = async () => {
       </VCard>
     </VCol>
   </VRow>
+
+  <VSnackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    timeout="5000"
+    location="bottom end"
+  >
+    {{ snackbar.message }}
+  </VSnackbar>
 </template>
 
 <style lang="scss">
