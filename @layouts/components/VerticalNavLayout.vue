@@ -113,7 +113,7 @@ export default defineComponent({
             [
               navbar,
               main,
-              footer,
+              // footer,
             ],
           ),
           layoutOverlay,
