@@ -46,7 +46,7 @@ const features = [
           Opera Peinture offers high-quality paints, combining innovation, durability, and eco-friendliness for all your painting projects.
         </p>
         <div class="d-flex flex-wrap justify-center gap-4">
-          <VBtn color="primary" size="large" to="/products/interior">
+          <VBtn color="primary" size="large" to="/products/decor">
             <VIcon icon="tabler-paint" class="me-2" />
             Explore Products
           </VBtn>
@@ -160,7 +160,7 @@ const features = [
           Explore our wide range of premium paints and find the perfect color for your next project.
         </p>
         <div class="d-flex flex-wrap justify-center gap-4">
-          <VBtn color="primary" size="large" to="/products/interior">
+          <VBtn color="primary" size="large" to="/products/decor">
             <VIcon icon="tabler-shopping-cart" class="me-2" />
             Shop Now
           </VBtn>
