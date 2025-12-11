@@ -41,6 +41,11 @@ export  function useNavItems() {
         to: { name: 'inspirations' },
         icon: { icon: 'tabler-sparkles' },
       },
+      {
+        title: 'Contact Us',
+        to: { name: 'contact' },
+        icon: { icon: 'tabler-map-pin' },
+      },
       (user as any)?.role as string ==="admin" && {
         title: 'Management',
         icon: { icon: 'tabler-user-shield' },
