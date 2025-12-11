@@ -7,9 +7,9 @@ export function useValidators() {
   // 👉 Required Validator
   const requiredValidator = (value) => {
     if (isNullOrUndefined(value) || isEmptyArray(value) || value === false)
-      return t("required");
+      return t("Required");
 
-    return !!String(value).trim().length || t("required");
+    return !!String(value).trim().length || t("Required");
   };
 
 
@@ -19,22 +19,22 @@ export function useValidators() {
     const regExp = /^(((5|6|7)[0-9]{8}))$/;
     const validPhone = regExp.test(phone);
 
-    return validPhone || t("invalid_phone");
+    return validPhone || t("Invalid phone");
   };
 
 
   const passwordValidator = (password) => {
-    if (!password) return t("required_field");
+    if (!password) return t("Required");
 
     const validPassword = password.length > 7;
 
-    return validPassword || t("invalid_password");
+    return validPassword || t("Invalid password");
   };
 
 
   // 👉 Confirm Password Validator
   const confirmPasswordValidator = (value, target) =>
-    value === target || t("password_mismatch");
+    value === target || t("Password mismatch");
 
   // 👉 Image Type Validator
   const imageTypeValidator = (value) => {
@@ -45,11 +45,11 @@ export function useValidators() {
     if (Array.isArray(value)) {
       return (
         value.every((file) => allowedTypes.includes(file.type)) ||
-        t("invalid_image_format")
+        t("Invalid image format")
       );
     }
 
-    return allowedTypes.includes(value.type) || t("invalid_image_format");
+    return allowedTypes.includes(value.type) || t("Invalid image format");
   };
 
 

@@ -3,6 +3,8 @@ import vuetify from 'vite-plugin-vuetify'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: '2025-12-11',
+
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8888',
@@ -92,6 +94,19 @@ export default defineNuxtConfig({
 
   vite: {
     define: { 'process.env': {} },
+
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+          silenceDeprecations: ['global-builtin', 'import', 'color-functions', 'mixed-decls'],
+        },
+        sass: {
+          api: 'modern-compiler',
+          silenceDeprecations: ['global-builtin', 'import', 'color-functions', 'mixed-decls'],
+        },
+      },
+    },
 
     resolve: {
       alias: {
