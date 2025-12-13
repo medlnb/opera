@@ -407,7 +407,7 @@ const colorPalette = [
 <template>
   <div class="room-painter-page">
     <VCard>
-      <VCardTitle class="d-flex align-center justify-space-between flex-wrap gap-2">
+      <VCardTitle class="d-flex align-center justify-space-between flex-wrap gap-2 pt-4">
         <div class="d-flex align-center gap-2">
           <VBtn
             variant="text"
@@ -734,7 +734,7 @@ const colorPalette = [
 
 <style scoped lang="scss">
 .room-painter-page {
-  padding: 24px;
+  padding: 0;
   margin-block: 0;
   margin-inline: auto;
   max-inline-size: 1600px;
