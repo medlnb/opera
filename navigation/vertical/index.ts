@@ -1,7 +1,9 @@
-import { useAuthStore } from '@/stores/auth';
-export  function useNavItems() {
+import { useAuthStore } from '@/stores/auth'
+
+export function useNavItems() {
   return computed(() => {
     const { user } = useAuthStore()
+
     return [
       {
         title: 'Home',
@@ -16,7 +18,7 @@ export  function useNavItems() {
       {
         title: 'Products',
         icon: { icon: 'tabler-paint' },
-        children:[
+        children: [
           {
             title: 'Decor',
             to: { name: 'products-type', params: { type: 'decor' } },
@@ -28,8 +30,8 @@ export  function useNavItems() {
           {
             title: 'Coating',
             to: { name: 'products-type', params: { type: 'coating' } },
-          }
-        ]
+          },
+        ],
       },
       {
         title: 'Tips',
@@ -42,44 +44,44 @@ export  function useNavItems() {
         icon: { icon: 'tabler-sparkles' },
       },
       {
-        title: 'Contact Us',
-        to: { name: 'contact' },
-        icon: { icon: 'tabler-map-pin' },
+        to: { name: 'room-painter' },
+        title: 'Virtual Painter',
+        icon: { icon: 'tabler-brush' },
       },
-      (user as any)?.role as string ==="admin" && {
+      (user as any)?.role as string === 'admin' && {
         title: 'Management',
         icon: { icon: 'tabler-user-shield' },
-        children:[
+        children: [
           {
             title: 'Dashboard',
-            to: { name: 'management-dashboard'},
+            to: { name: 'management-dashboard' },
           },
           {
             title: 'Products',
-            to: { name: 'management'},
+            to: { name: 'management' },
           },
           {
             title: 'New Product',
-            to: { name: 'management-product'},
+            to: { name: 'management-product' },
           },
           {
             title: 'Articles',
-            to: { name: 'management-articles'},
+            to: { name: 'management-articles' },
           },
           {
             title: 'New Article',
-            to: { name: 'management-newArticle'},
+            to: { name: 'management-newArticle' },
           },
           {
             title: 'Orders',
-            to: { name: 'management-orders'},
+            to: { name: 'management-orders' },
           },
           {
             title: 'Users',
-            to: { name: 'management-users'},
+            to: { name: 'management-users' },
           },
-        ]
+        ],
       },
     ].filter(Boolean)
-  });
+  })
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useNavItems } from '@/navigation/vertical'
+import { useNavItems } from '@/navigation/vertical/index'
 import { themeConfig } from '@themeConfig'
 
 // Components
@@ -10,6 +10,7 @@ import NavBarI18n from '@core/components/I18n.vue'
 
 // @layouts plugin
 import { VerticalNavLayout } from '@layouts'
+
 const navItems = useNavItems()
 </script>
 

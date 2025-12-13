@@ -1,0 +1,815 @@
+<script setup lang="ts">
+const router = useRouter()
+
+const fileInput = ref<HTMLInputElement | null>(null)
+
+const imageFile = ref<File | null>(null)
+const imageUrl = ref<string>('')
+const canvas = ref<HTMLCanvasElement | null>(null)
+const displayCanvas = ref<HTMLCanvasElement | null>(null)
+const ctx = ref<CanvasRenderingContext2D | null>(null)
+const displayCtx = ref<CanvasRenderingContext2D | null>(null)
+const selectedColor = ref('#FF5733')
+const originalImageData = ref<ImageData | null>(null)
+const isLoading = ref(false)
+const tolerance = ref(30)
+const isSelecting = ref(false)
+
+type ToolMode = 'paint' | 'erase'
+const toolMode = ref<ToolMode>('paint')
+
+const undoStack = ref<ImageData[]>([])
+const redoStack = ref<ImageData[]>([])
+
+const canUndo = computed(() => undoStack.value.length > 0)
+const canRedo = computed(() => redoStack.value.length > 0)
+
+const deselect = () => {
+  isSelecting.value = false
+}
+
+const clearHistory = () => {
+  undoStack.value = []
+  redoStack.value = []
+}
+
+const getSnapshot = () => {
+  if (!ctx.value || !canvas.value)
+    return null
+
+  return ctx.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
+}
+
+const applySnapshot = (snapshot: ImageData) => {
+  if (!ctx.value || !displayCtx.value)
+    return
+
+  ctx.value.putImageData(snapshot, 0, 0)
+  displayCtx.value.putImageData(snapshot, 0, 0)
+}
+
+const pushUndoSnapshot = () => {
+  const snapshot = getSnapshot()
+  if (!snapshot)
+    return
+
+  undoStack.value.push(snapshot)
+  redoStack.value = []
+}
+
+const undoLastEdit = () => {
+  if (!canUndo.value)
+    return
+
+  const current = getSnapshot()
+  const previous = undoStack.value.pop()!
+  if (current)
+    redoStack.value.push(current)
+
+  applySnapshot(previous)
+}
+
+const redoLastUndo = () => {
+  if (!canRedo.value)
+    return
+
+  const current = getSnapshot()
+  const next = redoStack.value.pop()!
+  if (current)
+    undoStack.value.push(current)
+
+  applySnapshot(next)
+}
+
+const handleBack = async () => {
+  // Prefer navigating back if there is browser history; otherwise go home
+  if (typeof window !== 'undefined' && window.history.length > 1) {
+    router.back()
+
+    return
+  }
+
+  await navigateTo('/')
+}
+
+const onKeyDown = (event: KeyboardEvent) => {
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+  const modKey = isMac ? event.metaKey : event.ctrlKey
+
+  if (modKey && event.key.toLowerCase() === 'z') {
+    event.preventDefault()
+    if (event.shiftKey)
+      redoLastUndo()
+    else
+      undoLastEdit()
+
+    return
+  }
+
+  if (modKey && event.key.toLowerCase() === 'y') {
+    event.preventDefault()
+    redoLastUndo()
+
+    return
+  }
+
+  if (event.key === 'Escape')
+    deselect()
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeyDown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeyDown)
+})
+
+// Load image onto canvas
+const loadImageToCanvas = () => {
+  if (!imageUrl.value)
+    return
+
+  isLoading.value = true
+
+  const img = new Image()
+
+  img.onload = () => {
+    if (canvas.value && displayCanvas.value) {
+      // Set canvas size to image size
+      canvas.value.width = img.width
+      canvas.value.height = img.height
+      displayCanvas.value.width = img.width
+      displayCanvas.value.height = img.height
+
+      ctx.value = canvas.value.getContext('2d', { willReadFrequently: true })
+      displayCtx.value = displayCanvas.value.getContext('2d', { willReadFrequently: true })
+
+      if (ctx.value && displayCtx.value) {
+        ctx.value.drawImage(img, 0, 0)
+        displayCtx.value.drawImage(img, 0, 0)
+        originalImageData.value = ctx.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
+        clearHistory()
+      }
+    }
+    isLoading.value = false
+  }
+  img.src = imageUrl.value
+}
+
+const triggerFilePicker = () => {
+  fileInput.value?.click()
+}
+
+// Load image from file
+const handleImageUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+
+    imageFile.value = file
+
+    const reader = new FileReader()
+
+    reader.onload = e => {
+      imageUrl.value = e.target?.result as string
+      loadImageToCanvas()
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+
+  if (!result)
+    return null
+
+  return {
+    r: Number.parseInt(result[1], 16),
+    g: Number.parseInt(result[2], 16),
+    b: Number.parseInt(result[3], 16),
+  }
+}
+
+function isEdgePixel(
+  x: number,
+  y: number,
+  pixels: Uint8ClampedArray,
+  width: number,
+  height: number,
+  targetR: number,
+  targetG: number,
+  targetB: number,
+): boolean {
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+    [-1, -1],
+    [-1, 1],
+    [1, -1],
+    [1, 1],
+  ]
+
+  for (const [dx, dy] of directions) {
+    const nx = x + dx
+    const ny = y + dy
+
+    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+      const pos = (ny * width + nx) * 4
+      const r = pixels[pos]
+      const g = pixels[pos + 1]
+      const b = pixels[pos + 2]
+
+      if (
+        Math.abs(r - targetR) > tolerance.value
+        || Math.abs(g - targetG) > tolerance.value
+        || Math.abs(b - targetB) > tolerance.value
+      )
+        return true
+    }
+  }
+
+  return false
+}
+
+// Flood fill algorithm with edge detection (paint) + depaint (restore original pixels)
+const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: number; b: number }, mode: ToolMode) => {
+  if (!ctx.value || !displayCtx.value || !canvas.value || !originalImageData.value)
+    return
+
+  pushUndoSnapshot()
+
+  const imageData = ctx.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
+  const pixels = imageData.data
+  const originalPixels = originalImageData.value.data
+  const width = canvas.value.width
+  const height = canvas.value.height
+
+  const startPos = (startY * width + startX) * 4
+  const startR = pixels[startPos]
+  const startG = pixels[startPos + 1]
+  const startB = pixels[startPos + 2]
+
+  // For paint: avoid doing work if already painted to same color
+  if (
+    mode === 'paint'
+    && Math.abs(startR - fillColor.r) < 5
+    && Math.abs(startG - fillColor.g) < 5
+    && Math.abs(startB - fillColor.b) < 5
+  )
+    return
+
+  const visited = new Uint8Array(width * height)
+  const stack: Array<{ x: number; y: number }> = [{ x: startX, y: startY }]
+
+  const colorMatch = (r: number, g: number, b: number): boolean => {
+    return (
+      Math.abs(r - startR) <= tolerance.value
+      && Math.abs(g - startG) <= tolerance.value
+      && Math.abs(b - startB) <= tolerance.value
+    )
+  }
+
+  while (stack.length > 0) {
+    const { x, y } = stack.pop()!
+
+    if (x < 0 || x >= width || y < 0 || y >= height)
+      continue
+
+    const pos = y * width + x
+    if (visited[pos])
+      continue
+
+    const pixelPos = pos * 4
+    const r = pixels[pixelPos]
+    const g = pixels[pixelPos + 1]
+    const b = pixels[pixelPos + 2]
+
+    if (!colorMatch(r, g, b))
+      continue
+
+    visited[pos] = 1
+
+    const edge = isEdgePixel(x, y, pixels, width, height, startR, startG, startB)
+    const alpha = edge ? 0.7 : 1.0
+
+    if (mode === 'paint') {
+      const or = originalPixels[pixelPos]
+      const og = originalPixels[pixelPos + 1]
+      const ob = originalPixels[pixelPos + 2]
+
+      // Idempotent paint: always blend against the ORIGINAL pixel, not the already-painted one.
+      // This prevents repeated clicks from making the same area darker.
+      pixels[pixelPos] = fillColor.r * alpha + or * (1 - alpha)
+      pixels[pixelPos + 1] = fillColor.g * alpha + og * (1 - alpha)
+      pixels[pixelPos + 2] = fillColor.b * alpha + ob * (1 - alpha)
+    }
+    else {
+      const or = originalPixels[pixelPos]
+      const og = originalPixels[pixelPos + 1]
+      const ob = originalPixels[pixelPos + 2]
+
+      // Depaint: move pixels back toward original (blend at edges for smoother boundary).
+      pixels[pixelPos] = or * alpha + r * (1 - alpha)
+      pixels[pixelPos + 1] = og * alpha + g * (1 - alpha)
+      pixels[pixelPos + 2] = ob * alpha + b * (1 - alpha)
+    }
+
+    stack.push({ x: x + 1, y })
+    stack.push({ x: x - 1, y })
+    stack.push({ x, y: y + 1 })
+    stack.push({ x, y: y - 1 })
+  }
+
+  ctx.value.putImageData(imageData, 0, 0)
+  displayCtx.value.putImageData(imageData, 0, 0)
+}
+
+// Handle canvas click
+const handleCanvasClick = (event: MouseEvent) => {
+  if (!displayCanvas.value || !isSelecting.value)
+    return
+
+  const rect = displayCanvas.value.getBoundingClientRect()
+  const scaleX = displayCanvas.value.width / rect.width
+  const scaleY = displayCanvas.value.height / rect.height
+
+  const x = Math.floor((event.clientX - rect.left) * scaleX)
+  const y = Math.floor((event.clientY - rect.top) * scaleY)
+
+  const color = hexToRgb(selectedColor.value)
+  if (!color)
+    return
+
+  applyRegion(x, y, color, toolMode.value)
+}
+
+// Reset to original image
+const resetImage = () => {
+  if (ctx.value && displayCtx.value && originalImageData.value && canvas.value) {
+    pushUndoSnapshot()
+    ctx.value.putImageData(originalImageData.value, 0, 0)
+    displayCtx.value.putImageData(originalImageData.value, 0, 0)
+  }
+}
+
+const clearImage = () => {
+  imageUrl.value = ''
+  imageFile.value = null
+  isSelecting.value = false
+  toolMode.value = 'paint'
+  clearHistory()
+}
+
+// Download edited image
+const downloadImage = () => {
+  if (displayCanvas.value) {
+    const link = document.createElement('a')
+
+    link.download = 'painted-room.png'
+    link.href = displayCanvas.value.toDataURL()
+    link.click()
+  }
+}
+
+// Predefined color palette
+const colorPalette = [
+  '#FFFFFF',
+  '#F5F5F5',
+  '#EEEEEE',
+  '#E0E0E0',
+  '#FF5733',
+  '#FF6B6B',
+  '#FFA07A',
+  '#FFD700',
+  '#4ECDC4',
+  '#45B7D1',
+  '#96CEB4',
+  '#87CEEB',
+  '#9B59B6',
+  '#DDA0DD',
+  '#E6B0AA',
+  '#F8B500',
+  '#2C3E50',
+  '#34495E',
+  '#7F8C8D',
+  '#95A5A6',
+  '#27AE60',
+  '#2ECC71',
+  '#A8E6CF',
+  '#C7CEEA',
+]
+</script>
+
+<template>
+  <div class="room-painter-page">
+    <VCard>
+      <VCardTitle class="d-flex align-center justify-space-between flex-wrap gap-2">
+        <div class="d-flex align-center gap-2">
+          <VBtn
+            variant="text"
+            color="default"
+            prepend-icon="tabler-arrow-left"
+            @click="handleBack"
+          >
+            Back
+          </VBtn>
+
+          <VDivider vertical />
+
+          <VIcon
+            icon="tabler-paint"
+            size="28"
+          />
+          Room Wall Painter
+        </div>
+
+        <VChip
+          v-if="imageUrl"
+          :color="isSelecting ? 'primary' : 'default'"
+          variant="tonal"
+        >
+          {{ isSelecting ? 'Painting enabled (Esc to deselect)' : 'Painting disabled' }}
+        </VChip>
+      </VCardTitle>
+      <VCardText>
+        Upload a photo of your room and paint the walls with different colors to visualize your ideas!
+      </VCardText>
+    </VCard>
+
+    <!-- Upload Section -->
+    <VCard
+      v-if="!imageUrl"
+      class="mt-6"
+    >
+      <VCardText class="text-center pa-12">
+        <VIcon
+          icon="tabler-upload"
+          size="64"
+          color="primary"
+          class="mb-4"
+        />
+        <h3 class="text-h5 mb-2">
+          Upload Room Image
+        </h3>
+        <p class="text-body-1 text-medium-emphasis mb-6">
+          Choose a photo of your room to start painting the walls
+        </p>
+
+        <VBtn
+          color="primary"
+          size="large"
+          prepend-icon="tabler-photo"
+          @click="triggerFilePicker"
+        >
+          Select Image
+        </VBtn>
+
+        <input
+          ref="fileInput"
+          type="file"
+          accept="image/*"
+          style="display: none"
+          @change="handleImageUpload"
+        >
+      </VCardText>
+    </VCard>
+
+    <!-- Editor Section -->
+    <div v-else>
+      <VRow>
+        <!-- Controls Panel -->
+        <VCol
+          cols="12"
+          md="3"
+        >
+          <VCard>
+            <VCardTitle>
+              <VIcon
+                icon="tabler-palette"
+                class="me-2"
+              />
+              Paint Controls
+            </VCardTitle>
+
+            <VCardText>
+              <!-- Selection Toggle -->
+              <div class="mb-6">
+                <div class="d-flex gap-2">
+                  <VBtn
+                    :color="isSelecting ? 'primary' : 'default'"
+                    :variant="isSelecting ? 'flat' : 'outlined'"
+                    block
+                    size="large"
+                    prepend-icon="tabler-pointer"
+                    @click="isSelecting = !isSelecting"
+                  >
+                    {{ isSelecting ? 'Click to Paint' : 'Enable Painting' }}
+                  </VBtn>
+                </div>
+
+                <div
+                  v-if="imageUrl"
+                  class="mt-3"
+                >
+                  <VBtnToggle
+                    v-model="toolMode"
+                    mandatory
+                    divided
+                    class="w-100"
+                  >
+                    <VBtn
+                      value="paint"
+                      prepend-icon="tabler-brush"
+                    >
+                      Paint
+                    </VBtn>
+                    <VBtn
+                      value="erase"
+                      prepend-icon="tabler-eraser"
+                    >
+                      Depaint
+                    </VBtn>
+                  </VBtnToggle>
+
+                  <p class="text-caption text-medium-emphasis mt-2">
+                    Depaint = click a painted wall area to restore the original photo there.
+                  </p>
+                </div>
+
+                <VBtn
+                  v-if="isSelecting"
+                  class="mt-3"
+                  color="default"
+                  variant="outlined"
+                  block
+                  prepend-icon="tabler-x"
+                  @click="deselect"
+                >
+                  Deselect / Stop painting
+                </VBtn>
+
+                <p
+                  v-if="isSelecting"
+                  class="text-caption text-medium-emphasis mt-2"
+                >
+                  Tip: press Esc to deselect. Use Ctrl+Z to undo.
+                </p>
+              </div>
+
+              <!-- Color Picker -->
+              <div class="mb-4">
+                <label class="text-sm font-weight-medium mb-2 d-block">Selected Color</label>
+                <input
+                  v-model="selectedColor"
+                  type="color"
+                  class="color-picker"
+                >
+              </div>
+
+              <!-- Color Palette -->
+              <div class="mb-6">
+                <label class="text-sm font-weight-medium mb-2 d-block">Quick Colors</label>
+                <div class="color-palette">
+                  <button
+                    v-for="color in colorPalette"
+                    :key="color"
+                    class="palette-color"
+                    :style="{ backgroundColor: color }"
+                    :class="{ active: selectedColor === color }"
+                    @click="selectedColor = color"
+                  />
+                </div>
+              </div>
+
+              <!-- Tolerance Slider -->
+              <div class="mb-6">
+                <label class="text-sm font-weight-medium mb-2 d-block">
+                  Detection Sensitivity: {{ tolerance }}
+                </label>
+                <VSlider
+                  v-model="tolerance"
+                  :min="5"
+                  :max="100"
+                  :step="5"
+                  thumb-label
+                  color="primary"
+                />
+                <p class="text-caption text-medium-emphasis">
+                  Higher values select larger areas with similar colors
+                </p>
+              </div>
+
+              <VDivider class="my-4" />
+
+              <!-- Undo/Redo -->
+              <div class="d-flex gap-3 mb-4">
+                <VBtn
+                  :disabled="!canUndo"
+                  color="default"
+                  variant="outlined"
+                  prepend-icon="tabler-arrow-back-up"
+                  @click="undoLastEdit"
+                >
+                  Undo
+                </VBtn>
+                <VBtn
+                  :disabled="!canRedo"
+                  color="default"
+                  variant="outlined"
+                  prepend-icon="tabler-arrow-forward-up"
+                  @click="redoLastUndo"
+                >
+                  Redo
+                </VBtn>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex flex-column gap-3">
+                <VBtn
+                  color="warning"
+                  variant="outlined"
+                  prepend-icon="tabler-refresh"
+                  block
+                  @click="resetImage"
+                >
+                  Reset Image
+                </VBtn>
+
+                <VBtn
+                  color="success"
+                  variant="flat"
+                  prepend-icon="tabler-download"
+                  block
+                  @click="downloadImage"
+                >
+                  Download Result
+                </VBtn>
+
+                <VBtn
+                  color="default"
+                  variant="outlined"
+                  prepend-icon="tabler-photo"
+                  block
+                  @click="clearImage"
+                >
+                  Upload New Image
+                </VBtn>
+              </div>
+            </VCardText>
+          </VCard>
+
+          <!-- Instructions Card -->
+          <VCard class="mt-4">
+            <VCardTitle class="text-sm">
+              <VIcon
+                icon="tabler-info-circle"
+                class="me-2"
+                size="20"
+              />
+              How to Use
+            </VCardTitle>
+            <VCardText>
+              <ol class="text-sm ps-4">
+                <li class="mb-2">
+                  Enable painting mode
+                </li>
+                <li class="mb-2">
+                  Choose a color from the palette or picker
+                </li>
+                <li class="mb-2">
+                  Click on any wall to paint it
+                </li>
+                <li class="mb-2">
+                  Adjust sensitivity for better edge detection
+                </li>
+                <li>Download your design when done!</li>
+              </ol>
+            </VCardText>
+          </VCard>
+        </VCol>
+
+        <!-- Canvas Area -->
+        <VCol
+          cols="12"
+          md="9"
+        >
+          <VCard>
+            <VCardText>
+              <div
+                class="canvas-container"
+                :class="{ 'painting-mode': isSelecting }"
+              >
+                <canvas
+                  ref="canvas"
+                  style="display: none;"
+                />
+                <canvas
+                  ref="displayCanvas"
+                  class="display-canvas"
+                  @click="handleCanvasClick"
+                />
+
+                <div
+                  v-if="isLoading"
+                  class="loading-overlay"
+                >
+                  <VProgressCircular
+                    indeterminate
+                    size="64"
+                    color="primary"
+                  />
+                </div>
+              </div>
+            </VCardText>
+          </VCard>
+        </VCol>
+      </VRow>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.room-painter-page {
+  padding: 24px;
+  margin-block: 0;
+  margin-inline: auto;
+  max-inline-size: 1600px;
+}
+
+.color-picker {
+  border: 2px solid rgb(var(--v-theme-surface-variant));
+  border-radius: 8px;
+  block-size: 60px;
+  cursor: pointer;
+  inline-size: 100%;
+
+  &:hover {
+    border-color: rgb(var(--v-theme-primary));
+  }
+}
+
+.color-palette {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.palette-color {
+  border: 2px solid rgb(var(--v-theme-surface-variant));
+  border-radius: 8px;
+  aspect-ratio: 1;
+  cursor: pointer;
+  inline-size: 100%;
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 15%);
+    transform: scale(1.1);
+  }
+
+  &.active {
+    border-width: 3px;
+    border-color: rgb(var(--v-theme-primary));
+    transform: scale(1.05);
+  }
+}
+
+.canvas-container {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: repeating-conic-gradient(#f5f5f5 0% 25%, #fff 0% 50%)
+    50% / 20px 20px;
+  inline-size: 100%;
+  min-block-size: 400px;
+
+  &.painting-mode {
+    cursor: crosshair;
+  }
+}
+
+.display-canvas {
+  display: block;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 10%);
+  max-block-size: 800px;
+  max-inline-size: 100%;
+  object-fit: contain;
+}
+
+.loading-overlay {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 90%);
+  inset: 0;
+}
+</style>

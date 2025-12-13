@@ -1,8 +1,8 @@
 <script setup>
-import logo from "@/assets/images/logo-v2.svg"
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
+import logo from '@images/logo-v2.svg'
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { themeConfig } from '@themeConfig'
@@ -15,6 +15,7 @@ definePageMeta({
 
 const loading = ref(false)
 const authStore = useAuthStore()
+
 const form = ref({
   phone: '',
   password: '',
@@ -25,6 +26,7 @@ const isPasswordVisible = ref(false)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
@@ -32,27 +34,32 @@ const showSnackbar = (message, color = 'success') => {
 const submit = async () => {
   try {
     loading.value = true
-    if (!form.value.phone || !form.value.password) 
+    if (!form.value.phone || !form.value.password)
       return showSnackbar('Phone and password are required', 'error')
-      
+
     const res = await fetch(`${config.public.apiBaseUrl}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone: "+213"+form.value.phone, password: form.value.password }),
+      body: JSON.stringify({ phone: `+213${form.value.phone}`, password: form.value.password }),
     })
+
     if (!res.ok) {
       const msg = await res.text()
       throw new Error(msg || 'Login failed')
     }
     const data = await res.json()
-    if (data?.token) authStore.setToken(data.token)
-    if (data?.user) authStore.patchUser(data.user)
-    
+    if (data?.token)
+      authStore.setToken(data.token)
+    if (data?.user)
+      authStore.patchUser(data.user)
+
     await navigateTo('/')
-  } catch (err) {
+  }
+  catch (err) {
     console.error(err)
     showSnackbar('Invalid credentials', 'error')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -99,7 +106,12 @@ const { phoneValidator } = useValidators()
       >
         <VCardText>
           <h4 class="text-h4 mb-1">
-            Welcome to <NuxtLink to="/" class="text-capitalize">{{ themeConfig.app.title }}</NuxtLink>! 👋🏻
+            Welcome to <NuxtLink
+              to="/"
+              class="text-capitalize"
+            >
+              {{ themeConfig.app.title }}
+            </NuxtLink>! 👋🏻
           </h4>
           <p class="mb-0">
             Please sign-in to your account and start the adventure
@@ -118,7 +130,12 @@ const { phoneValidator } = useValidators()
                   @input="form.phone = form.phone.replace(/\D/g, '')"
                 >
                   <template #prepend-inner>
-                    <p class="mb-0" style="margin-top: 1px;">0</p>
+                    <p
+                      class="mb-0"
+                      style="margin-block-start: 1px;"
+                    >
+                      0
+                    </p>
                   </template>
                 </AppTextField>
               </VCol>
@@ -144,7 +161,13 @@ const { phoneValidator } = useValidators()
                   </NuxtLink>
                 </div>
 
-                <VBtn block type="submit" :loading="loading">Login</VBtn>
+                <VBtn
+                  block
+                  type="submit"
+                  :loading="loading"
+                >
+                  Login
+                </VBtn>
               </VCol>
 
               <VCol
