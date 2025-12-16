@@ -13,7 +13,6 @@ const selectedColor = ref('#FF5733')
 const originalImageData = ref<ImageData | null>(null)
 const isLoading = ref(false)
 const tolerance = ref(30)
-const isSelecting = ref(false)
 
 type ToolMode = 'paint' | 'erase'
 const toolMode = ref<ToolMode>('paint')
@@ -23,10 +22,6 @@ const redoStack = ref<ImageData[]>([])
 
 const canUndo = computed(() => undoStack.value.length > 0)
 const canRedo = computed(() => redoStack.value.length > 0)
-
-const deselect = () => {
-  isSelecting.value = false
-}
 
 const clearHistory = () => {
   undoStack.value = []
@@ -109,12 +104,7 @@ const onKeyDown = (event: KeyboardEvent) => {
   if (modKey && event.key.toLowerCase() === 'y') {
     event.preventDefault()
     redoLastUndo()
-
-    return
   }
-
-  if (event.key === 'Escape')
-    deselect()
 }
 
 onMounted(() => {
@@ -445,7 +435,7 @@ const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: 
 
 // Handle canvas click
 const handleCanvasClick = (event: MouseEvent) => {
-  if (!displayCanvas.value || !isSelecting.value)
+  if (!displayCanvas.value)
     return
 
   const rect = displayCanvas.value.getBoundingClientRect()
@@ -474,7 +464,6 @@ const resetImage = () => {
 const clearImage = () => {
   imageUrl.value = ''
   imageFile.value = null
-  isSelecting.value = false
   toolMode.value = 'paint'
   clearHistory()
 }
@@ -544,10 +533,10 @@ const colorPalette = [
 
         <VChip
           v-if="imageUrl"
-          :color="isSelecting ? 'primary' : 'default'"
+          color="primary"
           variant="tonal"
         >
-          {{ isSelecting ? 'Painting enabled (Esc to deselect)' : 'Painting disabled' }}
+          Painting enabled
         </VChip>
       </VCardTitle>
       <VCardText>
@@ -611,67 +600,34 @@ const colorPalette = [
             </VCardTitle>
 
             <VCardText>
-              <!-- Selection Toggle -->
+              <!-- Paint mode (always enabled) -->
               <div class="mb-6">
-                <div class="d-flex gap-2">
+                <VBtnToggle
+                  v-model="toolMode"
+                  mandatory
+                  divided
+                  class="w-100"
+                >
                   <VBtn
-                    :color="isSelecting ? 'primary' : 'default'"
-                    :variant="isSelecting ? 'flat' : 'outlined'"
-                    block
-                    size="large"
-                    prepend-icon="tabler-pointer"
-                    @click="isSelecting = !isSelecting"
+                    value="paint"
+                    prepend-icon="tabler-brush"
                   >
-                    {{ isSelecting ? 'Click to Paint' : 'Enable Painting' }}
+                    Paint
                   </VBtn>
-                </div>
-
-                <div
-                  v-if="imageUrl"
-                  class="mt-3"
-                >
-                  <VBtnToggle
-                    v-model="toolMode"
-                    mandatory
-                    divided
-                    class="w-100"
+                  <VBtn
+                    value="erase"
+                    prepend-icon="tabler-eraser"
                   >
-                    <VBtn
-                      value="paint"
-                      prepend-icon="tabler-brush"
-                    >
-                      Paint
-                    </VBtn>
-                    <VBtn
-                      value="erase"
-                      prepend-icon="tabler-eraser"
-                    >
-                      Depaint
-                    </VBtn>
-                  </VBtnToggle>
+                    Depaint
+                  </VBtn>
+                </VBtnToggle>
 
-                  <p class="text-caption text-medium-emphasis mt-2">
-                    Depaint = click a painted wall area to restore the original photo there.
-                  </p>
-                </div>
+                <p class="text-caption text-medium-emphasis mt-2">
+                  Depaint = click a painted wall area to restore the original photo there.
+                </p>
 
-                <VBtn
-                  v-if="isSelecting"
-                  class="mt-3"
-                  color="default"
-                  variant="outlined"
-                  block
-                  prepend-icon="tabler-x"
-                  @click="deselect"
-                >
-                  Deselect / Stop painting
-                </VBtn>
-
-                <p
-                  v-if="isSelecting"
-                  class="text-caption text-medium-emphasis mt-2"
-                >
-                  Tip: press Esc to deselect. Use Ctrl+Z to undo.
+                <p class="text-caption text-medium-emphasis mt-2">
+                  Tip: use Ctrl+Z to undo.
                 </p>
               </div>
 
@@ -790,7 +746,7 @@ const colorPalette = [
             <VCardText>
               <ol class="text-sm ps-4">
                 <li class="mb-2">
-                  Enable painting mode
+                  Choose Paint or Depaint
                 </li>
                 <li class="mb-2">
                   Choose a color from the palette or picker
@@ -814,10 +770,7 @@ const colorPalette = [
         >
           <VCard>
             <VCardText>
-              <div
-                class="canvas-container"
-                :class="{ 'painting-mode': isSelecting }"
-              >
+              <div class="canvas-container painting-mode">
                 <canvas
                   ref="canvas"
                   style="display: none;"
@@ -851,16 +804,6 @@ const colorPalette = [
       >
         <VCard class="pa-2">
           <div class="d-flex align-center gap-2 flex-wrap">
-            <VBtn
-              :color="isSelecting ? 'primary' : 'default'"
-              :variant="isSelecting ? 'flat' : 'outlined'"
-              size="small"
-              prepend-icon="tabler-pointer"
-              @click="isSelecting = !isSelecting"
-            >
-              {{ isSelecting ? 'Painting on' : 'Paint' }}
-            </VBtn>
-
             <VBtnToggle
               v-model="toolMode"
               mandatory
@@ -1055,8 +998,9 @@ const colorPalette = [
   border-radius: 8px;
   background: repeating-conic-gradient(#f5f5f5 0% 25%, #fff 0% 50%)
     50% / 20px 20px;
-  inline-size: 100%;
-  min-block-size: 400px;
+  inline-size: fit-content;
+  margin-inline: auto;
+  max-inline-size: 100%;
 
   &.painting-mode {
     cursor: crosshair;
