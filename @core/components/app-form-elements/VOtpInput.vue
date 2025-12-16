@@ -8,7 +8,7 @@ const props = defineProps({
   length: { type: Number, default: 6 },
   label: { type: String, default: '' },
   placeholder: { type: String, default: '' },
-  class: { type: String, default: '' }
+  class: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -22,22 +22,23 @@ function initDigits() {
 
 initDigits()
 
-watch(() => props.modelValue, (val) => {
-  if (val == null) return
+watch(() => props.modelValue, val => {
+  if (val == null)
+    return
   for (let i = 0; i < props.length; i++) digits.value[i] = val[i] ?? ''
 })
 
-watch(digits, (val) => {
+watch(digits, val => {
   emit('update:modelValue', val.join(''))
 }, { deep: true })
-
 
 function onTyped(idx: number) {
   // move to next input when a digit is entered
   if (digits.value[idx] && idx < props.length - 1) {
     nextTick(() => {
       const next = inputs.value[idx + 1]
-      if (next) next.focus()
+      if (next)
+        next.focus()
     })
   }
 }
@@ -64,22 +65,29 @@ function setInputRef(el: unknown, idx: number) {
 </script>
 
 <template>
-  <div :class="['v-otp-input', props.class]">
-    <VLabel v-if="props.label" class="mb-1 text-body-2 text-high-emphasis" :text="props.label" />
+  <div
+    class="v-otp-input"
+    :class="[props.class]"
+  >
+    <VLabel
+      v-if="props.label"
+      class="mb-1 text-body-2 text-high-emphasis"
+      :text="props.label"
+    />
     <div class="v-otp-input__content d-flex gap-x-2">
       <input
         v-for="(_, idx) in props.length"
         :key="idx"
+        :ref="(el) => setInputRef(el, idx)"
+        v-model="digits[idx]"
         :placeholder="props.placeholder ? props.placeholder.split(' ')[idx] ?? '' : ''"
         class="v-otp-input__input"
         type="tel"
         inputmode="numeric"
         maxlength="1"
-        v-model="digits[idx]"
         @input="() => onTyped(idx)"
         @keydown="(e) => onKeyDown(e, idx)"
-        :ref="(el) => setInputRef(el, idx)"
-      />
+      >
     </div>
   </div>
 </template>

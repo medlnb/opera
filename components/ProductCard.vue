@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-import paint_Product from "@/assets/images/paint_Product.png";
-import { useAuthStore } from "@/stores/auth";
-
-const authStore = useAuthStore();
-const config = useRuntimeConfig();
+import paint_Product from '@images/paint_Product.png'
+import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -13,33 +10,36 @@ const props = defineProps({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   destination: { type: null },
-  isFavorite: { type: Boolean, default: false }
+  isFavorite: { type: Boolean, default: false },
 })
 
-// Use avatar from props if provided, otherwise fallback to static image
-const avatarSrc = computed(() => 
-  props.avatar 
-    ? `${config.public.apiBaseUrl}/api/image?id=${props.avatar}` 
-    : paint_Product
-)
-
 const emit = defineEmits(['toggle-favorite'])
+const authStore = useAuthStore()
+const config = useRuntimeConfig()
+
+// Use avatar from props if provided, otherwise fallback to static image
+const avatarSrc = computed(() =>
+  props.avatar
+    ? `${config.public.apiBaseUrl}/api/image?id=${props.avatar}`
+    : paint_Product,
+)
 
 const favoriteLoading = ref(false)
 const localIsFavorite = ref(props.isFavorite)
 
-watch(() => props.isFavorite, (val) => {
+watch(() => props.isFavorite, val => {
   localIsFavorite.value = val
 })
 
 async function toggleFavorite() {
-  if (!authStore.token) {
+  if (!authStore.token)
     return navigateTo('/login')
-  }
 
   try {
     favoriteLoading.value = true
+
     const method = localIsFavorite.value ? 'DELETE' : 'POST'
+
     const res = await fetch(`${config.public.apiBaseUrl}/api/favorites/${props._id}`, {
       method,
       headers: {
@@ -47,17 +47,20 @@ async function toggleFavorite() {
         'Authorization': `Bearer ${authStore.token}`,
       },
     })
-    if (!res.ok) throw new Error('Failed to update favorite')
+
+    if (!res.ok)
+      throw new Error('Failed to update favorite')
     localIsFavorite.value = !localIsFavorite.value
     emit('toggle-favorite', { _id: props._id, isFavorite: localIsFavorite.value })
-  } catch (err) {
+  }
+  catch (err) {
     console.error(err)
     alert('Failed to update favorites')
-  } finally {
+  }
+  finally {
     favoriteLoading.value = false
   }
 }
-
 </script>
 
 <template>
@@ -66,22 +69,29 @@ async function toggleFavorite() {
     sm="6"
     md="4"
   >
-    <VCard elevation="16" :to="`/product?id=${_id}`" class="h-100">
-    <VImg
-      :src="`${config.public.apiBaseUrl}/api/image?id=${imgSrc}`"
-      height="200"
-      width="100%"
-      cover
+    <VCard
+      elevation="16"
+      :to="`/product?id=${_id}`"
+      class="h-100"
     >
-      <template #placeholder>
-        <div
-          class="d-flex align-center justify-center"
-          style="height: 200px; background-color: #f0f0f0;"
-        >
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        </div>
-      </template>
-    </VImg>
+      <VImg
+        :src="`${config.public.apiBaseUrl}/api/image?id=${imgSrc}`"
+        height="200"
+        width="100%"
+        cover
+      >
+        <template #placeholder>
+          <div
+            class="d-flex align-center justify-center"
+            style="height: 200px; background-color: #f0f0f0;"
+          >
+            <VProgressCircular
+              indeterminate
+              color="primary"
+            />
+          </div>
+        </template>
+      </VImg>
 
       <VCardText class="position-relative pa-0 pt-10">
         <VImg
@@ -90,7 +100,7 @@ async function toggleFavorite() {
           class="avatar-center"
           :src="avatarSrc"
         />
-        
+
         <VCardItem class="px-3 pb-0 pt-3">
           <VCardTitle>{{ title }}</VCardTitle>
         </VCardItem>
@@ -105,7 +115,14 @@ async function toggleFavorite() {
 
         <VCardActions class="justify-space-between px-3">
           <div>
-            <VChip v-for="value in destination" :key="value" class="mr-1 mb-1" size="x-small">{{ value }}</VChip>
+            <VChip
+              v-for="value in destination"
+              :key="value"
+              class="mr-1 mb-1"
+              size="x-small"
+            >
+              {{ value }}
+            </VChip>
           </div>
           <IconBtn
             :color="localIsFavorite ? 'error' : 'secondary'"

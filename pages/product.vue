@@ -1,41 +1,48 @@
 <script setup>
-import { useAuthStore } from "@/stores/auth";
-import { useCartStore } from "@/stores/cart";
-import { useRoute } from "vue-router";
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useCartStore } from '@/stores/cart'
 
-const authStore = useAuthStore();
-const cartStore = useCartStore();
-const config = useRuntimeConfig();
+const authStore = useAuthStore()
+const cartStore = useCartStore()
+const config = useRuntimeConfig()
 const { query } = useRoute()
 const productDetails = ref()
 const productLoading = ref(true)
 const panelStatus = ref()
 const favoriteLoading = ref(false)
 const addingToCart = ref(false)
+
 const order = ref({
   variance: null,
   color: null,
   qty: 1,
-});
+})
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
 
-onMounted( async () => {
+onMounted(async () => {
   try {
     productLoading.value = true
-    const res = await fetch(`${config.public.apiBaseUrl}/api/products/${query.id}`,{
+
+    const res = await fetch(`${config.public.apiBaseUrl}/api/products/${query.id}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' , authorization: `Bearer ${authStore.token}`},
+      headers: { 'Content-Type': 'application/json', 'authorization': `Bearer ${authStore.token}` },
     })
+
     const data = await res.json()
-    productDetails.value = {...productDetails.value ,...data.data}
-  } catch (err) {
+
+    productDetails.value = { ...productDetails.value, ...data.data }
+  }
+  catch (err) {
     console.error(err)
     showSnackbar('Failed to load product', 'error')
-  } finally {
+  }
+  finally {
     productLoading.value = false
   }
 })
@@ -53,13 +60,16 @@ function selectVariance(i) {
 async function addToCart() {
   if (!authStore.token)
     return navigateTo('/login')
-  if (!productDetails.value?._id) return
+  if (!productDetails.value?._id)
+    return
   if (order.value.variance == null) {
     panelStatus.value = 1
+
     return
   }
   const variance = productDetails.value.variances.find(v => v._id === order.value.variance)
-  if (!variance?.quantity) return
+  if (!variance?.quantity)
+    return
 
   // Get selected color name or use empty string if no colors
   const colorName = productDetails.value.colors?.length && order.value.color != null
@@ -68,35 +78,41 @@ async function addToCart() {
 
   try {
     addingToCart.value = true
+
     const success = await cartStore.addItem({
       productId: productDetails.value._id,
       variance: variance._id,
       color: colorName,
       qty: Math.max(1, Number(order.value.qty) || 1),
     })
+
     if (success) {
       panelStatus.value = undefined
       order.value.qty = 1
       showSnackbar('Added to cart!', 'success')
-    } else {
+    }
+    else {
       showSnackbar('Failed to add to cart', 'error')
     }
-    
-  } catch (err) {
+  }
+  catch (err) {
     console.error(err)
     showSnackbar('Failed to add to cart', 'error')
-  } finally {
+  }
+  finally {
     addingToCart.value = false
   }
 }
 
 async function addToFavorites() {
-  if (!authStore.token) 
+  if (!authStore.token)
     return navigateTo('/login')
-  if (!productDetails.value?._id) return
+  if (!productDetails.value?._id)
+    return
 
   try {
     favoriteLoading.value = true
+
     const res = await fetch(`${config.public.apiBaseUrl}/api/favorites/${productDetails.value._id}`, {
       method: 'POST',
       headers: {
@@ -104,24 +120,30 @@ async function addToFavorites() {
         'Authorization': `Bearer ${authStore.token}`,
       },
     })
-    if (!res.ok) throw new Error('Failed to add favorite')
+
+    if (!res.ok)
+      throw new Error('Failed to add favorite')
     productDetails.value.isFavorite = true
     showSnackbar('Added to favorites', 'success')
-  } catch (err) {
+  }
+  catch (err) {
     console.error(err)
     showSnackbar('Failed to add to favorites', 'error')
-  } finally {
+  }
+  finally {
     favoriteLoading.value = false
   }
 }
 
 async function removeFromFavorites() {
-  if (!authStore.token) 
+  if (!authStore.token)
     return navigateTo('/login')
-  if (!productDetails.value?._id) return
+  if (!productDetails.value?._id)
+    return
 
   try {
     favoriteLoading.value = true
+
     const res = await fetch(`${config.public.apiBaseUrl}/api/favorites/${productDetails.value._id}`, {
       method: 'DELETE',
       headers: {
@@ -129,19 +151,24 @@ async function removeFromFavorites() {
         'Authorization': `Bearer ${authStore.token}`,
       },
     })
-    if (!res.ok) throw new Error('Failed to remove favorite')
+
+    if (!res.ok)
+      throw new Error('Failed to remove favorite')
     productDetails.value.isFavorite = false
     showSnackbar('Removed from favorites', 'success')
-  } catch (err) {
+  }
+  catch (err) {
     console.error(err)
     showSnackbar('Failed to remove from favorites', 'error')
-  } finally {
+  }
+  finally {
     favoriteLoading.value = false
   }
 }
 
 function toggleFavorite() {
-  if (productDetails.value?.isFavorite) removeFromFavorites()
+  if (productDetails.value?.isFavorite)
+    removeFromFavorites()
   else addToFavorites()
 }
 </script>
@@ -149,8 +176,15 @@ function toggleFavorite() {
 <template>
   <VCard class="overflow-visible course-details">
     <VCardText>
-      <div v-if="productLoading" class="d-flex align-center justify-center py-12">
-        <VProgressCircular indeterminate color="primary" size="48" />
+      <div
+        v-if="productLoading"
+        class="d-flex align-center justify-center py-12"
+      >
+        <VProgressCircular
+          indeterminate
+          color="primary"
+          size="48"
+        />
       </div>
       <template v-else>
         <VCardItem class="pa-0 mb-2">
@@ -166,7 +200,10 @@ function toggleFavorite() {
               >
                 {{ productDetails?.type }}
               </VChip>
-              <IconBtn @click="toggleFavorite" :loading="favoriteLoading">
+              <IconBtn
+                :loading="favoriteLoading"
+                @click="toggleFavorite"
+              >
                 <VIcon
                   :icon="productDetails?.isFavorite ? 'tabler-heart-filled' : 'tabler-heart'"
                   :color="productDetails?.isFavorite ? 'error' : undefined"
@@ -180,10 +217,21 @@ function toggleFavorite() {
         <VCard flat>
           <div class="pt-2">
             <VRow>
-              <VCol cols="12" md="8" class="py-0">
+              <VCol
+                cols="12"
+                md="8"
+                class="py-0"
+              >
                 <div class="bg-background rounded py-0">
-                  <div v-if="productLoading" class="d-flex align-center justify-center product-image-placeholder" style="background-color: #f0f0f0; height: 360px;">
-                    <VProgressCircular indeterminate color="primary" />
+                  <div
+                    v-if="productLoading"
+                    class="d-flex align-center justify-center product-image-placeholder"
+                    style="background-color: #f0f0f0; height: 360px;"
+                  >
+                    <VProgressCircular
+                      indeterminate
+                      color="primary"
+                    />
                   </div>
                   <VImg
                     v-else-if="productDetails"
@@ -195,11 +243,17 @@ function toggleFavorite() {
                         class="d-flex align-center justify-center product-image-placeholder"
                         style="background-color: #f0f0f0;"
                       >
-                        <VProgressCircular indeterminate color="primary" />
+                        <VProgressCircular
+                          indeterminate
+                          color="primary"
+                        />
                       </div>
                     </template>
 
-                    <div v-if="productDetails?.avatar" class="product-avatar bg-grey-300">
+                    <div
+                      v-if="productDetails?.avatar"
+                      class="product-avatar bg-grey-300"
+                    >
                       <VImg
                         :src="`${config.public.apiBaseUrl}/api/image?id=${productDetails.avatar}`"
                         height="200"
@@ -230,8 +284,13 @@ function toggleFavorite() {
                           <h5 class="text-h5 mb-1">
                             Colors
                           </h5>
-                          <div class="d-flex flex-wrap gap-1" v-if="productDetails && order.color != null">
-                            <VChip size="x-small">{{ productDetails.colors[order.color].name }}</VChip>
+                          <div
+                            v-if="productDetails && order.color != null"
+                            class="d-flex flex-wrap gap-1"
+                          >
+                            <VChip size="x-small">
+                              {{ productDetails.colors[order.color].name }}
+                            </VChip>
                           </div>
                         </div>
                       </template>
@@ -269,8 +328,13 @@ function toggleFavorite() {
                           <h5 class="text-h5 mb-1">
                             Size
                           </h5>
-                          <div class="d-flex flex-wrap gap-1" v-if="productDetails && order.variance != null">
-                            <VChip size="x-small">{{ productDetails.variances.find(v => v._id === order.variance)?.quantity ?? '-' }}</VChip>
+                          <div
+                            v-if="productDetails && order.variance != null"
+                            class="d-flex flex-wrap gap-1"
+                          >
+                            <VChip size="x-small">
+                              {{ productDetails.variances.find(v => v._id === order.variance)?.quantity ?? '-' }}
+                            </VChip>
                           </div>
                         </div>
                       </template>
@@ -306,16 +370,28 @@ function toggleFavorite() {
                       <template #title>
                         <div class="d-flex align-center justify-space-between w-100">
                           <div>
-                            <h5 class="text-h5 mb-1">Quantity</h5>
-                            <div class="d-flex flex-wrap gap-1" v-if="order.qty != null">
-                              <VChip size="x-small">{{ order.qty }}</VChip>
+                            <h5 class="text-h5 mb-1">
+                              Quantity
+                            </h5>
+                            <div
+                              v-if="order.qty != null"
+                              class="d-flex flex-wrap gap-1"
+                            >
+                              <VChip size="x-small">
+                                {{ order.qty }}
+                              </VChip>
                             </div>
                           </div>
                         </div>
                       </template>
                       <template #text>
                         <div class="d-flex align-center justify-center gap-2">
-                          <VBtn icon="tabler-minus" variant="tonal" density="comfortable" @click="order.qty = Math.max(1, (Number(order.qty) || 1) - 1)" />
+                          <VBtn
+                            icon="tabler-minus"
+                            variant="tonal"
+                            density="comfortable"
+                            @click="order.qty = Math.max(1, (Number(order.qty) || 1) - 1)"
+                          />
                           <div>
                             <AppTextField
                               v-model.number="order.qty"
@@ -325,14 +401,19 @@ function toggleFavorite() {
                               style="inline-size: 92px;"
                             />
                           </div>
-                          <VBtn icon="tabler-plus" variant="tonal" density="comfortable" @click="order.qty = Math.max(1, (Number(order.qty) || 1) + 1)" />
+                          <VBtn
+                            icon="tabler-plus"
+                            variant="tonal"
+                            density="comfortable"
+                            @click="order.qty = Math.max(1, (Number(order.qty) || 1) + 1)"
+                          />
                         </div>
                       </template>
                     </VExpansionPanel>
                   </VExpansionPanels>
                   <div class="d-flex flex-wrap gap-2 mt-2">
-                    <VBtn 
-                      class="mt-2 flex-fill" 
+                    <VBtn
+                      class="mt-2 flex-fill"
                       color="primary"
                       :loading="addingToCart"
                       @click="addToCart"
@@ -354,7 +435,9 @@ function toggleFavorite() {
 
             <template v-if="productDetails?.destination?.length">
               <VDivider class="my-6" />
-              <h5 class="text-h5 mb-3">Destinations</h5>
+              <h5 class="text-h5 mb-3">
+                Destinations
+              </h5>
               <div class="d-flex flex-wrap gap-2">
                 <VChip
                   v-for="(dest, i) in productDetails.destination"
@@ -369,43 +452,74 @@ function toggleFavorite() {
 
             <template v-if="productDetails?.properties?.length">
               <VDivider class="my-6" />
-              <h5 class="text-h5 mb-3">Properties</h5>
+              <h5 class="text-h5 mb-3">
+                Properties
+              </h5>
               <VList class="card-list">
-                <VListItem v-for="(prop, i) in productDetails.properties" :key="`prop-${i}`">
+                <VListItem
+                  v-for="(prop, i) in productDetails.properties"
+                  :key="`prop-${i}`"
+                >
                   <template #prepend>
                     <VIcon icon="tabler-check" />
                   </template>
-                  <VListItemTitle class="text-body-1">{{ prop }}</VListItemTitle>
+                  <VListItemTitle class="text-body-1">
+                    {{ prop }}
+                  </VListItemTitle>
                 </VListItem>
               </VList>
             </template>
 
             <VDivider class="my-6" />
-            <h5 class="text-h5 mb-3">Technical Characteristics</h5>
+            <h5 class="text-h5 mb-3">
+              Technical Characteristics
+            </h5>
             <VList class="card-list">
               <VListItem>
-                <template #prepend><VIcon icon="tabler-scale" /></template>
-                <VListItemTitle class="text-body-1">Density: {{ productDetails?.densite }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-scale" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Density: {{ productDetails?.densite }}
+                </VListItemTitle>
               </VListItem>
               <VListItem>
-                <template #prepend><VIcon icon="tabler-gauge" /></template>
-                <VListItemTitle class="text-body-1">Coverage: {{ productDetails?.rendement }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-gauge" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Coverage: {{ productDetails?.rendement }}
+                </VListItemTitle>
               </VListItem>
               <VListItem>
-                <template #prepend><VIcon icon="tabler-hourglass" /></template>
-                <VListItemTitle class="text-body-1">Drying Time: {{ productDetails?.tempsSachage }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-hourglass" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Drying Time: {{ productDetails?.tempsSachage }}
+                </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.teinte">
-                <template #prepend><VIcon icon="tabler-palette" /></template>
-                <VListItemTitle class="text-body-1">Tint: {{ productDetails.teinte }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-palette" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Tint: {{ productDetails.teinte }}
+                </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.viscosite">
-                <template #prepend><VIcon icon="tabler-wave-sine" /></template>
-                <VListItemTitle class="text-body-1">Viscosity: {{ productDetails.viscosite }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-wave-sine" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Viscosity: {{ productDetails.viscosite }}
+                </VListItemTitle>
               </VListItem>
             </VList>
             <template v-if="productDetails?.aspectdifilmsec?.length">
-              <VLabel class="mb-2 pt-4">Appearance of the paint film</VLabel>
+              <VLabel class="mb-2 pt-4">
+                Appearance of the paint film
+              </VLabel>
               <div class="d-flex flex-wrap gap-2 ps-4">
                 <VChip
                   v-for="(a, i) in productDetails.aspectdifilmsec"
@@ -419,33 +533,65 @@ function toggleFavorite() {
             </template>
 
             <VDivider class="my-6" />
-            <h5 class="text-h5 mb-3">Application</h5>
+            <h5 class="text-h5 mb-3">
+              Application
+            </h5>
             <VList class="card-list pb-2">
               <VListItem>
-                <template #prepend><VIcon icon="tabler-droplet" /></template>
-                <VListItemTitle class="text-body-1">Dilution: {{ productDetails?.dilution }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-droplet" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Dilution: {{ productDetails?.dilution }}
+                </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.nettoyageMateriel">
-                <template #prepend><VIcon icon="tabler-brush" /></template>
-                <VListItemTitle class="text-body-1">Tool Cleaning: {{ productDetails.nettoyageMateriel }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-brush" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Tool Cleaning: {{ productDetails.nettoyageMateriel }}
+                </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.preparationSupport">
-                <template #prepend><VIcon icon="tabler-hammer" /></template>
-                <VListItemTitle class="text-body-1">Surface Prep: {{ productDetails.preparationSupport }}</VListItemTitle>
+                <template #prepend>
+                  <VIcon icon="tabler-hammer" />
+                </template>
+                <VListItemTitle class="text-body-1">
+                  Surface Prep: {{ productDetails.preparationSupport }}
+                </VListItemTitle>
               </VListItem>
             </VList>
 
             <template v-if="productDetails?.supports?.length">
-              <h6 class="text-subtitle-1 mt-2 mb-2">Supported Surfaces</h6>
+              <h6 class="text-subtitle-1 mt-2 mb-2">
+                Supported Surfaces
+              </h6>
               <div class="d-flex flex-wrap gap-2">
-                <VChip v-for="(s, i) in productDetails.supports" :key="`sup-${i}`" label variant="tonal">{{ s }}</VChip>
+                <VChip
+                  v-for="(s, i) in productDetails.supports"
+                  :key="`sup-${i}`"
+                  label
+                  variant="tonal"
+                >
+                  {{ s }}
+                </VChip>
               </div>
             </template>
 
             <template v-if="productDetails?.materielApplication?.length">
-              <h6 class="text-subtitle-1 mt-2 mb-2 pt-2">Application Tools</h6>
+              <h6 class="text-subtitle-1 mt-2 mb-2 pt-2">
+                Application Tools
+              </h6>
               <div class="d-flex flex-wrap gap-2">
-                <VChip v-for="(m, i) in productDetails.materielApplication" :key="`mat-${i}`" label variant="tonal">{{ m }}</VChip>
+                <VChip
+                  v-for="(m, i) in productDetails.materielApplication"
+                  :key="`mat-${i}`"
+                  label
+                  variant="tonal"
+                >
+                  {{ m }}
+                </VChip>
               </div>
             </template>
           </VCardText>
@@ -505,12 +651,12 @@ body .v-layout .v-application__wrap{
     }
   }
 }
-.product-image { 
+.product-image {
   position: relative;
-  height: 400px !important; 
+  height: 400px !important;
 }
 .product-image-placeholder {
-  height: 400px !important; 
+  height: 400px !important;
 }
 
 .product-avatar {

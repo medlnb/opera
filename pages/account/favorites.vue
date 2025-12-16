@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { paginationMeta } from '@api-utils/paginationMeta'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { paginationMeta } from '@api-utils/paginationMeta'
+
+import { useAuthStore } from '@/stores/auth'
 
 definePageMeta({
   authed: true,
@@ -16,7 +18,6 @@ const headers = [
 // Data table options
 const itemsPerPage = ref(10)
 const page = ref(1)
-
 
 // Update data table options
 const updateOptions = (options: any) => {
@@ -38,7 +39,6 @@ onMounted(() => {
   fetchProducts()
 })
 
-import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
 
@@ -54,38 +54,45 @@ const products = computed(() => (productsData.value?.data || []).map(ele => ({
   image: ele.imageUrl ? `${config.public.apiBaseUrl}/api/image?id=${ele.imageUrl}` : undefined,
   price: ele.variances?.[0]?.price ?? 0,
 })))
+
 const totalProduct = computed(() => productsData.value?.pagination.total || 0)
 
 const fetchProducts = async () => {
   try {
     loading.value = true
-    const res = await fetch(`${config.public.apiBaseUrl}/api/favorites?p=${page.value}&perPage=${itemsPerPage.value}`, { 
+
+    const res = await fetch(`${config.public.apiBaseUrl}/api/favorites?p=${page.value}&perPage=${itemsPerPage.value}`, {
       method: 'GET',
-      headers:{
+      headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`
-      }
-     })
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+    })
+
     const data = await res.json()
+
     productsData.value = data
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 const deleteProduct = async (id: string) => {
-  if (deleting.has(id)) return
+  if (deleting.has(id))
+    return
   deleting.add(id)
   try {
     await fetch(`${config.public.apiBaseUrl}/api/favorites/${id}`, {
       method: 'DELETE',
-      headers:{
+      headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`
-      }
+        'Authorization': `Bearer ${authStore.token}`,
+      },
     })
     await fetchProducts()
-  } finally {
+  }
+  finally {
     deleting.delete(id)
   }
 }
@@ -123,16 +130,33 @@ const deleteProduct = async (id: string) => {
       >
         <template #loading>
           <div class="d-flex justify-center py-6">
-            <VProgressCircular indeterminate color="primary" />
+            <VProgressCircular
+              indeterminate
+              color="primary"
+            />
           </div>
         </template>
 
         <template #no-data>
           <div class="text-center py-12">
-            <VIcon icon="tabler-heart-off" size="64" class="text-disabled mb-4" />
-            <p class="text-h6 text-disabled">No favorites yet</p>
-            <p class="text-body-2 text-disabled">Browse products and add some to your favorites</p>
-            <VBtn color="primary" to="/products/interior" class="mt-4">Browse Products</VBtn>
+            <VIcon
+              icon="tabler-heart-off"
+              size="64"
+              class="text-disabled mb-4"
+            />
+            <p class="text-h6 text-disabled">
+              No favorites yet
+            </p>
+            <p class="text-body-2 text-disabled">
+              Browse products and add some to your favorites
+            </p>
+            <VBtn
+              color="primary"
+              to="/products/interior"
+              class="mt-4"
+            >
+              Browse Products
+            </VBtn>
           </div>
         </template>
 
@@ -159,17 +183,32 @@ const deleteProduct = async (id: string) => {
 
         <!-- type -->
         <template #item.type="{ item }">
-          <VChip label density="comfortable" color="primary" variant="tonal">{{ item.type }}</VChip>
+          <VChip
+            label
+            density="comfortable"
+            color="primary"
+            variant="tonal"
+          >
+            {{ item.type }}
+          </VChip>
         </template>
 
         <!-- Actions -->
         <template #item.actions="{ item }">
           <IconBtn :disabled="deleting.has(item.id)">
             <template v-if="deleting.has(item.id)">
-              <VProgressCircular indeterminate size="20" color="error" />
+              <VProgressCircular
+                indeterminate
+                size="20"
+                color="error"
+              />
             </template>
             <template v-else>
-              <VIcon icon="tabler-trash" color="error" @click="deleteProduct(item.id)" />
+              <VIcon
+                icon="tabler-trash"
+                color="error"
+                @click="deleteProduct(item.id)"
+              />
             </template>
           </IconBtn>
         </template>

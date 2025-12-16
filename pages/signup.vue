@@ -1,23 +1,23 @@
-<script setup >
-import logo from "@/assets/images/logo-v2.svg";
-import communes from '@/data/commune.json';
-import { useAuthStore } from "@/stores/auth.js";
-import { useValidators } from '@/utils/validators';
-import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant';
-import registerMultistepBgDark from '@images/pages/register-multistep-bg-dark.png';
-import registerMultistepBgLight from '@images/pages/register-multistep-bg-light.png';
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { useRouter } from 'vue-router';
+<script setup>
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
+import { useRouter } from 'vue-router'
+import logo from '@images/logo-v2.svg'
+import communes from '@/data/commune.json'
+import { useAuthStore } from '@/stores/auth.js'
+import { useValidators } from '@/utils/validators'
+import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
+import registerMultistepBgDark from '@images/pages/register-multistep-bg-dark.png'
+import registerMultistepBgLight from '@images/pages/register-multistep-bg-light.png'
 
 definePageMeta({
   layout: 'blank',
 })
 
-const { $firebaseAuth : auth } = useNuxtApp();
+const { $firebaseAuth: auth } = useNuxtApp()
 const config = useRuntimeConfig()
 const authStore = useAuthStore()
 const router = useRouter()
-const recaptchaVerifier = ref();
+const recaptchaVerifier = ref()
 const confirmationResult = ref()
 const loading = ref(false)
 
@@ -28,24 +28,27 @@ const currentStep = ref(0)
 const formRef = ref()
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
 
-
 const getRecaptchaVerifier = () => {
-  if (recaptchaVerifier.value) return
+  if (recaptchaVerifier.value)
+    return
+
   const verifier = new RecaptchaVerifier(
     auth,
-    "recaptcha-container",
-    { size: "invisible" },
-  );
-  recaptchaVerifier.value = verifier;
-};
+    'recaptcha-container',
+    { size: 'invisible' },
+  )
+
+  recaptchaVerifier.value = verifier
+}
 
 onMounted(() => {
-  getRecaptchaVerifier();
-});
+  getRecaptchaVerifier()
+})
 
 // Reordered: Personal info first, then phone verification
 const items = [
@@ -61,28 +64,32 @@ const items = [
   },
 ]
 
-const code = ref("");
+const code = ref('')
+
 const form = ref({
-  phone: '',          
-  password: '',      
+  phone: '',
+  password: '',
   confirmPassword: '',
   firstName: '',
   lastName: '',
   address: '',
-  state: "1",                 
-  city: "1",                  
+  state: '1',
+  city: '1',
 })
 
 // Build wilaya (state) options from grouped communes
 const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
+
 const stateOptions = computed(() =>
-  wilayaGroups.map(g => ({ id: String(g[0].wilaya_id), label: g[0].name }))
+  wilayaGroups.map(g => ({ id: String(g[0].wilaya_id), label: g[0].name })),
 )
 
 // Cities (communes) for selected wilaya
 const cityOptions = computed(() => {
-  if (!form.value.state) return []
+  if (!form.value.state)
+    return []
   const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(form.value.state))
+
   return group ? group.map(c => ({ id: String(c.id), label: c.name })) : []
 })
 
@@ -98,46 +105,53 @@ function startCooldown() {
   resendCooldown.value = 60
   cooldownInterval = setInterval(() => {
     resendCooldown.value--
-    if (resendCooldown.value <= 0) {
+    if (resendCooldown.value <= 0)
       clearInterval(cooldownInterval)
-    }
   }, 1000)
 }
 
 async function sendCode() {
-  if (!form.value.phone || form.value.phone.length !== 9) 
+  if (!form.value.phone || form.value.phone.length !== 9)
     return showSnackbar('Please enter a valid 9-digit phone number', 'error')
-  
+
   try {
-    loading.value = true;
-    const phoneNumber = "+213"+form.value.phone;
-    const result  = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier.value);
-    confirmationResult.value = result;
+    loading.value = true
+
+    const phoneNumber = `+213${form.value.phone}`
+    const result = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier.value)
+
+    confirmationResult.value = result
     startCooldown()
-    showSnackbar('Verification code sent to 0' + form.value.phone, 'info')
-  } catch (err) {
+    showSnackbar(`Verification code sent to 0${form.value.phone}`, 'info')
+  }
+  catch (err) {
     showSnackbar(err.message || 'Failed to send SMS', 'error')
-  } finally {
-    loading.value = false;
+  }
+  finally {
+    loading.value = false
   }
 }
 
 async function verifyCode() {
-  if (!code.value || code.value.length !== 6) {
+  if (!code.value || code.value.length !== 6)
     return showSnackbar('Please enter the 6-digit verification code', 'error')
-  }
+
   try {
-    loading.value = true;
-    const userCredential = await confirmationResult.value.confirm(code.value);
-    if(userCredential.user) {
+    loading.value = true
+
+    const userCredential = await confirmationResult.value.confirm(code.value)
+    if (userCredential.user) {
       showSnackbar('Phone verified! Creating your account...', 'success')
+
       // Phone verified, now submit registration
       await onSubmit()
     }
-  } catch (err) {
+  }
+  catch (err) {
     showSnackbar('Invalid code or verification failed', 'error')
-  } finally {
-    loading.value = false;
+  }
+  finally {
+    loading.value = false
   }
 }
 
@@ -146,7 +160,11 @@ function goToPhoneStep() {
   if (formRef.value) {
     const result = formRef.value.validate?.()
     if (result && typeof result.then === 'function') {
-      result.then(r => { if (r.valid) currentStep.value = 1; else showSnackbar('Please fix the highlighted errors', 'error') })
+      result.then(r => {
+        if (r.valid)
+          currentStep.value = 1; else showSnackbar('Please fix the highlighted errors', 'error')
+      })
+
       return
     }
   }
@@ -161,35 +179,43 @@ const onSubmit = async () => {
       const r = await res
       if (!r.valid) {
         showSnackbar('Please fix the highlighted errors', 'error')
+
         return
       }
     }
   }
   try {
-    loading.value = true;
-    const phone = "+213"+form.value.phone;
-    const res = await fetch(`${config.public.apiBaseUrl}/api/auth/register`,{
-      method: "POST",
+    loading.value = true
+
+    const phone = `+213${form.value.phone}`
+
+    const res = await fetch(`${config.public.apiBaseUrl}/api/auth/register`, {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({...form.value, phone}),
+      body: JSON.stringify({ ...form.value, phone }),
     })
-    if(!res.ok) throw new Error("Failed to register");
+
+    if (!res.ok)
+      throw new Error('Failed to register')
     const data = await res.json()
     if (data?.token) {
       authStore.setToken(data.token)
       authStore.patchUser(data.user)
       showSnackbar('Registration successful', 'success')
-      router.push("/")
-    } else {
-      throw new Error("Registration failed");
+      router.push('/')
     }
-  } catch(err) {
-    console.log(err);
+    else {
+      throw new Error('Registration failed')
+    }
+  }
+  catch (err) {
+    console.log(err)
     showSnackbar('Registration failed', 'error')
-  } finally {
-    loading.value = false;
+  }
+  finally {
+    loading.value = false
   }
 }
 
@@ -236,7 +262,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
           :direction="$vuetify.display.smAndUp ? 'horizontal' : 'vertical'"
           icon-size="24"
           class="stepper-icon-step-bg mb-8"
-          isActiveStepValid
+          is-active-step-valid
         />
 
         <VWindow
@@ -255,7 +281,10 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
               </p>
 
               <VRow>
-                <VCol cols="12" md="6">
+                <VCol
+                  cols="12"
+                  md="6"
+                >
                   <AppTextField
                     v-model="form.firstName"
                     label="First Name"
@@ -264,7 +293,10 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                   />
                 </VCol>
 
-                <VCol cols="12" md="6">
+                <VCol
+                  cols="12"
+                  md="6"
+                >
                   <AppTextField
                     v-model="form.lastName"
                     label="Last Name"
@@ -282,8 +314,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     placeholder="············"
                     :type="isPasswordVisible ? 'text' : 'password'"
                     :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                    @click:append-inner="isPasswordVisible = !isPasswordVisible"
                     :rules="[requiredValidator, passwordValidator]"
+                    @click:append-inner="isPasswordVisible = !isPasswordVisible"
                   />
                 </VCol>
 
@@ -297,8 +329,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     placeholder="············"
                     :type="isConfirmPasswordVisible ? 'text' : 'password'"
                     :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                    @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
                     :rules="[val => confirmPasswordValidator(val, form.password)]"
+                    @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
                   />
                 </VCol>
 
@@ -364,21 +396,36 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     @input="form.phone = form.phone.replace(/\D/g, '')"
                   >
                     <template #prepend-inner>
-                      <p class="mb-0" style="margin-top: 1px;">0</p>
+                      <p
+                        class="mb-0"
+                        style="margin-top: 1px;"
+                      >
+                        0
+                      </p>
                     </template>
                   </AppTextField>
                 </VCol>
 
                 <!-- OTP Input Section -->
-                <VCol v-if="confirmationResult" cols="12">
-                  <VCard variant="outlined" class="pa-4">
+                <VCol
+                  v-if="confirmationResult"
+                  cols="12"
+                >
+                  <VCard
+                    variant="outlined"
+                    class="pa-4"
+                  >
                     <div class="text-center mb-4">
-                      <VIcon icon="tabler-device-mobile-message" size="48" color="primary" />
+                      <VIcon
+                        icon="tabler-device-mobile-message"
+                        size="48"
+                        color="primary"
+                      />
                       <p class="text-body-1 mt-2 mb-0">
                         We sent a code to <strong>0{{ form.phone }}</strong>
                       </p>
                     </div>
-                    
+
                     <div class="d-flex justify-center mb-4">
                       <VOtpInput
                         v-model="code"
@@ -417,7 +464,10 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
             color="secondary"
             @click="currentStep = 0; confirmationResult = null; code = ''"
           >
-            <VIcon icon="tabler-arrow-left" start />
+            <VIcon
+              icon="tabler-arrow-left"
+              start
+            />
             Back
           </VBtn>
           <div v-else />
@@ -425,33 +475,42 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
           <!-- Step 1: Next button -->
           <VBtn
             v-if="currentStep === 0"
-            @click="goToPhoneStep"
             :loading="loading"
+            @click="goToPhoneStep"
           >
             Next
-            <VIcon icon="tabler-arrow-right" end />
+            <VIcon
+              icon="tabler-arrow-right"
+              end
+            />
           </VBtn>
 
           <!-- Step 2: Send Code or Verify -->
           <VBtn
             v-else-if="!confirmationResult"
-            @click="sendCode"
             :disabled="!recaptchaVerifier || !form.phone || form.phone.length !== 9"
             :loading="loading"
             color="primary"
+            @click="sendCode"
           >
-            <VIcon icon="tabler-send" start />
+            <VIcon
+              icon="tabler-send"
+              start
+            />
             Send Code
           </VBtn>
 
           <VBtn
             v-else
-            @click="verifyCode"
             :disabled="!code || code.length !== 6"
             :loading="loading"
             color="success"
+            @click="verifyCode"
           >
-            <VIcon icon="tabler-check" start />
+            <VIcon
+              icon="tabler-check"
+              start
+            />
             Verify & Create Account
           </VBtn>
         </div>

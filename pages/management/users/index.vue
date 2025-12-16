@@ -1,8 +1,8 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-import { paginationMeta } from '@api-utils/paginationMeta'
 import { debounce } from 'lodash'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { useAuthStore } from '@/stores/auth'
+import { paginationMeta } from '@api-utils/paginationMeta'
 
 definePageMeta({
   authed: true,
@@ -25,6 +25,7 @@ const userToAction = ref(null)
 const actionLoading = ref(false)
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
@@ -61,128 +62,143 @@ const fetchUsers = async () => {
       perPage: itemsPerPage.value,
     })
 
-    if (search.value.trim()) {
+    if (search.value.trim())
       params.append('search', search.value.trim())
-    }
-    if (bannedFilter.value !== 'all') {
+
+    if (bannedFilter.value !== 'all')
       params.append('banned', bannedFilter.value)
-    }
 
     const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users?${params}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
+
     const data = await res.json()
+
     users.value = data.data || []
     totalUsers.value = data.pagination?.total || 0
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to fetch users:', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 // Format date
-const formatDate = (date) => {
-  if (!date) return '-'
+const formatDate = date => {
+  if (!date)
+    return '-'
   const d = new Date(date)
-  return d.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
+
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
     day: 'numeric',
   })
 }
 
 // View user details
-const viewUser = (user) => {
+const viewUser = user => {
   router.push(`/management/users/${user._id}`)
 }
 
 // Open ban dialog
-const openBanDialog = (user) => {
+const openBanDialog = user => {
   userToAction.value = user
   banDialog.value = true
 }
 
 // Confirm ban/unban
 const confirmBan = async () => {
-  if (!userToAction.value) return
-  
+  if (!userToAction.value)
+    return
+
   actionLoading.value = true
   try {
-    const endpoint = userToAction.value.banned 
+    const endpoint = userToAction.value.banned
       ? `${config.public.apiBaseUrl}/api/admin/users/${userToAction.value._id}/unban`
       : `${config.public.apiBaseUrl}/api/admin/users/${userToAction.value._id}/ban`
-    
+
     const res = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
-    
+
     if (res.ok) {
       showSnackbar(
         userToAction.value.banned ? 'User unbanned successfully' : 'User banned successfully',
-        'success'
+        'success',
       )
       banDialog.value = false
       userToAction.value = null
       await fetchUsers()
-    } else {
+    }
+    else {
       const data = await res.json()
+
       showSnackbar(data.message || 'Action failed', 'error')
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to ban/unban user:', error)
     showSnackbar('Action failed', 'error')
-  } finally {
+  }
+  finally {
     actionLoading.value = false
   }
 }
 
 // Open delete dialog
-const openDeleteDialog = (user) => {
+const openDeleteDialog = user => {
   userToAction.value = user
   deleteDialog.value = true
 }
 
 // Confirm delete
 const confirmDelete = async () => {
-  if (!userToAction.value) return
-  
+  if (!userToAction.value)
+    return
+
   actionLoading.value = true
   try {
     const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users/${userToAction.value._id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
-    
+
     if (res.ok || res.status === 204) {
       showSnackbar('User deleted successfully', 'success')
       deleteDialog.value = false
       userToAction.value = null
       await fetchUsers()
-    } else {
+    }
+    else {
       const data = await res.json()
+
       showSnackbar(data.message || 'Delete failed', 'error')
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to delete user:', error)
     showSnackbar('Delete failed', 'error')
-  } finally {
+  }
+  finally {
     actionLoading.value = false
   }
 }
 
 // Update data table options
-const updateOptions = (options) => {
+const updateOptions = options => {
   page.value = options.page
 }
 
@@ -219,7 +235,10 @@ onMounted(() => {
 
 <template>
   <div>
-    <VCard title="Users Management" class="mb-6">
+    <VCard
+      title="Users Management"
+      class="mb-6"
+    >
       <VDivider class="my-4" />
 
       <div class="d-flex flex-wrap gap-4 mx-5">
@@ -269,13 +288,19 @@ onMounted(() => {
       >
         <template #loading>
           <div class="d-flex justify-center py-6">
-            <VProgressCircular indeterminate color="primary" />
+            <VProgressCircular
+              indeterminate
+              color="primary"
+            />
           </div>
         </template>
 
         <template #item.user="{ item }">
           <div class="d-flex align-center gap-3 py-2">
-            <VAvatar color="primary" variant="tonal">
+            <VAvatar
+              color="primary"
+              variant="tonal"
+            >
               <span>{{ (item.firstName?.[0] || '') + (item.lastName?.[0] || '') }}</span>
             </VAvatar>
             <div>
@@ -345,8 +370,14 @@ onMounted(() => {
 
         <template #no-data>
           <div class="text-center py-12">
-            <VIcon icon="tabler-users" size="64" class="text-disabled mb-4" />
-            <p class="text-h6 text-disabled">No users found</p>
+            <VIcon
+              icon="tabler-users"
+              size="64"
+              class="text-disabled mb-4"
+            />
+            <p class="text-h6 text-disabled">
+              No users found
+            </p>
             <p class="text-body-2 text-disabled">
               {{ search ? 'Try adjusting your search' : 'No users registered yet' }}
             </p>
@@ -372,7 +403,10 @@ onMounted(() => {
     </VCard>
 
     <!-- Ban/Unban Dialog -->
-    <VDialog v-model="banDialog" max-width="500">
+    <VDialog
+      v-model="banDialog"
+      max-width="500"
+    >
       <VCard>
         <VCardTitle class="text-h5">
           {{ userToAction?.banned ? 'Unban User?' : 'Ban User?' }}
@@ -381,16 +415,25 @@ onMounted(() => {
           <div class="mb-2">
             Are you sure you want to {{ userToAction?.banned ? 'unban' : 'ban' }} this user?
           </div>
-          <div v-if="userToAction" class="font-weight-medium">
+          <div
+            v-if="userToAction"
+            class="font-weight-medium"
+          >
             {{ userToAction.firstName }} {{ userToAction.lastName }}
           </div>
-          <div v-if="!userToAction?.banned" class="text-body-2 text-warning mt-3">
+          <div
+            v-if="!userToAction?.banned"
+            class="text-body-2 text-warning mt-3"
+          >
             The user will not be able to log in while banned.
           </div>
         </VCardText>
         <VCardActions>
           <VSpacer />
-          <VBtn variant="text" @click="banDialog = false">
+          <VBtn
+            variant="text"
+            @click="banDialog = false"
+          >
             Cancel
           </VBtn>
           <VBtn
@@ -406,7 +449,10 @@ onMounted(() => {
     </VDialog>
 
     <!-- Delete Dialog -->
-    <VDialog v-model="deleteDialog" max-width="500">
+    <VDialog
+      v-model="deleteDialog"
+      max-width="500"
+    >
       <VCard>
         <VCardTitle class="text-h5">
           Delete User Account?
@@ -415,7 +461,10 @@ onMounted(() => {
           <div class="mb-2">
             Are you sure you want to permanently delete this user's account?
           </div>
-          <div v-if="userToAction" class="font-weight-medium">
+          <div
+            v-if="userToAction"
+            class="font-weight-medium"
+          >
             {{ userToAction.firstName }} {{ userToAction.lastName }}
           </div>
           <div class="text-body-2 text-error mt-3">
@@ -424,7 +473,10 @@ onMounted(() => {
         </VCardText>
         <VCardActions>
           <VSpacer />
-          <VBtn variant="text" @click="deleteDialog = false">
+          <VBtn
+            variant="text"
+            @click="deleteDialog = false"
+          >
             Cancel
           </VBtn>
           <VBtn
@@ -439,7 +491,11 @@ onMounted(() => {
       </VCard>
     </VDialog>
 
-    <VSnackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    <VSnackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      timeout="3000"
+    >
       {{ snackbar.message }}
     </VSnackbar>
   </div>

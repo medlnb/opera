@@ -11,11 +11,14 @@ const fetchArticles = async () => {
   try {
     const res = await fetch(`${config.public.apiBaseUrl}/api/articles?for=inspiration&p=${page.value}&perPage=${perPage.value}`)
     const data = await res.json()
+
     articles.value = data.data || []
     totalArticles.value = data.pagination?.total || 0
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to fetch inspirations:', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -33,31 +36,59 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="mb-4" style="position: relative;">
-			<VImg 
-				src="https://jazeerapaints.com/media/blockbuilder_blocktype/s/h/shutterstock_1868800168-fotor-20240625141552_2.png"
-				class="rounded w-100 hero-img"
-				style="min-height: 150px;"
-				cover
-			/>
-			<div style="inset: 0;" class="d-flex align-center justify-center position-absolute">
-				<div class="text-center px-4">
-					<p class="mb-1 hero-title">Inspiration Gallery</p>
-					<p class="mb-0 hero-subtitle">Discover helpful tips and tricks for your painting projects</p>
-				</div>
-			</div>
-		</div>
+    <div
+      class="mb-4"
+      style="position: relative;"
+    >
+      <VImg
+        src="https://jazeerapaints.com/media/blockbuilder_blocktype/s/h/shutterstock_1868800168-fotor-20240625141552_2.png"
+        class="rounded w-100 hero-img"
+        style="min-height: 150px;"
+        cover
+      />
+      <div
+        style="inset: 0;"
+        class="d-flex align-center justify-center position-absolute"
+      >
+        <div class="text-center px-4">
+          <p class="mb-1 hero-title">
+            Inspiration Gallery
+          </p>
+          <p class="mb-0 hero-subtitle">
+            Discover helpful tips and tricks for your painting projects
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="d-flex justify-center py-12">
-      <VProgressCircular indeterminate color="primary" size="48" />
+    <div
+      v-if="loading"
+      class="d-flex justify-center py-12"
+    >
+      <VProgressCircular
+        indeterminate
+        color="primary"
+        size="48"
+      />
     </div>
 
     <!-- Empty State -->
-    <VCard v-else-if="articles.length === 0" class="text-center py-12">
-      <VIcon icon="tabler-sparkles" size="64" class="text-disabled mb-4" />
-      <h3 class="text-h6 text-disabled mb-2">No inspirations available yet</h3>
-      <p class="text-body-2 text-disabled">Check back soon for inspiring ideas!</p>
+    <VCard
+      v-else-if="articles.length === 0"
+      class="text-center py-12"
+    >
+      <VIcon
+        icon="tabler-sparkles"
+        size="64"
+        class="text-disabled mb-4"
+      />
+      <h3 class="text-h6 text-disabled mb-2">
+        No inspirations available yet
+      </h3>
+      <p class="text-body-2 text-disabled">
+        Check back soon for inspiring ideas!
+      </p>
     </VCard>
 
     <!-- Articles Grid -->
@@ -83,7 +114,10 @@ onMounted(() => {
             >
               <template #placeholder>
                 <div class="d-flex align-center justify-center fill-height">
-                  <VProgressCircular indeterminate color="primary" />
+                  <VProgressCircular
+                    indeterminate
+                    color="primary"
+                  />
                 </div>
               </template>
             </VImg>
@@ -92,7 +126,11 @@ onMounted(() => {
                 {{ article.title }}
               </h3>
               <div class="d-flex align-center text-caption text-disabled">
-                <VIcon icon="tabler-calendar" size="14" class="me-1" />
+                <VIcon
+                  icon="tabler-calendar"
+                  size="14"
+                  class="me-1"
+                />
                 {{ new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}
               </div>
             </VCardText>
@@ -101,7 +139,10 @@ onMounted(() => {
       </VRow>
 
       <!-- Pagination -->
-      <div v-if="totalPages > 1" class="d-flex justify-center mt-8">
+      <div
+        v-if="totalPages > 1"
+        class="d-flex justify-center mt-8"
+      >
         <VPagination
           v-model="page"
           :length="totalPages"

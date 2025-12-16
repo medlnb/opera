@@ -1,10 +1,10 @@
-import { useAuthStore } from "@/stores/auth";
-import { defu } from 'defu';
-import type { UseFetchOptions } from 'nuxt/app';
+import { defu } from 'defu'
+import type { UseFetchOptions } from 'nuxt/app'
+import { useAuthStore } from '@/stores/auth'
 
 export const useApi: typeof useFetch = <T>(url: MaybeRefOrGetter<string>, options: UseFetchOptions<T> = {}) => {
   const config = useRuntimeConfig()
-  const authStore = useAuthStore();
+  const authStore = useAuthStore()
   const accessToken = authStore.token
 
   const defaults: UseFetchOptions<T> = {

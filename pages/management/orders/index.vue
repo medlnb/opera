@@ -1,7 +1,7 @@
 <script setup>
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -52,33 +52,38 @@ const fetchOrders = async () => {
       perPage: itemsPerPage.value,
     })
 
-    if (statusFilter.value !== 'all') {
+    if (statusFilter.value !== 'all')
       params.append('status', statusFilter.value)
-    }
 
     const res = await fetch(`${config.public.apiBaseUrl}/api/admin/orders?${params}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
+
     const data = await res.json()
+
     orders.value = data.data || []
     totalOrders.value = data.pagination?.total || 0
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to fetch orders:', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 // Format date
-const formatDate = (date) => {
-  if (!date) return '-'
+const formatDate = date => {
+  if (!date)
+    return '-'
   const d = new Date(date)
-  return d.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
+
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
@@ -86,7 +91,7 @@ const formatDate = (date) => {
 }
 
 // Get status color
-const getStatusColor = (status) => {
+const getStatusColor = status => {
   const colors = {
     pending: 'warning',
     confirmed: 'info',
@@ -94,16 +99,17 @@ const getStatusColor = (status) => {
     delivered: 'success',
     cancelled: 'error',
   }
+
   return colors[status] || 'default'
 }
 
 // View order details
-const viewOrder = (order) => {
+const viewOrder = order => {
   router.push(`/management/orders/${order._id}`)
 }
 
 // Update data table options
-const updateOptions = (options) => {
+const updateOptions = options => {
   page.value = options.page
 }
 
@@ -130,7 +136,10 @@ onMounted(() => {
 
 <template>
   <div>
-    <VCard title="Orders Management" class="mb-6">
+    <VCard
+      title="Orders Management"
+      class="mb-6"
+    >
       <VDivider class="my-4" />
 
       <div class="d-flex flex-wrap gap-4 mx-5">
@@ -168,7 +177,10 @@ onMounted(() => {
       >
         <template #loading>
           <div class="d-flex justify-center py-6">
-            <VProgressCircular indeterminate color="primary" />
+            <VProgressCircular
+              indeterminate
+              color="primary"
+            />
           </div>
         </template>
 
@@ -187,11 +199,18 @@ onMounted(() => {
               {{ item.user.phone }}
             </div>
           </div>
-          <span v-else class="text-disabled">-</span>
+          <span
+            v-else
+            class="text-disabled"
+          >-</span>
         </template>
 
         <template #item.items="{ item }">
-          <VChip label size="small" color="secondary">
+          <VChip
+            label
+            size="small"
+            color="secondary"
+          >
             {{ item.items?.length || 0 }} items
           </VChip>
         </template>
@@ -228,8 +247,14 @@ onMounted(() => {
 
         <template #no-data>
           <div class="text-center py-12">
-            <VIcon icon="tabler-package" size="64" class="text-disabled mb-4" />
-            <p class="text-h6 text-disabled">No orders found</p>
+            <VIcon
+              icon="tabler-package"
+              size="64"
+              class="text-disabled mb-4"
+            />
+            <p class="text-h6 text-disabled">
+              No orders found
+            </p>
             <p class="text-body-2 text-disabled">
               {{ statusFilter === 'all' ? 'No orders have been placed yet' : `No ${statusFilter} orders found` }}
             </p>

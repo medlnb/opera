@@ -1,9 +1,9 @@
 <script setup>
-import { useAuthStore } from "@/stores/auth.js";
+import { useAuthStore } from '@/stores/auth.js'
 
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 
-const items = [    
+const items = [
   { title: 'My Orders', to: { name: '/account/orders' }, icon: { icon: 'tabler-shopping-cart' } },
   { title: 'My Cart', to: { name: '/account/cart' }, icon: { icon: 'tabler-shopping-bag' } },
   { title: 'My Favorites', to: { name: '/account/favorites' }, icon: { icon: 'tabler-heart' } },
@@ -12,6 +12,7 @@ const items = [
 
 const logout = () => {
   authStore.logout()
+
   // Refresh current page instead of redirecting to login
   window.location.reload()
 }
@@ -45,8 +46,8 @@ const logout = () => {
       color="primary"
       variant="tonal"
     >
-      <VImg 
-        :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`" 
+      <VImg
+        :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`"
         cover
       />
       <!-- SECTION Menu -->
@@ -81,13 +82,17 @@ const logout = () => {
             <VListItemTitle class="font-weight-semibold">
               {{ `${authStore.user?.firstName || ''} ${authStore.user?.lastName || ''}` }}
             </VListItemTitle>
-            <VListItemSubtitle>{{ authStore.user?.phone ? authStore.user.phone.slice(0, 4) + ' ' + authStore.user.phone.slice(4, 20) : '' }}</VListItemSubtitle>
+            <VListItemSubtitle>{{ authStore.user?.phone ? `${authStore.user.phone.slice(0, 4)} ${authStore.user.phone.slice(4, 20)}` : '' }}</VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />
 
-
-          <VListItem v-for="item in items" :key="item.to.name" link :to="item.to.name">
+          <VListItem
+            v-for="item in items"
+            :key="item.to.name"
+            link
+            :to="item.to.name"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"

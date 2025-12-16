@@ -10,11 +10,14 @@ const fetchArticle = async () => {
     const res = await fetch(`${config.public.apiBaseUrl}/api/articles/${route.params.id}`)
     if (res.ok) {
       const data = await res.json()
+
       article.value = data.data
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to fetch article:', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -27,17 +30,41 @@ onMounted(() => {
 <template>
   <div>
     <!-- Loading State -->
-    <div v-if="loading" class="d-flex justify-center py-12">
-      <VProgressCircular indeterminate color="primary" size="48" />
+    <div
+      v-if="loading"
+      class="d-flex justify-center py-12"
+    >
+      <VProgressCircular
+        indeterminate
+        color="primary"
+        size="48"
+      />
     </div>
 
     <!-- Not Found State -->
-    <VCard v-else-if="!article" class="text-center py-12">
-      <VIcon icon="tabler-file-off" size="64" class="text-disabled mb-4" />
-      <h3 class="text-h6 text-disabled mb-2">Article not found</h3>
-      <p class="text-body-2 text-disabled mb-4">The article you're looking for doesn't exist.</p>
-      <VBtn color="primary" to="/tips">
-        <VIcon icon="tabler-arrow-left" class="me-2" />
+    <VCard
+      v-else-if="!article"
+      class="text-center py-12"
+    >
+      <VIcon
+        icon="tabler-file-off"
+        size="64"
+        class="text-disabled mb-4"
+      />
+      <h3 class="text-h6 text-disabled mb-2">
+        Article not found
+      </h3>
+      <p class="text-body-2 text-disabled mb-4">
+        The article you're looking for doesn't exist.
+      </p>
+      <VBtn
+        color="primary"
+        to="/tips"
+      >
+        <VIcon
+          icon="tabler-arrow-left"
+          class="me-2"
+        />
         Back to Tips
       </VBtn>
     </VCard>
@@ -51,7 +78,10 @@ onMounted(() => {
         to="/tips"
         class="mb-4"
       >
-        <VIcon icon="tabler-arrow-left" class="me-2" />
+        <VIcon
+          icon="tabler-arrow-left"
+          class="me-2"
+        />
         Back to Tips
       </VBtn>
 
@@ -65,20 +95,35 @@ onMounted(() => {
       >
         <template #placeholder>
           <div class="d-flex align-center justify-center fill-height">
-            <VProgressCircular indeterminate color="primary" />
+            <VProgressCircular
+              indeterminate
+              color="primary"
+            />
           </div>
         </template>
       </VImg>
 
       <!-- Article Header -->
       <div class="mb-6">
-        <h1 class="text-h3 font-weight-bold mb-3">{{ article.title }}</h1>
+        <h1 class="text-h3 font-weight-bold mb-3">
+          {{ article.title }}
+        </h1>
         <div class="d-flex align-center gap-4 text-body-2 text-medium-emphasis">
           <div class="d-flex align-center">
-            <VIcon icon="tabler-calendar" size="18" class="me-1" />
+            <VIcon
+              icon="tabler-calendar"
+              size="18"
+              class="me-1"
+            />
             {{ new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
           </div>
-          <VChip label color="primary" size="small">Tip</VChip>
+          <VChip
+            label
+            color="primary"
+            size="small"
+          >
+            Tip
+          </VChip>
         </div>
       </div>
 
@@ -86,14 +131,24 @@ onMounted(() => {
 
       <!-- Article Blocks -->
       <div class="article-content">
-        <template v-for="block in article.blocks" :key="block.id">
+        <template
+          v-for="block in article.blocks"
+          :key="block.id"
+        >
           <!-- Title Block -->
-          <h2 v-if="block.type === 'title' && block.content" class="text-h4 font-weight-medium mb-4 mt-6">
+          <h2
+            v-if="block.type === 'title' && block.content"
+            class="text-h4 font-weight-medium mb-4 mt-6"
+          >
             {{ block.content }}
           </h2>
 
           <!-- Text Block -->
-          <p v-else-if="block.type === 'text' && block.content" class="text-body-1 mb-4" style="white-space: pre-wrap; line-height: 1.8;">
+          <p
+            v-else-if="block.type === 'text' && block.content"
+            class="text-body-1 mb-4"
+            style="white-space: pre-wrap; line-height: 1.8;"
+          >
             {{ block.content }}
           </p>
 
@@ -105,8 +160,14 @@ onMounted(() => {
             max-height="500"
           >
             <template #placeholder>
-              <div class="d-flex align-center justify-center fill-height" style="min-height: 200px;">
-                <VProgressCircular indeterminate color="primary" />
+              <div
+                class="d-flex align-center justify-center fill-height"
+                style="min-height: 200px;"
+              >
+                <VProgressCircular
+                  indeterminate
+                  color="primary"
+                />
               </div>
             </template>
           </VImg>
@@ -116,8 +177,15 @@ onMounted(() => {
       <!-- Bottom Navigation -->
       <VDivider class="my-8" />
       <div class="d-flex justify-center">
-        <VBtn color="primary" variant="tonal" to="/tips">
-          <VIcon icon="tabler-arrow-left" class="me-2" />
+        <VBtn
+          color="primary"
+          variant="tonal"
+          to="/tips"
+        >
+          <VIcon
+            icon="tabler-arrow-left"
+            class="me-2"
+          />
           Back to All Tips
         </VBtn>
       </div>

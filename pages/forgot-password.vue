@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import logo from "@/assets/images/logo-v2.svg"
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
+import logo from '@images/logo-v2.svg'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
 
 definePageMeta({
   layout: 'blank',
@@ -26,6 +26,7 @@ const phoneVerified = ref(false)
 const loading = ref(false)
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message: string, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
@@ -34,7 +35,8 @@ const showSnackbar = (message: string, color = 'success') => {
 const currentStep = ref(0)
 
 const getRecaptchaVerifier = () => {
-  if (recaptchaVerifier.value) return
+  if (recaptchaVerifier.value)
+    return
   recaptchaVerifier.value = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' })
 }
 
@@ -43,68 +45,80 @@ onMounted(() => {
 })
 
 async function sendCode() {
-  if (!phone.value || phone.value.length !== 9) {
+  if (!phone.value || phone.value.length !== 9)
     return showSnackbar('Please enter a valid 9-digit phone number', 'error')
-  }
+
   try {
     loading.value = true
-    const phoneNumber = '+213' + phone.value
+
+    const phoneNumber = `+213${phone.value}`
     const result = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier.value!)
+
     confirmationResult.value = result
     currentStep.value = 1
     showSnackbar('Verification code sent', 'success')
-  } catch (err: any) {
+  }
+  catch (err: any) {
     showSnackbar(err.message || 'Failed to send SMS', 'error')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 async function verifyCode() {
-  if (!code.value || code.value.length !== 6) {
+  if (!code.value || code.value.length !== 6)
     return showSnackbar('Please enter the 6-digit code', 'error')
-  }
+
   try {
     loading.value = true
+
     const userCredential = await confirmationResult.value.confirm(code.value)
     if (userCredential.user) {
       phoneVerified.value = true
       currentStep.value = 2
       showSnackbar('Phone verified! Now set your new password', 'success')
     }
-  } catch (err: any) {
+  }
+  catch (err: any) {
     showSnackbar('Invalid code or verification failed', 'error')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 async function resetPassword() {
-  if (!newPassword.value || newPassword.value.length < 6) {
+  if (!newPassword.value || newPassword.value.length < 6)
     return showSnackbar('Password must be at least 6 characters', 'error')
-  }
-  if (newPassword.value !== confirmPassword.value) {
+
+  if (newPassword.value !== confirmPassword.value)
     return showSnackbar('Passwords do not match', 'error')
-  }
+
   try {
     loading.value = true
-    const fullPhone = '+213' + phone.value
+
+    const fullPhone = `+213${phone.value}`
+
     const res = await fetch(`${config.public.apiBaseUrl}/api/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: fullPhone, newPassword: newPassword.value }),
     })
+
     const data = await res.json()
-    if (!res.ok) throw new Error(data.message || 'Failed to reset password')
+    if (!res.ok)
+      throw new Error(data.message || 'Failed to reset password')
     showSnackbar('Password reset successfully! Redirecting to login...', 'success')
     setTimeout(() => router.push('/login'), 2000)
-  } catch (err: any) {
+  }
+  catch (err: any) {
     showSnackbar(err.message || 'Failed to reset password', 'error')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
-
 
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 </script>
@@ -158,7 +172,10 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
           <VForm @submit.prevent="currentStep === 0 ? sendCode() : currentStep === 1 ? verifyCode() : resetPassword()">
             <VRow>
               <!-- Step 0: Phone Number -->
-              <VCol v-if="currentStep === 0" cols="12">
+              <VCol
+                v-if="currentStep === 0"
+                cols="12"
+              >
                 <AppTextField
                   v-model="phone"
                   autofocus
@@ -167,13 +184,21 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
                   maxlength="9"
                 >
                   <template #prepend-inner>
-                    <p class="mb-0" style="margin-top: 1px;">0</p>
+                    <p
+                      class="mb-0"
+                      style="margin-top: 1px;"
+                    >
+                      0
+                    </p>
                   </template>
                 </AppTextField>
               </VCol>
 
               <!-- Step 1: OTP Code -->
-              <VCol v-if="currentStep === 1" cols="12">
+              <VCol
+                v-if="currentStep === 1"
+                cols="12"
+              >
                 <div class="d-flex justify-center">
                   <VOtpInput
                     v-model="code"

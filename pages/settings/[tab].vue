@@ -55,18 +55,19 @@ definePageMeta({
         <VWindowItem value="security">
           <AccountSettingsSecurity />
         </VWindowItem>
-        <!-- 
-        <VWindowItem value="billing-plans">
+        <!--
+          <VWindowItem value="billing-plans">
           <AccountSettingsBillingAndPlans />
-        </VWindowItem>
+          </VWindowItem>
 
-        <VWindowItem value="notification">
+          <VWindowItem value="notification">
           <AccountSettingsNotification />
-        </VWindowItem>
+          </VWindowItem>
 
-        <VWindowItem value="connection">
+          <VWindowItem value="connection">
           <AccountSettingsConnections />
-        </VWindowItem> -->
+          </VWindowItem>
+        -->
       </VWindow>
     </ClientOnly>
   </div>

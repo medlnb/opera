@@ -13,6 +13,7 @@ const formRef = ref()
 const { requiredValidator, passwordValidator, confirmPasswordValidator } = useValidators()
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message: string, color: string = 'success') => {
   snackbar.value = { show: true, message, color }
 }
@@ -25,6 +26,7 @@ const onSave = async () => {
       const r = await result
       if (!r.valid) {
         showSnackbar('Please fix the highlighted errors', 'error')
+
         return
       }
     }
@@ -40,17 +42,20 @@ const onSave = async () => {
       },
     })
 
-    if (error.value) 
+    if (error.value)
       return showSnackbar(error.value?.data?.message || 'Failed to change password', 'error')
 
     showSnackbar('Password updated successfully', 'success')
+
     // reset fields after success
     currentPassword.value = ''
     newPassword.value = ''
     confirmPassword.value = ''
-  } catch (err) {
+  }
+  catch (err) {
     showSnackbar('Failed to change password', 'error')
-  } finally {
+  }
+  finally {
     isSaving.value = false
   }
 }
@@ -60,7 +65,6 @@ const passwordRequirements = [
   'At least one lowercase character',
   'At least one number, symbol, or whitespace character',
 ]
-
 </script>
 
 <template>
@@ -81,8 +85,8 @@ const passwordRequirements = [
                   label="Current Password"
                   autocomplete="on"
                   placeholder="············"
-                  @click:append-inner="isCurrentPasswordVisible = !isCurrentPasswordVisible"
                   :rules="[requiredValidator]"
+                  @click:append-inner="isCurrentPasswordVisible = !isCurrentPasswordVisible"
                 />
               </VCol>
             </VRow>
@@ -99,8 +103,8 @@ const passwordRequirements = [
                   label="New Password"
                   autocomplete="on"
                   placeholder="············"
-                  @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
                   :rules="[requiredValidator, passwordValidator]"
+                  @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
                 />
               </VCol>
 
@@ -115,8 +119,8 @@ const passwordRequirements = [
                   label="Confirm New Password"
                   autocomplete="on"
                   placeholder="············"
+                  :rules="[(val:any) => confirmPasswordValidator(val, newPassword)]"
                   @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
-                  :rules="[( val:any ) => confirmPasswordValidator(val, newPassword)]"
                 />
               </VCol>
             </VRow>
@@ -146,7 +150,13 @@ const passwordRequirements = [
           </VCardText>
 
           <VCardText class="d-flex flex-wrap gap-4">
-            <VBtn :loading="isSaving" :disabled="isSaving" @click="onSave">Save changes</VBtn>
+            <VBtn
+              :loading="isSaving"
+              :disabled="isSaving"
+              @click="onSave"
+            >
+              Save changes
+            </VBtn>
 
             <VBtn
               type="reset"

@@ -20,7 +20,6 @@ const navItems = useNavItems()
         to="/"
         class="app-logo d-flex align-center gap-x-3"
       >
-
         <h1 class="app-title font-weight-bold leading-normal text-xl text-capitalize">
           {{ themeConfig.app.title }}
         </h1>

@@ -9,16 +9,19 @@ definePageMeta({
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const config = useRuntimeConfig()
+
 const checkout = ref({
   shippingCost: 0,
   address: '',
   state: '',
   city: '',
 })
+
 const checkoutLoading = ref(false)
 const updatingItem = reactive(new Set())
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
@@ -26,6 +29,7 @@ const showSnackbar = (message, color = 'success') => {
 onMounted(() => {
   if (!authStore.token) {
     navigateTo('/login')
+
     return
   }
   cartStore.fetchCart()
@@ -33,9 +37,11 @@ onMounted(() => {
 
 async function updateQuantity(item, delta) {
   const key = `${item.product}-${item.variance}-${item.color}`
-  if (updatingItem.has(key)) return
+  if (updatingItem.has(key))
+    return
 
   const newQty = Math.max(1, (item.qty || 1) + delta)
+
   updatingItem.add(key)
   try {
     await cartStore.updateItem({
@@ -44,14 +50,16 @@ async function updateQuantity(item, delta) {
       color: item.color,
       qty: newQty,
     })
-  } finally {
+  }
+  finally {
     updatingItem.delete(key)
   }
 }
 
 async function removeItem(item) {
   const key = `${item.product}-${item.variance}-${item.color}`
-  if (updatingItem.has(key)) return
+  if (updatingItem.has(key))
+    return
 
   updatingItem.add(key)
   try {
@@ -60,13 +68,15 @@ async function removeItem(item) {
       variance: item.variance,
       color: item.color,
     })
-  } finally {
+  }
+  finally {
     updatingItem.delete(key)
   }
 }
 
 async function handleCheckout() {
-  if (cartStore.isEmpty) return
+  if (cartStore.isEmpty)
+    return
 
   checkoutLoading.value = true
   try {
@@ -77,15 +87,17 @@ async function handleCheckout() {
         city: checkout.value.city || undefined,
       },
     })
-    if (order) {
+
+    if (order)
       showSnackbar('Order placed successfully', 'success')
-    } else {
+    else
       showSnackbar('Checkout failed', 'error')
-    }
-  } catch (err) {
+  }
+  catch (err) {
     console.log(err)
     showSnackbar('Checkout failed', 'error')
-  } finally {
+  }
+  finally {
     checkoutLoading.value = false
   }
 }
@@ -103,16 +115,40 @@ const total = computed(() => {
 
 <template>
   <div>
-    <VCard title="Shopping Cart" class="mb-6">
+    <VCard
+      title="Shopping Cart"
+      class="mb-6"
+    >
       <VCardText>
-        <div v-if="cartStore.loading && cartStore.items.length === 0" class="text-center py-8">
-          <VProgressCircular indeterminate color="primary" />
+        <div
+          v-if="cartStore.loading && cartStore.items.length === 0"
+          class="text-center py-8"
+        >
+          <VProgressCircular
+            indeterminate
+            color="primary"
+          />
         </div>
 
-        <div v-else-if="cartStore.isEmpty" class="text-center py-8">
-          <VIcon icon="tabler-shopping-cart-off" size="64" class="text-disabled mb-4" />
-          <p class="text-h6 text-disabled">Your cart is empty</p>
-          <VBtn color="primary" to="/products/interior" class="mt-4">Browse Products</VBtn>
+        <div
+          v-else-if="cartStore.isEmpty"
+          class="text-center py-8"
+        >
+          <VIcon
+            icon="tabler-shopping-cart-off"
+            size="64"
+            class="text-disabled mb-4"
+          />
+          <p class="text-h6 text-disabled">
+            Your cart is empty
+          </p>
+          <VBtn
+            color="primary"
+            to="/products/interior"
+            class="mt-4"
+          >
+            Browse Products
+          </VBtn>
         </div>
 
         <template v-else>
@@ -129,7 +165,12 @@ const total = computed(() => {
                   rounded
                   :image="`${config.public.apiBaseUrl}/api/image?id=${item.imageUrl}`"
                 />
-                <VAvatar v-else size="64" rounded color="grey-lighten-3">
+                <VAvatar
+                  v-else
+                  size="64"
+                  rounded
+                  color="grey-lighten-3"
+                >
                   <VIcon icon="tabler-package" />
                 </VAvatar>
               </template>
@@ -156,7 +197,10 @@ const total = computed(() => {
                     :disabled="item.qty <= 1 || updatingItem.has(`${item.product}-${item.variance}-${item.color}`)"
                     @click="updateQuantity(item, -1)"
                   />
-                  <span class="text-body-1 font-weight-medium" style="min-inline-size: 24px; text-align: center;">
+                  <span
+                    class="text-body-1 font-weight-medium"
+                    style="min-inline-size: 24px; text-align: center;"
+                  >
                     {{ item.qty }}
                   </span>
                   <VBtn
@@ -182,8 +226,13 @@ const total = computed(() => {
           <VDivider class="my-4" />
 
           <VRow>
-            <VCol cols="12" md="6">
-              <h6 class="text-h6 mb-3">Shipping Details (Optional)</h6>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <h6 class="text-h6 mb-3">
+                Shipping Details (Optional)
+              </h6>
               <VRow>
                 <VCol cols="12">
                   <AppTextField
@@ -209,9 +258,17 @@ const total = computed(() => {
               </VRow>
             </VCol>
 
-            <VCol cols="12" md="6">
-              <VCard variant="outlined" class="pa-4">
-                <h6 class="text-h6 mb-4">Order Summary</h6>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VCard
+                variant="outlined"
+                class="pa-4"
+              >
+                <h6 class="text-h6 mb-4">
+                  Order Summary
+                </h6>
                 <div class="d-flex justify-space-between mb-2">
                   <span class="text-body-1">Subtotal</span>
                   <span class="text-body-1 font-weight-medium">{{ subtotal }} DZD</span>

@@ -1,8 +1,8 @@
 <script setup>
-import { useApi } from '@/composables/useApi'
-import { paginationMeta } from '@api-utils/paginationMeta'
 import { debounce } from 'lodash'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { useApi } from '@/composables/useApi'
+import { paginationMeta } from '@api-utils/paginationMeta'
 
 definePageMeta({
   authed: true,
@@ -10,6 +10,7 @@ definePageMeta({
 })
 
 const router = useRouter()
+
 // Reactive state
 const articles = ref([])
 const loading = ref(false)
@@ -48,71 +49,79 @@ const fetchArticles = async () => {
       perPage: itemsPerPage.value,
     }
 
-    if (typeFilter.value !== 'all') 
+    if (typeFilter.value !== 'all')
       params.for = typeFilter.value
 
-    if (search.value.trim()) 
+    if (search.value.trim())
       params.search = search.value.trim()
 
-    const { data , error } = await useApi(`/api/articles`, { method: 'GET' , params })
+    const { data, error } = await useApi('/api/articles', { method: 'GET', params })
+
     articles.value = data.value.data
-    
+
     totalArticles.value = data.value.pagination?.total || 0
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to fetch articles:', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
 
 // Format date
-const formatDate = (date) => {
-  if (!date) return '-'
+const formatDate = date => {
+  if (!date)
+    return '-'
   const d = new Date(date)
-  return d.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   })
 }
 
 // Edit article
-const editArticle = (article) => {
+const editArticle = article => {
   router.push(`/management/newArticle?id=${article._id}`)
 }
 
 // Open delete dialog
-const openDeleteDialog = (article) => {
+const openDeleteDialog = article => {
   articleToDelete.value = article
   deleteDialog.value = true
 }
 
 // Confirm delete
 const confirmDelete = async () => {
-  if (!articleToDelete.value) return
-  
+  if (!articleToDelete.value)
+    return
+
   deleting.value = true
   try {
     await useApi(`/api/articles/${articleToDelete.value._id}`, { method: 'DELETE' })
     deleteDialog.value = false
     articleToDelete.value = null
-    
+
     // Refresh list
     await fetchArticles()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to delete article:', error)
-  } finally {
+  }
+  finally {
     deleting.value = false
   }
 }
 
 // Get type chip color
-const getTypeColor = (type) => {
+const getTypeColor = type => {
   return type === 'tip' ? 'primary' : 'success'
 }
 
 // Update data table options
-const updateOptions = (options) => {
+const updateOptions = options => {
   page.value = options.page
 }
 
@@ -149,10 +158,19 @@ onMounted(() => {
 
 <template>
   <div>
-    <VCard title="Articles Management" class="mb-6">
+    <VCard
+      title="Articles Management"
+      class="mb-6"
+    >
       <template #append>
-        <VBtn color="primary" to="/management/newArticle">
-          <VIcon icon="tabler-plus" class="me-2" />
+        <VBtn
+          color="primary"
+          to="/management/newArticle"
+        >
+          <VIcon
+            icon="tabler-plus"
+            class="me-2"
+          />
           Create Article
         </VBtn>
       </template>
@@ -205,12 +223,17 @@ onMounted(() => {
       >
         <template #loading>
           <div class="d-flex justify-center py-6">
-            <VProgressCircular indeterminate color="primary" />
+            <VProgressCircular
+              indeterminate
+              color="primary"
+            />
           </div>
         </template>
 
         <template #item.title="{ item }">
-          <div class="font-weight-medium">{{ item.title }}</div>
+          <div class="font-weight-medium">
+            {{ item.title }}
+          </div>
         </template>
 
         <template #item.for="{ item }">
@@ -248,13 +271,26 @@ onMounted(() => {
 
         <template #no-data>
           <div class="text-center py-12">
-            <VIcon icon="tabler-file-text" size="64" class="text-disabled mb-4" />
-            <p class="text-h6 text-disabled">No articles found</p>
+            <VIcon
+              icon="tabler-file-text"
+              size="64"
+              class="text-disabled mb-4"
+            />
+            <p class="text-h6 text-disabled">
+              No articles found
+            </p>
             <p class="text-body-2 text-disabled">
               {{ typeFilter === 'all' ? 'Create your first article to get started' : `No ${typeFilter} articles found` }}
             </p>
-            <VBtn color="primary" to="/management/newArticle" class="mt-4">
-              <VIcon icon="tabler-plus" class="me-2" />
+            <VBtn
+              color="primary"
+              to="/management/newArticle"
+              class="mt-4"
+            >
+              <VIcon
+                icon="tabler-plus"
+                class="me-2"
+              />
               Create Article
             </VBtn>
           </div>
@@ -291,7 +327,10 @@ onMounted(() => {
           <div class="mb-2">
             Are you sure you want to delete this article?
           </div>
-          <div v-if="articleToDelete" class="font-weight-medium">
+          <div
+            v-if="articleToDelete"
+            class="font-weight-medium"
+          >
             "{{ articleToDelete.title }}"
           </div>
           <div class="text-body-2 text-error mt-3">

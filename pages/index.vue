@@ -42,16 +42,34 @@ const features = [
         <h1 class="text-h3 text-md-h2 font-weight-bold mb-4 text-white">
           Work with an <span class="text-primary">Excellent</span> Product
         </h1>
-        <p class="text-body-1 text-white-50 mb-6 mx-auto" style="max-width: 600px;">
+        <p
+          class="text-body-1 text-white-50 mb-6 mx-auto"
+          style="max-width: 600px;"
+        >
           Opera Peinture offers high-quality paints, combining innovation, durability, and eco-friendliness for all your painting projects.
         </p>
         <div class="d-flex flex-wrap justify-center gap-4">
-          <VBtn color="primary" size="large" to="/products/decor">
-            <VIcon icon="tabler-paint" class="me-2" />
+          <VBtn
+            color="primary"
+            size="large"
+            to="/products/decor"
+          >
+            <VIcon
+              icon="tabler-paint"
+              class="me-2"
+            />
             Explore Products
           </VBtn>
-          <VBtn variant="outlined" color="white" size="large" to="/colors">
-            <VIcon icon="tabler-palette" class="me-2" />
+          <VBtn
+            variant="outlined"
+            color="white"
+            size="large"
+            to="/colors"
+          >
+            <VIcon
+              icon="tabler-palette"
+              class="me-2"
+            />
             View Colors
           </VBtn>
         </div>
@@ -80,7 +98,10 @@ const features = [
     <!-- About Section -->
     <VCard class="mb-6">
       <VRow no-gutters>
-        <VCol cols="12" md="6">
+        <VCol
+          cols="12"
+          md="6"
+        >
           <VImg
             src="https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800"
             height="100%"
@@ -90,15 +111,25 @@ const features = [
           >
             <template #placeholder>
               <div class="d-flex align-center justify-center fill-height">
-                <VProgressCircular indeterminate color="primary" />
+                <VProgressCircular
+                  indeterminate
+                  color="primary"
+                />
               </div>
             </template>
           </VImg>
         </VCol>
-        <VCol cols="12" md="6">
+        <VCol
+          cols="12"
+          md="6"
+        >
           <VCardText class="pa-6 pa-md-8 d-flex flex-column justify-center h-100">
-            <div class="text-overline text-primary mb-2">About Us</div>
-            <h2 class="text-h4 font-weight-bold mb-4">Who are we?</h2>
+            <div class="text-overline text-primary mb-2">
+              About Us
+            </div>
+            <h2 class="text-h4 font-weight-bold mb-4">
+              Who are we?
+            </h2>
             <p class="text-body-1 text-medium-emphasis mb-4">
               Founded in 2014 in Batna, Opera Paints specializes in the manufacturing, production, and export of high-quality paints that meet durability and environmental safety standards.
             </p>
@@ -109,9 +140,16 @@ const features = [
               Currently, its products are available in over 80 points of sale in Algeria, as well as in Côte d'Ivoire and Burkina Faso.
             </p>
             <div>
-              <VBtn color="primary" variant="tonal" to="/tips">
+              <VBtn
+                color="primary"
+                variant="tonal"
+                to="/tips"
+              >
                 Learn More
-                <VIcon icon="tabler-arrow-right" class="ms-2" />
+                <VIcon
+                  icon="tabler-arrow-right"
+                  class="ms-2"
+                />
               </VBtn>
             </div>
           </VCardText>
@@ -122,8 +160,12 @@ const features = [
     <!-- Features Section -->
     <div class="mb-6">
       <div class="text-center mb-6">
-        <div class="text-overline text-primary mb-2">Why Choose Us</div>
-        <h2 class="text-h4 font-weight-bold">Our Commitment to Excellence</h2>
+        <div class="text-overline text-primary mb-2">
+          Why Choose Us
+        </div>
+        <h2 class="text-h4 font-weight-bold">
+          Our Commitment to Excellence
+        </h2>
       </div>
       <VRow>
         <VCol
@@ -140,9 +182,14 @@ const features = [
               size="64"
               class="mb-4"
             >
-              <VIcon :icon="feature.icon" size="32" />
+              <VIcon
+                :icon="feature.icon"
+                size="32"
+              />
             </VAvatar>
-            <h3 class="text-h6 font-weight-medium mb-3">{{ feature.title }}</h3>
+            <h3 class="text-h6 font-weight-medium mb-3">
+              {{ feature.title }}
+            </h3>
             <p class="text-body-2 text-medium-emphasis mb-0">
               {{ feature.description }}
             </p>
@@ -155,17 +202,36 @@ const features = [
     <VCard class="cta-section overflow-hidden">
       <div class="cta-bg" />
       <VCardText class="text-center py-12 px-4 position-relative">
-        <h2 class="text-h4 font-weight-bold mb-4">Ready to Transform Your Space?</h2>
-        <p class="text-body-1 text-medium-emphasis mb-6 mx-auto" style="max-width: 500px;">
+        <h2 class="text-h4 font-weight-bold mb-4">
+          Ready to Transform Your Space?
+        </h2>
+        <p
+          class="text-body-1 text-medium-emphasis mb-6 mx-auto"
+          style="max-width: 500px;"
+        >
           Explore our wide range of premium paints and find the perfect color for your next project.
         </p>
         <div class="d-flex flex-wrap justify-center gap-4">
-          <VBtn color="primary" size="large" to="/products/decor">
-            <VIcon icon="tabler-shopping-cart" class="me-2" />
+          <VBtn
+            color="primary"
+            size="large"
+            to="/products/decor"
+          >
+            <VIcon
+              icon="tabler-shopping-cart"
+              class="me-2"
+            />
             Shop Now
           </VBtn>
-          <VBtn variant="outlined" size="large" to="/inspirations">
-            <VIcon icon="tabler-sparkles" class="me-2" />
+          <VBtn
+            variant="outlined"
+            size="large"
+            to="/inspirations"
+          >
+            <VIcon
+              icon="tabler-sparkles"
+              class="me-2"
+            />
             Get Inspired
           </VBtn>
         </div>

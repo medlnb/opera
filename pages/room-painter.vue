@@ -235,12 +235,90 @@ function isEdgePixel(
   return false
 }
 
+function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  const rn = r / 255
+  const gn = g / 255
+  const bn = b / 255
+
+  const max = Math.max(rn, gn, bn)
+  const min = Math.min(rn, gn, bn)
+  const delta = max - min
+
+  let h = 0
+  let s = 0
+  const l = (max + min) / 2
+
+  if (delta !== 0) {
+    s = delta / (1 - Math.abs(2 * l - 1))
+
+    if (max === rn)
+      h = ((gn - bn) / delta) % 6
+    else if (max === gn)
+      h = (bn - rn) / delta + 2
+    else
+      h = (rn - gn) / delta + 4
+
+    h *= 60
+    if (h < 0)
+      h += 360
+  }
+
+  return { h, s, l }
+}
+
+function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+  const c = (1 - Math.abs(2 * l - 1)) * s
+  const hp = (h % 360) / 60
+  const x = c * (1 - Math.abs((hp % 2) - 1))
+
+  let rn = 0
+  let gn = 0
+  let bn = 0
+
+  if (hp >= 0 && hp < 1) {
+    rn = c
+    gn = x
+    bn = 0
+  }
+  else if (hp >= 1 && hp < 2) {
+    rn = x
+    gn = c
+    bn = 0
+  }
+  else if (hp >= 2 && hp < 3) {
+    rn = 0
+    gn = c
+    bn = x
+  }
+  else if (hp >= 3 && hp < 4) {
+    rn = 0
+    gn = x
+    bn = c
+  }
+  else if (hp >= 4 && hp < 5) {
+    rn = x
+    gn = 0
+    bn = c
+  }
+  else {
+    rn = c
+    gn = 0
+    bn = x
+  }
+
+  const m = l - c / 2
+
+  return {
+    r: Math.round((rn + m) * 255),
+    g: Math.round((gn + m) * 255),
+    b: Math.round((bn + m) * 255),
+  }
+}
+
 // Flood fill algorithm with edge detection (paint) + depaint (restore original pixels)
 const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: number; b: number }, mode: ToolMode) => {
   if (!ctx.value || !displayCtx.value || !canvas.value || !originalImageData.value)
     return
-
-  pushUndoSnapshot()
 
   const imageData = ctx.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
   const pixels = imageData.data
@@ -249,27 +327,67 @@ const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: 
   const height = canvas.value.height
 
   const startPos = (startY * width + startX) * 4
-  const startR = pixels[startPos]
-  const startG = pixels[startPos + 1]
-  const startB = pixels[startPos + 2]
+  const currentStartR = pixels[startPos]
+  const currentStartG = pixels[startPos + 1]
+  const currentStartB = pixels[startPos + 2]
 
-  // For paint: avoid doing work if already painted to same color
-  if (
-    mode === 'paint'
-    && Math.abs(startR - fillColor.r) < 5
-    && Math.abs(startG - fillColor.g) < 5
-    && Math.abs(startB - fillColor.b) < 5
-  )
-    return
+  const originalStartR = originalPixels[startPos]
+  const originalStartG = originalPixels[startPos + 1]
+  const originalStartB = originalPixels[startPos + 2]
+
+  const fillHsl = rgbToHsl(fillColor.r, fillColor.g, fillColor.b)
+
+  const paintFromOriginal = (or: number, og: number, ob: number): { r: number; g: number; b: number } => {
+    // Preserve photo lighting/shadows: keep original pixel lightness, but apply selected hue/saturation.
+    const { l } = rgbToHsl(or, og, ob)
+
+    return hslToRgb(fillHsl.h, fillHsl.s, l)
+  }
+
+  // No-op checks (must happen BEFORE pushing undo snapshots).
+  // Paint: if the clicked pixel already matches the expected painted value, do nothing.
+  // Erase: if the clicked pixel already matches the original, do nothing.
+  if (mode === 'paint') {
+    const edge = isEdgePixel(startX, startY, originalPixels, width, height, originalStartR, originalStartG, originalStartB)
+    const alpha = edge ? 0.7 : 1.0
+
+    const painted = paintFromOriginal(originalStartR, originalStartG, originalStartB)
+
+    const expectedR = painted.r * alpha + originalStartR * (1 - alpha)
+    const expectedG = painted.g * alpha + originalStartG * (1 - alpha)
+    const expectedB = painted.b * alpha + originalStartB * (1 - alpha)
+
+    if (
+      Math.abs(currentStartR - expectedR) <= 1
+      && Math.abs(currentStartG - expectedG) <= 1
+      && Math.abs(currentStartB - expectedB) <= 1
+    )
+      return
+  }
+  else {
+    if (
+      Math.abs(currentStartR - originalStartR) <= 1
+      && Math.abs(currentStartG - originalStartG) <= 1
+      && Math.abs(currentStartB - originalStartB) <= 1
+    )
+      return
+  }
+
+  pushUndoSnapshot()
+
+  // Region selection is based on ORIGINAL pixels (stable across repeated paints/erases).
+  const regionR = originalStartR
+  const regionG = originalStartG
+  const regionB = originalStartB
 
   const visited = new Uint8Array(width * height)
   const stack: Array<{ x: number; y: number }> = [{ x: startX, y: startY }]
 
   const colorMatch = (r: number, g: number, b: number): boolean => {
     return (
-      Math.abs(r - startR) <= tolerance.value
-      && Math.abs(g - startG) <= tolerance.value
-      && Math.abs(b - startB) <= tolerance.value
+      Math.abs(r - regionR) <= tolerance.value
+      && Math.abs(g - regionG) <= tolerance.value
+      && Math.abs(b - regionB) <= tolerance.value
     )
   }
 
@@ -288,30 +406,27 @@ const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: 
     const g = pixels[pixelPos + 1]
     const b = pixels[pixelPos + 2]
 
-    if (!colorMatch(r, g, b))
+    const or = originalPixels[pixelPos]
+    const og = originalPixels[pixelPos + 1]
+    const ob = originalPixels[pixelPos + 2]
+
+    if (!colorMatch(or, og, ob))
       continue
 
     visited[pos] = 1
 
-    const edge = isEdgePixel(x, y, pixels, width, height, startR, startG, startB)
+    const edge = isEdgePixel(x, y, originalPixels, width, height, regionR, regionG, regionB)
     const alpha = edge ? 0.7 : 1.0
 
     if (mode === 'paint') {
-      const or = originalPixels[pixelPos]
-      const og = originalPixels[pixelPos + 1]
-      const ob = originalPixels[pixelPos + 2]
+      // Preserve shadows by coloring the original pixel rather than flattening it.
+      const painted = paintFromOriginal(or, og, ob)
 
-      // Idempotent paint: always blend against the ORIGINAL pixel, not the already-painted one.
-      // This prevents repeated clicks from making the same area darker.
-      pixels[pixelPos] = fillColor.r * alpha + or * (1 - alpha)
-      pixels[pixelPos + 1] = fillColor.g * alpha + og * (1 - alpha)
-      pixels[pixelPos + 2] = fillColor.b * alpha + ob * (1 - alpha)
+      pixels[pixelPos] = painted.r * alpha + or * (1 - alpha)
+      pixels[pixelPos + 1] = painted.g * alpha + og * (1 - alpha)
+      pixels[pixelPos + 2] = painted.b * alpha + ob * (1 - alpha)
     }
     else {
-      const or = originalPixels[pixelPos]
-      const og = originalPixels[pixelPos + 1]
-      const ob = originalPixels[pixelPos + 2]
-
       // Depaint: move pixels back toward original (blend at edges for smoother boundary).
       pixels[pixelPos] = or * alpha + r * (1 - alpha)
       pixels[pixelPos + 1] = og * alpha + g * (1 - alpha)
@@ -406,7 +521,7 @@ const colorPalette = [
 
 <template>
   <div class="room-painter-page">
-    <VCard>
+    <VCard class="mb-4">
       <VCardTitle class="d-flex align-center justify-space-between flex-wrap gap-2 pt-4">
         <div class="d-flex align-center gap-2">
           <VBtn
@@ -663,7 +778,7 @@ const colorPalette = [
           </VCard>
 
           <!-- Instructions Card -->
-          <VCard class="mt-4">
+          <VCard class="mt-4 d-none d-md-block">
             <VCardTitle class="text-sm">
               <VIcon
                 icon="tabler-info-circle"
@@ -728,6 +843,120 @@ const colorPalette = [
           </VCard>
         </VCol>
       </VRow>
+
+      <!-- Mobile sticky toolbar: keeps key actions reachable without scrolling -->
+      <div
+        v-if="imageUrl"
+        class="mobile-toolbar d-md-none"
+      >
+        <VCard class="pa-2">
+          <div class="d-flex align-center gap-2 flex-wrap">
+            <VBtn
+              :color="isSelecting ? 'primary' : 'default'"
+              :variant="isSelecting ? 'flat' : 'outlined'"
+              size="small"
+              prepend-icon="tabler-pointer"
+              @click="isSelecting = !isSelecting"
+            >
+              {{ isSelecting ? 'Painting on' : 'Paint' }}
+            </VBtn>
+
+            <VBtnToggle
+              v-model="toolMode"
+              mandatory
+              divided
+              density="compact"
+              class="mobile-tool-toggle"
+            >
+              <VBtn
+                value="paint"
+                prepend-icon="tabler-brush"
+                size="small"
+              >
+                Paint
+              </VBtn>
+              <VBtn
+                value="erase"
+                prepend-icon="tabler-eraser"
+                size="small"
+              >
+                Depaint
+              </VBtn>
+            </VBtnToggle>
+
+            <VBtn
+              :disabled="!canUndo"
+              color="default"
+              variant="outlined"
+              size="small"
+              prepend-icon="tabler-arrow-back-up"
+              @click="undoLastEdit"
+            >
+              Undo
+            </VBtn>
+            <VBtn
+              :disabled="!canRedo"
+              color="default"
+              variant="outlined"
+              size="small"
+              prepend-icon="tabler-arrow-forward-up"
+              @click="redoLastUndo"
+            >
+              Redo
+            </VBtn>
+
+            <input
+              v-model="selectedColor"
+              type="color"
+              class="color-picker color-picker--sm"
+              aria-label="Selected color"
+            >
+          </div>
+
+          <div class="mobile-color-row mt-2">
+            <button
+              v-for="color in colorPalette"
+              :key="color"
+              class="palette-color palette-color--sm"
+              :style="{ backgroundColor: color }"
+              :class="{ active: selectedColor === color }"
+              @click="selectedColor = color"
+            />
+          </div>
+
+          <div class="d-flex gap-2 mt-2">
+            <VBtn
+              color="warning"
+              variant="outlined"
+              size="small"
+              prepend-icon="tabler-refresh"
+              @click="resetImage"
+            >
+              Reset
+            </VBtn>
+
+            <VBtn
+              color="success"
+              variant="flat"
+              size="small"
+              prepend-icon="tabler-download"
+              @click="downloadImage"
+            >
+              Download
+            </VBtn>
+
+            <VBtn
+              color="default"
+              variant="outlined"
+              size="small"
+              prepend-icon="tabler-photo"
+              @click="clearImage"
+            >
+              New
+            </VBtn>
+          </div>
+        </VCard>
+      </div>
     </div>
   </div>
 </template>
@@ -750,6 +979,12 @@ const colorPalette = [
   &:hover {
     border-color: rgb(var(--v-theme-primary));
   }
+}
+
+.color-picker--sm {
+  padding: 0;
+  block-size: 36px;
+  inline-size: 56px;
 }
 
 .color-palette {
@@ -775,6 +1010,39 @@ const colorPalette = [
     border-width: 3px;
     border-color: rgb(var(--v-theme-primary));
     transform: scale(1.05);
+  }
+}
+
+.palette-color--sm {
+  flex: 0 0 auto;
+  border-radius: 10px;
+  block-size: 28px;
+  inline-size: 28px;
+}
+
+.mobile-toolbar {
+  position: fixed;
+  z-index: 10;
+  padding: 8px;
+  background: rgb(var(--v-theme-background));
+  inset-block-end: 0;
+  inset-inline: 0;
+}
+
+.mobile-color-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-block: 2px;
+}
+
+.mobile-tool-toggle {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 959.98px) {
+  .room-painter-page {
+    padding-block-end: 170px;
   }
 }
 

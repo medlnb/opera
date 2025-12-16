@@ -1,8 +1,8 @@
 <script setup>
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -28,6 +28,7 @@ const banDialog = ref(false)
 const actionLoading = ref(false)
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
@@ -43,7 +44,7 @@ const orderHeaders = [
 ]
 
 // Get status color
-const getStatusColor = (status) => {
+const getStatusColor = status => {
   const colors = {
     pending: 'warning',
     confirmed: 'info',
@@ -51,36 +52,48 @@ const getStatusColor = (status) => {
     delivered: 'success',
     cancelled: 'error',
   }
+
   return colors[status] || 'default'
 }
 
 // Location helpers based on communes dataset
 const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
-const getStateLabel = (stateId) => {
-  if (!stateId) return null
+
+const getStateLabel = stateId => {
+  if (!stateId)
+    return null
   const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
+
   return group ? group[0].name : null
 }
+
 const getCityLabel = (stateId, cityId) => {
-  if (!stateId || !cityId) return null
+  if (!stateId || !cityId)
+    return null
   const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
-  if (!group) return null
+  if (!group)
+    return null
   const city = group.find(c => String(c.id) === String(cityId))
+
   return city ? city.name : null
 }
+
 const displayLocation = computed(() => {
   const state = getStateLabel(user.value?.state)
   const city = getCityLabel(user.value?.state, user.value?.city)
+
   return [city, state].filter(Boolean).join(', ')
 })
 
 // Format date
-const formatDate = (date) => {
-  if (!date) return '-'
+const formatDate = date => {
+  if (!date)
+    return '-'
   const d = new Date(date)
-  return d.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
+
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
     day: 'numeric',
   })
 }
@@ -92,17 +105,21 @@ const fetchUser = async () => {
     const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users/${route.params.id}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
+
     if (res.ok) {
       const data = await res.json()
+
       user.value = data.data
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to fetch user:', error)
     showSnackbar('Failed to load user details', 'error')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -119,95 +136,109 @@ const fetchOrders = async () => {
     const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users/${route.params.id}/orders?${params}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
+
     if (res.ok) {
       const data = await res.json()
+
       orders.value = data.data || []
       totalOrders.value = data.pagination?.total || 0
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to fetch orders:', error)
-  } finally {
+  }
+  finally {
     ordersLoading.value = false
   }
 }
 
 // Ban/Unban user
 const confirmBan = async () => {
-  if (!user.value) return
-  
+  if (!user.value)
+    return
+
   actionLoading.value = true
   try {
-    const endpoint = user.value.banned 
+    const endpoint = user.value.banned
       ? `${config.public.apiBaseUrl}/api/admin/users/${user.value._id}/unban`
       : `${config.public.apiBaseUrl}/api/admin/users/${user.value._id}/ban`
-    
+
     const res = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
-    
+
     if (res.ok) {
       showSnackbar(
         user.value.banned ? 'User unbanned successfully' : 'User banned successfully',
-        'success'
+        'success',
       )
       user.value.banned = !user.value.banned
       banDialog.value = false
-    } else {
+    }
+    else {
       const data = await res.json()
+
       showSnackbar(data.message || 'Action failed', 'error')
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to ban/unban user:', error)
     showSnackbar('Action failed', 'error')
-  } finally {
+  }
+  finally {
     actionLoading.value = false
   }
 }
 
 // Delete user
 const confirmDelete = async () => {
-  if (!user.value) return
-  
+  if (!user.value)
+    return
+
   actionLoading.value = true
   try {
     const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users/${user.value._id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authStore.token}`,
+        'Authorization': `Bearer ${authStore.token}`,
       },
     })
-    
+
     if (res.ok || res.status === 204) {
       showSnackbar('User deleted successfully', 'success')
       deleteDialog.value = false
       router.push('/management/users')
-    } else {
+    }
+    else {
       const data = await res.json()
+
       showSnackbar(data.message || 'Delete failed', 'error')
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to delete user:', error)
     showSnackbar('Delete failed', 'error')
-  } finally {
+  }
+  finally {
     actionLoading.value = false
   }
 }
 
 // View order
-const viewOrder = (order) => {
+const viewOrder = order => {
   router.push(`/management/orders/${order._id}`)
 }
 
 // Update options
-const updateOptions = (options) => {
+const updateOptions = options => {
   page.value = options.page
 }
 
@@ -236,22 +267,49 @@ onMounted(() => {
       to="/management/users"
       class="mb-4"
     >
-      <VIcon icon="tabler-arrow-left" class="me-2" />
+      <VIcon
+        icon="tabler-arrow-left"
+        class="me-2"
+      />
       Back to Users
     </VBtn>
 
     <!-- Loading State -->
-    <div v-if="loading" class="d-flex justify-center py-12">
-      <VProgressCircular indeterminate color="primary" size="48" />
+    <div
+      v-if="loading"
+      class="d-flex justify-center py-12"
+    >
+      <VProgressCircular
+        indeterminate
+        color="primary"
+        size="48"
+      />
     </div>
 
     <!-- Not Found State -->
-    <VCard v-else-if="!user" class="text-center py-12">
-      <VIcon icon="tabler-user-off" size="64" class="text-disabled mb-4" />
-      <h3 class="text-h6 text-disabled mb-2">User not found</h3>
-      <p class="text-body-2 text-disabled mb-4">The user you're looking for doesn't exist.</p>
-      <VBtn color="primary" to="/management/users">
-        <VIcon icon="tabler-arrow-left" class="me-2" />
+    <VCard
+      v-else-if="!user"
+      class="text-center py-12"
+    >
+      <VIcon
+        icon="tabler-user-off"
+        size="64"
+        class="text-disabled mb-4"
+      />
+      <h3 class="text-h6 text-disabled mb-2">
+        User not found
+      </h3>
+      <p class="text-body-2 text-disabled mb-4">
+        The user you're looking for doesn't exist.
+      </p>
+      <VBtn
+        color="primary"
+        to="/management/users"
+      >
+        <VIcon
+          icon="tabler-arrow-left"
+          class="me-2"
+        />
         Back to Users
       </VBtn>
     </VCard>
@@ -260,10 +318,18 @@ onMounted(() => {
     <template v-else>
       <VRow>
         <!-- User Profile -->
-        <VCol cols="12" md="4">
+        <VCol
+          cols="12"
+          md="4"
+        >
           <VCard class="mb-6">
             <VCardText class="text-center pt-6">
-              <VAvatar color="primary" variant="tonal" size="100" class="mb-4">
+              <VAvatar
+                color="primary"
+                variant="tonal"
+                size="100"
+                class="mb-4"
+              >
                 <span class="text-h4">{{ (user.firstName?.[0] || '') + (user.lastName?.[0] || '') }}</span>
               </VAvatar>
               <h4 class="text-h5 font-weight-medium mb-1">
@@ -292,47 +358,83 @@ onMounted(() => {
             <VCardText>
               <div class="d-flex flex-column gap-4">
                 <div class="d-flex align-center">
-                  <VIcon icon="tabler-phone" class="me-3" color="primary" />
+                  <VIcon
+                    icon="tabler-phone"
+                    class="me-3"
+                    color="primary"
+                  />
                   <div>
-                    <div class="text-caption text-disabled">Phone</div>
-                    <div class="font-weight-medium">{{ user.phone || '-' }}</div>
+                    <div class="text-caption text-disabled">
+                      Phone
+                    </div>
+                    <div class="font-weight-medium">
+                      {{ user.phone || '-' }}
+                    </div>
                   </div>
                 </div>
                 <div class="d-flex align-center">
-                  <VIcon icon="tabler-map-pin" class="me-3" color="primary" />
+                  <VIcon
+                    icon="tabler-map-pin"
+                    class="me-3"
+                    color="primary"
+                  />
                   <div>
-                    <div class="text-caption text-disabled">Location</div>
+                    <div class="text-caption text-disabled">
+                      Location
+                    </div>
                     <div class="font-weight-medium">
                       {{ displayLocation || '-' }}
                     </div>
                   </div>
                 </div>
                 <div class="d-flex align-center">
-                  <VIcon icon="tabler-home" class="me-3" color="primary" />
+                  <VIcon
+                    icon="tabler-home"
+                    class="me-3"
+                    color="primary"
+                  />
                   <div>
-                    <div class="text-caption text-disabled">Address</div>
-                    <div class="font-weight-medium">{{ user.address || '-' }}</div>
+                    <div class="text-caption text-disabled">
+                      Address
+                    </div>
+                    <div class="font-weight-medium">
+                      {{ user.address || '-' }}
+                    </div>
                   </div>
                 </div>
                 <div class="d-flex align-center">
-                  <VIcon icon="tabler-calendar" class="me-3" color="primary" />
+                  <VIcon
+                    icon="tabler-calendar"
+                    class="me-3"
+                    color="primary"
+                  />
                   <div>
-                    <div class="text-caption text-disabled">Joined</div>
-                    <div class="font-weight-medium">{{ formatDate(user.createdAt) }}</div>
+                    <div class="text-caption text-disabled">
+                      Joined
+                    </div>
+                    <div class="font-weight-medium">
+                      {{ formatDate(user.createdAt) }}
+                    </div>
                   </div>
                 </div>
               </div>
             </VCardText>
             <VDivider />
-            <VCardText v-if="user.role !== 'admin'" class="gap-2">
+            <VCardText
+              v-if="user.role !== 'admin'"
+              class="gap-2"
+            >
               <VBtn
                 :color="user.banned ? 'success' : 'warning'"
                 variant="tonal"
                 block
-                @click="banDialog = true"
                 class="mb-2"
+                @click="banDialog = true"
               >
-                <VIcon :icon="user.banned ? 'tabler-lock-open' : 'tabler-lock'" class="me-2" />
+                <VIcon
+                  :icon="user.banned ? 'tabler-lock-open' : 'tabler-lock'"
+                  class="me-2"
+                />
                 {{ user.banned ? 'Unban' : 'Ban' }}
               </VBtn>
               <VBtn
@@ -341,7 +443,10 @@ onMounted(() => {
                 block
                 @click="deleteDialog = true"
               >
-                <VIcon icon="tabler-trash" class="me-2" />
+                <VIcon
+                  icon="tabler-trash"
+                  class="me-2"
+                />
                 Delete
               </VBtn>
             </VCardText>
@@ -349,11 +454,18 @@ onMounted(() => {
         </VCol>
 
         <!-- User Orders -->
-        <VCol cols="12" md="8">
+        <VCol
+          cols="12"
+          md="8"
+        >
           <VCard>
             <VCardTitle class="d-flex align-center justify-space-between">
               <span>Orders History</span>
-              <VChip label color="primary" size="small">
+              <VChip
+                label
+                color="primary"
+                size="small"
+              >
                 {{ totalOrders }} orders
               </VChip>
             </VCardTitle>
@@ -372,7 +484,10 @@ onMounted(() => {
             >
               <template #loading>
                 <div class="d-flex justify-center py-6">
-                  <VProgressCircular indeterminate color="primary" />
+                  <VProgressCircular
+                    indeterminate
+                    color="primary"
+                  />
                 </div>
               </template>
 
@@ -383,7 +498,11 @@ onMounted(() => {
               </template>
 
               <template #item.items="{ item }">
-                <VChip label size="small" color="secondary">
+                <VChip
+                  label
+                  size="small"
+                  color="secondary"
+                >
                   {{ item.items?.length || 0 }} items
                 </VChip>
               </template>
@@ -420,8 +539,14 @@ onMounted(() => {
 
               <template #no-data>
                 <div class="text-center py-12">
-                  <VIcon icon="tabler-package" size="48" class="text-disabled mb-4" />
-                  <p class="text-body-1 text-disabled">No orders yet</p>
+                  <VIcon
+                    icon="tabler-package"
+                    size="48"
+                    class="text-disabled mb-4"
+                  />
+                  <p class="text-body-1 text-disabled">
+                    No orders yet
+                  </p>
                 </div>
               </template>
 
@@ -447,7 +572,10 @@ onMounted(() => {
     </template>
 
     <!-- Ban/Unban Dialog -->
-    <VDialog v-model="banDialog" max-width="500">
+    <VDialog
+      v-model="banDialog"
+      max-width="500"
+    >
       <VCard>
         <VCardTitle class="text-h5">
           {{ user?.banned ? 'Unban User?' : 'Ban User?' }}
@@ -456,16 +584,25 @@ onMounted(() => {
           <div class="mb-2">
             Are you sure you want to {{ user?.banned ? 'unban' : 'ban' }} this user?
           </div>
-          <div v-if="user" class="font-weight-medium">
+          <div
+            v-if="user"
+            class="font-weight-medium"
+          >
             {{ user.firstName }} {{ user.lastName }}
           </div>
-          <div v-if="!user?.banned" class="text-body-2 text-warning mt-3">
+          <div
+            v-if="!user?.banned"
+            class="text-body-2 text-warning mt-3"
+          >
             The user will not be able to log in while banned.
           </div>
         </VCardText>
         <VCardActions>
           <VSpacer />
-          <VBtn variant="text" @click="banDialog = false">
+          <VBtn
+            variant="text"
+            @click="banDialog = false"
+          >
             Cancel
           </VBtn>
           <VBtn
@@ -481,7 +618,10 @@ onMounted(() => {
     </VDialog>
 
     <!-- Delete Dialog -->
-    <VDialog v-model="deleteDialog" max-width="500">
+    <VDialog
+      v-model="deleteDialog"
+      max-width="500"
+    >
       <VCard>
         <VCardTitle class="text-h5">
           Delete User Account?
@@ -490,7 +630,10 @@ onMounted(() => {
           <div class="mb-2">
             Are you sure you want to permanently delete this user's account?
           </div>
-          <div v-if="user" class="font-weight-medium">
+          <div
+            v-if="user"
+            class="font-weight-medium"
+          >
             {{ user.firstName }} {{ user.lastName }}
           </div>
           <div class="text-body-2 text-error mt-3">
@@ -499,7 +642,10 @@ onMounted(() => {
         </VCardText>
         <VCardActions>
           <VSpacer />
-          <VBtn variant="text" @click="deleteDialog = false">
+          <VBtn
+            variant="text"
+            @click="deleteDialog = false"
+          >
             Cancel
           </VBtn>
           <VBtn
@@ -514,7 +660,11 @@ onMounted(() => {
       </VCard>
     </VDialog>
 
-    <VSnackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    <VSnackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      timeout="3000"
+    >
       {{ snackbar.message }}
     </VSnackbar>
   </div>

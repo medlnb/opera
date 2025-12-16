@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
-import { useRoute } from 'vue-router'
 
 definePageMeta({
   admin: true,
@@ -28,10 +28,10 @@ const coverInvalid = computed(() => showAssetErrors.value && !form.imageUrl)
 const avatarInvalid = computed(() => showAssetErrors.value && !form.avatar)
 
 const TYPE_OPTIONS = ['decor', 'buildings', 'coating']
-const DESTINATION_OPTIONS = ['Habitations','Bureaux','Hotel','Restaurants','Showroom','Magasins']
-const SUPPORT_OPTIONS = ['Platre','Ciment','Enduit','Brique']
-const MATERIEL_OPTIONS = ['Rouleau','Pinceau','Pistolet','Brosse']
-const ASPECT_OPTIONS = ['Mat','Satiné','Brillant','Velours']
+const DESTINATION_OPTIONS = ['Habitations', 'Bureaux', 'Hotel', 'Restaurants', 'Showroom', 'Magasins']
+const SUPPORT_OPTIONS = ['Platre', 'Ciment', 'Enduit', 'Brique']
+const MATERIEL_OPTIONS = ['Rouleau', 'Pinceau', 'Pistolet', 'Brosse']
+const ASPECT_OPTIONS = ['Mat', 'Satiné', 'Brillant', 'Velours']
 
 const form = reactive({
   imageUrl: '',
@@ -42,6 +42,7 @@ const form = reactive({
   destination: [] as string[],
   properties: [] as string[],
   variances: [{ quantity: '', price: 0 }] as { quantity: string; price: number }[],
+
   // Caracteristiques technique
   densite: '',
   rendement: '',
@@ -49,6 +50,7 @@ const form = reactive({
   aspectdifilmsec: [] as string[],
   teinte: '',
   viscosite: '',
+
   // Mise en oeuvre
   dilution: '',
   supports: [] as string[],
@@ -59,15 +61,18 @@ const form = reactive({
 })
 
 onMounted(async () => {
-  if (!isEdit.value) return
+  if (!isEdit.value)
+    return
   try {
     loadingProduct.value = true
+
     const res = await fetch(`${config.public.apiBaseUrl}/api/products/${String(route.query.id)}`, {
       headers: {
         'Content-Type': 'application/json',
-        authorization : `Bearer ${authStore.token}`
-      }
+        'authorization': `Bearer ${authStore.token}`,
+      },
     })
+
     const data = await res.json()
     const p = data?.data
     if (p) {
@@ -78,7 +83,7 @@ onMounted(async () => {
       form.definition = p.definition || ''
       form.destination = Array.isArray(p.destination) ? p.destination : []
       form.properties = Array.isArray(p.properties) ? p.properties : []
-      form.variances = Array.isArray(p.variances) && p.variances.length ? p.variances.map((v:any)=>({ quantity: v.quantity || '', price: Number(v.price) || 0 })) : [{ quantity: '', price: 0 }]
+      form.variances = Array.isArray(p.variances) && p.variances.length ? p.variances.map((v: any) => ({ quantity: v.quantity || '', price: Number(v.price) || 0 })) : [{ quantity: '', price: 0 }]
       form.densite = p.densite || ''
       form.rendement = p.rendement || ''
       form.tempsSachage = p.tempsSachage || ''
@@ -90,33 +95,42 @@ onMounted(async () => {
       form.materielApplication = Array.isArray(p.materielApplication) ? p.materielApplication : []
       form.nettoyageMateriel = p.nettoyageMateriel || ''
       form.preparationSupport = p.preparationSupport || ''
-      form.colors = Array.isArray(p.colors) && p.colors.length ? p.colors.map((c:any)=>({ name: c.name || '', code: c.code || '#000000' })) : [{ name: '', code: '#000000' }]
+      form.colors = Array.isArray(p.colors) && p.colors.length ? p.colors.map((c: any) => ({ name: c.name || '', code: c.code || '#000000' })) : [{ name: '', code: '#000000' }]
     }
-  } catch (err) {
+  }
+  catch (err) {
     snackbar.value = { show: true, text: 'Failed to load product', color: 'error' }
-  } finally {
+  }
+  finally {
     loadingProduct.value = false
   }
 })
 
 // Upload image helper
 async function uploadImage(file: File): Promise<string | null> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const reader = new FileReader()
+
     reader.onload = async () => {
       try {
         const dataUri = reader.result as string
         const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-        if (authStore.token) headers['Authorization'] = `Bearer ${authStore.token}`
+        if (authStore.token)
+          headers.Authorization = `Bearer ${authStore.token}`
+
         const res = await fetch(`${config.public.apiBaseUrl}/api/image`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ image: dataUri }),
         })
-        if (!res.ok) throw new Error('Upload failed')
+
+        if (!res.ok)
+          throw new Error('Upload failed')
         const data = await res.json()
+
         resolve(data.id)
-      } catch {
+      }
+      catch {
         snackbar.value = { show: true, text: 'Image upload failed', color: 'error' }
         resolve(null)
       }
@@ -127,48 +141,60 @@ async function uploadImage(file: File): Promise<string | null> {
 
 function handleCoverDrop(e: DragEvent) {
   e.preventDefault()
+
   const file = e.dataTransfer?.files[0]
-  if (file && file.type.startsWith('image/')) uploadCover(file)
+  if (file && file.type.startsWith('image/'))
+    uploadCover(file)
 }
 
 function handleAvatarDrop(e: DragEvent) {
   e.preventDefault()
+
   const file = e.dataTransfer?.files[0]
-  if (file && file.type.startsWith('image/')) uploadAvatar(file)
+  if (file && file.type.startsWith('image/'))
+    uploadAvatar(file)
 }
 
 async function uploadCover(file: File) {
   uploadingCover.value = true
+
   const id = await uploadImage(file)
-  if (id) form.imageUrl = id
+  if (id)
+    form.imageUrl = id
   uploadingCover.value = false
 }
 
 async function uploadAvatar(file: File) {
   uploadingAvatar.value = true
+
   const id = await uploadImage(file)
-  if (id) form.avatar = id
+  if (id)
+    form.avatar = id
   uploadingAvatar.value = false
 }
 
 function selectCoverFile() {
   const input = document.createElement('input')
+
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (e) => {
+  input.onchange = e => {
     const file = (e.target as HTMLInputElement).files?.[0]
-    if (file) uploadCover(file)
+    if (file)
+      uploadCover(file)
   }
   input.click()
 }
 
 function selectAvatarFile() {
   const input = document.createElement('input')
+
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (e) => {
+  input.onchange = e => {
     const file = (e.target as HTMLInputElement).files?.[0]
-    if (file) uploadAvatar(file)
+    if (file)
+      uploadAvatar(file)
   }
   input.click()
 }
@@ -196,32 +222,32 @@ async function publishProduct() {
     const v = formRef.value.validate()
     if (v && typeof v.then === 'function') {
       const r = await v
-      if (!r.valid) 
+      if (!r.valid)
         return snackbar.value = { show: true, text: 'Please fix the highlighted errors', color: 'error' }
     }
   }
 
   // Manual checks for assets and nested arrays according to schema
-  if (!form.imageUrl) 
+  if (!form.imageUrl)
     snackbar.value = { show: true, text: 'Cover image is required', color: 'error' }
-    
-  if (!form.avatar) 
+
+  if (!form.avatar)
     snackbar.value = { show: true, text: 'Avatar is required', color: 'error' }
-    
-  if (!Array.isArray(form.colors) || form.colors.length === 0) 
+
+  if (!Array.isArray(form.colors) || form.colors.length === 0)
     snackbar.value = { show: true, text: 'At least one color is required', color: 'error' }
-    
+
   const invalidColor = form.colors.find(c => !c.name || !c.code)
-  if (invalidColor) 
+  if (invalidColor)
     snackbar.value = { show: true, text: 'Each color must have name and code', color: 'error' }
-    
-  if (!Array.isArray(form.variances) || form.variances.length === 0) 
+
+  if (!Array.isArray(form.variances) || form.variances.length === 0)
     snackbar.value = { show: true, text: 'At least one variance is required', color: 'error' }
-    
+
   const invalidVariance = form.variances.find(v => !v.quantity || Number(v.price) <= 0)
-  if (invalidVariance) 
+  if (invalidVariance)
     snackbar.value = { show: true, text: 'Each variance requires quantity and positive price', color: 'error' }
-    
+
   saving.value = true
   try {
     const body = {
@@ -235,19 +261,23 @@ async function publishProduct() {
 
     const res = await fetch(url, {
       method,
-      headers:{
+      headers: {
         'Content-Type': 'application/json',
-        authorization : `Bearer ${authStore.token}`
+        'authorization': `Bearer ${authStore.token}`,
       },
       body: JSON.stringify(body),
     })
-    if (!res.ok) throw new Error('Failed to save product')
+
+    if (!res.ok)
+      throw new Error('Failed to save product')
 
     snackbar.value = { show: true, text: isEdit.value ? 'Product updated' : 'Product created', color: 'success' }
     navigateTo('/management')
-  } catch (err) {
+  }
+  catch (err) {
     snackbar.value = { show: true, text: 'Failed to save product', color: 'error' }
-  } finally {
+  }
+  finally {
     saving.value = false
   }
 }
@@ -260,19 +290,35 @@ function discard() {
 <template>
   <div class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
     <div class="d-flex flex-column justify-center">
-      <h4 class="text-h4 font-weight-medium">{{ isEdit ? 'Edit product' : 'Add a new product' }}</h4>
+      <h4 class="text-h4 font-weight-medium">
+        {{ isEdit ? 'Edit product' : 'Add a new product' }}
+      </h4>
       <span>{{ isEdit ? 'Update the product details below' : 'Fill in the product details below' }}</span>
     </div>
     <div class="d-flex gap-4 align-center flex-wrap">
-      <VBtn variant="tonal" color="secondary" @click="discard">Discard</VBtn>
-      <VBtn :loading="saving" @click="publishProduct">{{ isEdit ? 'Save Changes' : 'Publish Product' }}</VBtn>
+      <VBtn
+        variant="tonal"
+        color="secondary"
+        @click="discard"
+      >
+        Discard
+      </VBtn>
+      <VBtn
+        :loading="saving"
+        @click="publishProduct"
+      >
+        {{ isEdit ? 'Save Changes' : 'Publish Product' }}
+      </VBtn>
     </div>
   </div>
 
-  <VCard class="mb-6" title="Product Preview">
+  <VCard
+    class="mb-6"
+    title="Product Preview"
+  >
     <VCardText>
       <div class="preview-card">
-        <div 
+        <div
           class="preview-cover"
           :class="{ 'error-outline': coverInvalid }"
           @drop="handleCoverDrop"
@@ -281,7 +327,10 @@ function discard() {
         >
           <template v-if="uploadingCover">
             <div class="cover-placeholder d-flex align-center justify-center">
-              <VProgressCircular indeterminate color="primary" />
+              <VProgressCircular
+                indeterminate
+                color="primary"
+              />
             </div>
           </template>
           <template v-else-if="form.imageUrl">
@@ -290,18 +339,32 @@ function discard() {
               height="200"
               cover
             />
-            <VBtn size="x-small" icon variant="flat" color="error" class="cover-remove-btn" @click.stop="form.imageUrl = ''">
-              <VIcon icon="tabler-x" size="14" />
+            <VBtn
+              size="x-small"
+              icon
+              variant="flat"
+              color="error"
+              class="cover-remove-btn"
+              @click.stop="form.imageUrl = ''"
+            >
+              <VIcon
+                icon="tabler-x"
+                size="14"
+              />
             </VBtn>
           </template>
           <template v-else>
             <div class="cover-placeholder d-flex flex-column align-center justify-center">
-              <VIcon icon="tabler-photo" size="40" class="text-disabled" />
+              <VIcon
+                icon="tabler-photo"
+                size="40"
+                class="text-disabled"
+              />
               <span class="text-body-2 text-disabled">Click to add cover</span>
             </div>
           </template>
-          
-          <div 
+
+          <div
             class="preview-avatar"
             :class="{ 'error-outline': avatarInvalid }"
             @drop.stop="handleAvatarDrop"
@@ -310,7 +373,11 @@ function discard() {
           >
             <template v-if="uploadingAvatar">
               <div class="avatar-placeholder d-flex align-center justify-center">
-                <VProgressCircular indeterminate size="24" color="primary" />
+                <VProgressCircular
+                  indeterminate
+                  size="24"
+                  color="primary"
+                />
               </div>
             </template>
             <template v-else-if="form.avatar">
@@ -319,199 +386,393 @@ function discard() {
                 height="75"
                 width="75"
               />
-              <VBtn size="x-small" icon variant="flat" color="error" class="avatar-remove-btn" @click.stop="form.avatar = ''">
-                <VIcon icon="tabler-x" size="12" />
+              <VBtn
+                size="x-small"
+                icon
+                variant="flat"
+                color="error"
+                class="avatar-remove-btn"
+                @click.stop="form.avatar = ''"
+              >
+                <VIcon
+                  icon="tabler-x"
+                  size="12"
+                />
               </VBtn>
             </template>
             <template v-else>
               <div class="avatar-placeholder d-flex flex-column align-center justify-center">
-                <VIcon icon="tabler-box" size="24" class="text-disabled" />
+                <VIcon
+                  icon="tabler-box"
+                  size="24"
+                  class="text-disabled"
+                />
               </div>
             </template>
           </div>
         </div>
-        
+
         <div class="pt-10 px-3 pb-3">
-          <p v-if="coverInvalid" class="text-error text-caption mb-1">Cover image is required</p>
-          <p v-if="avatarInvalid" class="text-error text-caption mb-0">Avatar is required</p>
+          <p
+            v-if="coverInvalid"
+            class="text-error text-caption mb-1"
+          >
+            Cover image is required
+          </p>
+          <p
+            v-if="avatarInvalid"
+            class="text-error text-caption mb-0"
+          >
+            Avatar is required
+          </p>
         </div>
       </div>
     </VCardText>
   </VCard>
 
-
   <VForm ref="formRef">
-  <VRow>
-    <VCol md="8">
-      <!-- Product Information -->
-      <VCard class="mb-6" title="Product Information">
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <AppTextField v-model="form.title" label="Title" placeholder="Product title" :rules="[requiredValidator]" />
-            </VCol>
-            <VCol cols="12">
-              <VTextarea v-model="form.definition" label="Definition" placeholder="Product definition" rows="3" :rules="[requiredValidator]" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VLabel class="mb-1">Type</VLabel>
-              <VSelect
-                v-model="form.type"
-                :items="TYPE_OPTIONS"
-                placeholder="Select type"
+    <VRow>
+      <VCol md="8">
+        <!-- Product Information -->
+        <VCard
+          class="mb-6"
+          title="Product Information"
+        >
+          <VCardText>
+            <VRow>
+              <VCol cols="12">
+                <AppTextField
+                  v-model="form.title"
+                  label="Title"
+                  placeholder="Product title"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol cols="12">
+                <VTextarea
+                  v-model="form.definition"
+                  label="Definition"
+                  placeholder="Product definition"
+                  rows="3"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VLabel class="mb-1">
+                  Type
+                </VLabel>
+                <VSelect
+                  v-model="form.type"
+                  :items="TYPE_OPTIONS"
+                  placeholder="Select type"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VLabel class="mb-1">
+                  Destination
+                </VLabel>
+                <VSelect
+                  v-model="form.destination"
+                  :items="DESTINATION_OPTIONS"
+                  multiple
+                  chips
+                  closable-chips
+                  :rules="[arrayRequired]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VLabel class="mb-1">
+                  Properties
+                </VLabel>
+                <VCombobox
+                  v-model="form.properties"
+                  multiple
+                  chips
+                  closable-chips
+                  placeholder="Add properties"
+                  :rules="[arrayRequired]"
+                />
+              </VCol>
+            </VRow>
+          </VCardText>
+        </VCard>
+
+        <!-- Caracteristiques Technique -->
+        <VCard
+          class="mb-6"
+          title="Caractéristiques Techniques"
+        >
+          <VCardText>
+            <VRow>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="form.densite"
+                  label="Densité"
+                  placeholder="e.g. 1.2"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="form.rendement"
+                  label="Rendement"
+                  placeholder="e.g. 10m²/L"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="form.tempsSachage"
+                  label="Temps de Séchage"
+                  placeholder="e.g. 2h"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VLabel class="mb-1">
+                  Aspect du Film Sec
+                </VLabel>
+                <VSelect
+                  v-model="form.aspectdifilmsec"
+                  :items="ASPECT_OPTIONS"
+                  multiple
+                  chips
+                  closable-chips
+                  :rules="[arrayRequired]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="form.teinte"
+                  label="Teinte (optionnel)"
+                  placeholder="e.g. Blanc"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="form.viscosite"
+                  label="Viscosité (optionnel)"
+                  placeholder="e.g. 100 KU"
+                />
+              </VCol>
+            </VRow>
+          </VCardText>
+        </VCard>
+
+        <!-- Mise en Oeuvre -->
+        <VCard
+          class="mb-6"
+          title="Mise en Œuvre"
+        >
+          <VCardText>
+            <VRow>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="form.dilution"
+                  label="Dilution"
+                  placeholder="e.g. 5-10% eau"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VLabel class="mb-1">
+                  Supports
+                </VLabel>
+                <VSelect
+                  v-model="form.supports"
+                  :items="SUPPORT_OPTIONS"
+                  multiple
+                  chips
+                  closable-chips
+                  :rules="[arrayRequired]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VLabel class="mb-1">
+                  Matériel d'Application
+                </VLabel>
+                <VSelect
+                  v-model="form.materielApplication"
+                  :items="MATERIEL_OPTIONS"
+                  multiple
+                  chips
+                  closable-chips
+                  :rules="[arrayRequired]"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="form.nettoyageMateriel"
+                  label="Nettoyage Matériel (optionnel)"
+                  placeholder="e.g. Eau"
+                />
+              </VCol>
+              <VCol cols="12">
+                <VTextarea
+                  v-model="form.preparationSupport"
+                  label="Préparation Support (optionnel)"
+                  rows="2"
+                />
+              </VCol>
+            </VRow>
+          </VCardText>
+        </VCard>
+      </VCol>
+
+      <VCol
+        md="4"
+        cols="12"
+      >
+        <!-- Colors -->
+        <VCard title="Colors">
+          <VCardText>
+            <div
+              v-for="(c, idx) in form.colors"
+              :key="idx"
+              class="d-flex gap-2 align-center mb-3"
+            >
+              <AppTextField
+                v-model="c.name"
+                label="Name"
+                placeholder="Color name"
+                class="flex-grow-1"
                 :rules="[requiredValidator]"
               />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VLabel class="mb-1">Destination</VLabel>
-              <VSelect
-                v-model="form.destination"
-                :items="DESTINATION_OPTIONS"
-                multiple
-                chips
-                closable-chips
-                :rules="[arrayRequired]"
-              />
-            </VCol>
-            <VCol cols="12" md="6">
-                <VLabel class="mb-1">Properties</VLabel>
-              <VCombobox
-                v-model="form.properties"
-                multiple
-                chips
-                closable-chips
-                placeholder="Add properties"
-                :rules="[arrayRequired]"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-
-      <!-- Caracteristiques Technique -->
-      <VCard class="mb-6" title="Caractéristiques Techniques">
-        <VCardText>
-          <VRow>
-            <VCol cols="12" md="6">
-              <AppTextField v-model="form.densite" label="Densité" placeholder="e.g. 1.2" :rules="[requiredValidator]" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <AppTextField v-model="form.rendement" label="Rendement" placeholder="e.g. 10m²/L" :rules="[requiredValidator]" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <AppTextField v-model="form.tempsSachage" label="Temps de Séchage" placeholder="e.g. 2h" :rules="[requiredValidator]" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VLabel class="mb-1">Aspect du Film Sec</VLabel>
-              <VSelect
-                v-model="form.aspectdifilmsec"
-                :items="ASPECT_OPTIONS"
-                multiple
-                chips
-                closable-chips
-                :rules="[arrayRequired]"
-              />
-            </VCol>
-            <VCol cols="12" md="6">
-              <AppTextField v-model="form.teinte" label="Teinte (optionnel)" placeholder="e.g. Blanc" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <AppTextField v-model="form.viscosite" label="Viscosité (optionnel)" placeholder="e.g. 100 KU" />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-
-      <!-- Mise en Oeuvre -->
-      <VCard class="mb-6" title="Mise en Œuvre">
-        <VCardText>
-          <VRow>
-            <VCol cols="12" md="6">
-              <AppTextField v-model="form.dilution" label="Dilution" placeholder="e.g. 5-10% eau" :rules="[requiredValidator]" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VLabel class="mb-1">Supports</VLabel>
-              <VSelect
-                v-model="form.supports"
-                :items="SUPPORT_OPTIONS"
-                multiple
-                chips
-                closable-chips
-                :rules="[arrayRequired]"
-              />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VLabel class="mb-1">Matériel d'Application</VLabel>
-              <VSelect
-                v-model="form.materielApplication"
-                :items="MATERIEL_OPTIONS"
-                multiple
-                chips
-                closable-chips
-                :rules="[arrayRequired]"
-              />
-            </VCol>
-            <VCol cols="12" md="6">
-              <AppTextField v-model="form.nettoyageMateriel" label="Nettoyage Matériel (optionnel)" placeholder="e.g. Eau" />
-            </VCol>
-            <VCol cols="12">
-              <VTextarea v-model="form.preparationSupport" label="Préparation Support (optionnel)" rows="2" />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-    </VCol>
-
-    <VCol md="4" cols="12">
-      <!-- Colors -->
-      <VCard title="Colors">
-        <VCardText>
-          <div v-for="(c, idx) in form.colors" :key="idx" class="d-flex gap-2 align-center mb-3">
-            <AppTextField v-model="c.name" label="Name" placeholder="Color name" class="flex-grow-1" :rules="[requiredValidator]" />
-            <div>
-              <VLabel class="mb-1">Code</VLabel>
               <div>
-                <input type="color" v-model="c.code" style="width: 50px; height: 40px; border: none; cursor: pointer;" />
+                <VLabel class="mb-1">
+                  Code
+                </VLabel>
+                <div>
+                  <input
+                    v-model="c.code"
+                    type="color"
+                    style="width: 50px; height: 40px; border: none; cursor: pointer;"
+                  >
+                </div>
               </div>
-            </div>
-            <VBtn v-if="form.colors.length > 1" icon size="small" color="error" variant="text" @click="removeColor(idx)">
-              <VIcon icon="tabler-trash" />
-            </VBtn>
-          </div>
-          <VBtn variant="tonal" @click="addColor">Add Color</VBtn>
-        </VCardText>
-      </VCard>
-
-      <!-- Variances -->
-      <VCard class="mt-6" title="Variances">
-        <VCardText>
-          <VRow v-for="(v, idx) in form.variances" :key="idx" class="mb-2" dense>
-            <VCol :cols="form.variances.length > 1 ? 5 : 6">
-              <AppTextField v-model="v.quantity" label="Quantity" placeholder="e.g. 1L, 5kg" :rules="[requiredValidator]" />
-            </VCol>
-            <VCol :cols="form.variances.length > 1 ? 5 : 6">
-              <AppTextField 
-                v-model.number="v.price" 
-                label="Price (DZD)" 
-                type="number" 
-                :rules="[requiredValidator]"  
-                @input="v.price = Number(String(v.price).replace(/[^0-9]/g, ''))"
-              />
-            </VCol>
-            <VCol cols="2" class="d-flex align-center" v-if="form.variances.length > 1">
-              <VBtn  icon size="small" color="error" variant="text" @click="removeVariance(idx)">
+              <VBtn
+                v-if="form.colors.length > 1"
+                icon
+                size="small"
+                color="error"
+                variant="text"
+                @click="removeColor(idx)"
+              >
                 <VIcon icon="tabler-trash" />
               </VBtn>
-            </VCol>
-          </VRow>
-          <VBtn class="mt-2" variant="tonal" @click="addVariance">Add Variance</VBtn>
-        </VCardText>
-      </VCard>
-    </VCol>
-  </VRow>
+            </div>
+            <VBtn
+              variant="tonal"
+              @click="addColor"
+            >
+              Add Color
+            </VBtn>
+          </VCardText>
+        </VCard>
+
+        <!-- Variances -->
+        <VCard
+          class="mt-6"
+          title="Variances"
+        >
+          <VCardText>
+            <VRow
+              v-for="(v, idx) in form.variances"
+              :key="idx"
+              class="mb-2"
+              dense
+            >
+              <VCol :cols="form.variances.length > 1 ? 5 : 6">
+                <AppTextField
+                  v-model="v.quantity"
+                  label="Quantity"
+                  placeholder="e.g. 1L, 5kg"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol :cols="form.variances.length > 1 ? 5 : 6">
+                <AppTextField
+                  v-model.number="v.price"
+                  label="Price (DZD)"
+                  type="number"
+                  :rules="[requiredValidator]"
+                  @input="v.price = Number(String(v.price).replace(/[^0-9]/g, ''))"
+                />
+              </VCol>
+              <VCol
+                v-if="form.variances.length > 1"
+                cols="2"
+                class="d-flex align-center"
+              >
+                <VBtn
+                  icon
+                  size="small"
+                  color="error"
+                  variant="text"
+                  @click="removeVariance(idx)"
+                >
+                  <VIcon icon="tabler-trash" />
+                </VBtn>
+              </VCol>
+            </VRow>
+            <VBtn
+              class="mt-2"
+              variant="tonal"
+              @click="addVariance"
+            >
+              Add Variance
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VCol>
+    </VRow>
   </VForm>
 
-  <VSnackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+  <VSnackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    timeout="3000"
+  >
     {{ snackbar.text }}
   </VSnackbar>
 </template>

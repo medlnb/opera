@@ -1,12 +1,11 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth';
-import { useCartStore } from '@/stores/cart';
-
+import { useAuthStore } from '@/stores/auth'
+import { useCartStore } from '@/stores/cart'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 
-cartStore.fetchCart();
+cartStore.fetchCart()
 </script>
 
 <template>

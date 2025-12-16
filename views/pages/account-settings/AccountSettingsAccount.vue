@@ -1,14 +1,15 @@
 <script setup>
-import communes from '@/data/commune.json';
-import { useAuthStore } from "@/stores/auth.js";
-import { useValidators } from '@/utils/validators';
+import communes from '@/data/commune.json'
+import { useAuthStore } from '@/stores/auth.js'
+import { useValidators } from '@/utils/validators'
 
 const config = useRuntimeConfig()
-const authStore = useAuthStore();
+const authStore = useAuthStore()
+
 const accountData = {
   ...authStore.user ?? {},
-  phone: authStore.user?.phone.slice(4) ?? ``,
-  avatar : authStore.user?.avatar ?? `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName.charAt(0)}${authStore.user?.lastName.charAt(0)}`,
+  phone: authStore.user?.phone.slice(4) ?? '',
+  avatar: authStore.user?.avatar ?? `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName.charAt(0)}${authStore.user?.lastName.charAt(0)}`,
 }
 
 const refInputEl = ref()
@@ -26,6 +27,7 @@ const updateProfile = async () => {
       const r = await result
       if (!r.valid) {
         showSnackbar('Please fix the highlighted errors', 'error')
+
         return
       }
     }
@@ -44,8 +46,10 @@ const updateProfile = async () => {
         city: accountDataLocal.value.city,
       },
     })
+
     if (error.value) {
       showSnackbar('Failed to update profile', 'error')
+
       return console.error('Failed to update profile:', error.value)
     }
 
@@ -53,24 +57,28 @@ const updateProfile = async () => {
       authStore.patchUser(data.value.user)
       showSnackbar('Profile updated successfully', 'success')
     }
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Failed to update profile:', err)
     showSnackbar('Failed to update profile', 'error')
-  } finally {
+  }
+  finally {
     isLoading.value = false
   }
 }
 
-
 // Build wilaya and city options from communes dataset
 const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
+
 const stateOptions = computed(() =>
-  wilayaGroups.map(g => ({ id: String(g[0].wilaya_id), label: `${g[0].name}` }))
+  wilayaGroups.map(g => ({ id: String(g[0].wilaya_id), label: `${g[0].name}` })),
 )
 
 const cityOptions = computed(() => {
-  if (!accountDataLocal.value.state) return []
+  if (!accountDataLocal.value.state)
+    return []
   const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(accountDataLocal.value.state))
+
   return group ? group.map(c => ({ id: String(c.id), label: c.name })) : []
 })
 
@@ -85,92 +93,105 @@ const resetForm = () => {
 const isUploadingAvatar = ref(false)
 const avatarError = ref('')
 
-const changeAvatar = async (file) => {
+const changeAvatar = async file => {
   const { files } = file.target
-  if (!files || !files.length) return
+  if (!files || !files.length)
+    return
 
   avatarError.value = ''
-  
+
   // Check file size (3MB = 3 * 1024 * 1024 bytes)
   const maxSize = 3 * 1024 * 1024
   if (files[0].size > maxSize) {
     avatarError.value = 'Image size must be less than 3MB'
     showSnackbar('Image size must be less than 3MB', 'error')
+
     return
   }
 
   const fileReader = new FileReader()
+
   fileReader.readAsDataURL(files[0])
-  
+
   fileReader.onload = async () => {
-    if (typeof fileReader.result !== 'string') return
-    
+    if (typeof fileReader.result !== 'string')
+      return
+
     const imageDataUri = fileReader.result
+
     isUploadingAvatar.value = true
-    
+
     try {
       // Check if user already has an avatar ID (stored in user object)
       // const existingAvatarId = authStore.user?.avatarId
-      
+
       // if (!existingAvatarId) {
       //   // Update existing image
       //   const { error } = await useApi(`/api/image/${existingAvatarId}`, {
       //     method: 'PATCH',
       //     body: { image: imageDataUri },
       //   })
-        
+
       //   if (error.value) {
       //     console.error('Failed to update avatar:', error.value)
       //     return
       //   }
-        
+
       //   // Update local avatar display (append timestamp to bust cache)
       //   const avatarUrl = `/api/image?id=${existingAvatarId}&t=${Date.now()}`
       //   accountDataLocal.value.avatar = avatarUrl
       //   authStore.patchUser({ avatar: avatarUrl })
       // } else {
-        // Create new image
-        const { data, error } = await useApi('/api/image', {
-          method: 'POST',
-          body: { image: imageDataUri },
+      // Create new image
+      const { data, error } = await useApi('/api/image', {
+        method: 'POST',
+        body: { image: imageDataUri },
+      })
+
+      if (error.value) {
+        showSnackbar('Failed to upload avatar', 'error')
+
+        return console.error('Failed to upload avatar:', error.value)
+      }
+
+      if (data.value?.id) {
+        const avatarUrl = `${config.public.apiBaseUrl}/api/image?id=${data.value.id}`
+
+        accountDataLocal.value.avatar = avatarUrl
+
+        // Update user profile with new avatar URL and avatarId
+        const { error: updateError } = await useApi('/api/auth/me', {
+          method: 'PATCH',
+          body: { avatar: avatarUrl },
         })
-        if (error.value) {
-          showSnackbar('Failed to upload avatar', 'error')
-          return console.error('Failed to upload avatar:', error.value)
+
+        if (updateError.value) {
+          showSnackbar('Failed to update profile', 'error')
+
+          return console.error('Failed to update profile with avatar:', updateError.value)
         }
-        
-        if (data.value?.id) {
-          const avatarUrl = `${config.public.apiBaseUrl}/api/image?id=${data.value.id}`
-          accountDataLocal.value.avatar = avatarUrl
-          
-          // Update user profile with new avatar URL and avatarId
-          const { error: updateError } = await useApi('/api/auth/me', {
-            method: 'PATCH',
-            body: { avatar: avatarUrl },
-          })
-          
-          if (updateError.value) {
-            showSnackbar('Failed to update profile', 'error')
-            return console.error('Failed to update profile with avatar:', updateError.value)
-          }
-          
-          authStore.patchUser({ avatar: avatarUrl })
-          showSnackbar('Avatar updated successfully', 'success')
-        }
+
+        authStore.patchUser({ avatar: avatarUrl })
+        showSnackbar('Avatar updated successfully', 'success')
+      }
+
       // }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Failed to change avatar:', err)
       showSnackbar('Failed to change avatar', 'error')
-    } finally {
+    }
+    finally {
       isUploadingAvatar.value = false
     }
   }
 }
 
-const snackbar = ref({ show: false, message: "", color: "success" });
-const showSnackbar = (message, color = "snackbar") => {
-  snackbar.value = { show: true, message, color };
-};
+const snackbar = ref({ show: false, message: '', color: 'success' })
+
+const showSnackbar = (message, color = 'snackbar') => {
+  snackbar.value = { show: true, message, color }
+}
 </script>
 
 <template>
@@ -213,7 +234,10 @@ const showSnackbar = (message, color = "snackbar") => {
             <p class="text-body-1 mb-0">
               Allowed JPG, GIF or PNG. Max size of 3MB
             </p>
-            <p v-if="avatarError" class="text-error mb-0">
+            <p
+              v-if="avatarError"
+              class="text-error mb-0"
+            >
               {{ avatarError }}
             </p>
           </form>
@@ -222,7 +246,10 @@ const showSnackbar = (message, color = "snackbar") => {
         <VDivider />
 
         <VCardText class="pt-2">
-          <VForm ref="formRef" class="mt-6">
+          <VForm
+            ref="formRef"
+            class="mt-6"
+          >
             <VRow>
               <VCol
                 md="6"
@@ -278,7 +305,7 @@ const showSnackbar = (message, color = "snackbar") => {
                 />
               </VCol>
 
-              <VCol 
+              <VCol
                 cols="12"
                 md="6"
               >
@@ -301,7 +328,12 @@ const showSnackbar = (message, color = "snackbar") => {
                   disabled
                 >
                   <template #prepend-inner>
-                    <p class="mb-0" style="margin-top: 1px;">0</p>
+                    <p
+                      class="mb-0"
+                      style="margin-top: 1px;"
+                    >
+                      0
+                    </p>
                   </template>
                 </AppTextField>
               </VCol>
