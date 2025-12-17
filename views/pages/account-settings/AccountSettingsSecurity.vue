@@ -34,7 +34,7 @@ const onSave = async () => {
 
   isSaving.value = true
   try {
-    const { data, error } = await useApi('/api/auth/change-password', {
+    const { error } = await useApi('/api/auth/change-password', {
       method: 'PATCH',
       body: {
         oldPassword: currentPassword.value,

@@ -43,9 +43,20 @@ onMounted(() => {
       <VImg
         src="https://jazeerapaints.com/media/blockbuilder_blocktype/s/h/shutterstock_1868800168-fotor-20240625141552_2.png"
         class="rounded w-100 hero-img"
-        style="min-height: 150px;"
+        style="min-block-size: 150px;"
+        height="250"
         cover
-      />
+        position="left center"
+      >
+        <template #placeholder>
+          <div
+            class="w-100 hero-placeholder"
+            style="min-block-size: 150px;"
+          >
+            <div class="fade-placeholder h-100 w-100" />
+          </div>
+        </template>
+      </VImg>
       <div
         style="inset: 0;"
         class="d-flex align-center justify-center position-absolute"
@@ -113,12 +124,7 @@ onMounted(() => {
               class="article-image"
             >
               <template #placeholder>
-                <div class="d-flex align-center justify-center fill-height">
-                  <VProgressCircular
-                    indeterminate
-                    color="primary"
-                  />
-                </div>
+                <div class="fade-placeholder w-100 h-100" />
               </template>
             </VImg>
             <VCardText>
@@ -164,9 +170,10 @@ onMounted(() => {
 
 .article-title {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .article-image {
@@ -175,14 +182,31 @@ onMounted(() => {
 </style>
 
 <style scoped>
-.hero-img :deep(img) {
-  object-position: left center !important;
+.hero-placeholder {
+  block-size: 250px;
+}
+
+.fade-placeholder {
+  animation: fade-pulse 1.2s ease-in-out infinite;
+  background-color: rgba(var(--v-theme-on-surface), 0.06);
+}
+
+@keyframes fade-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .hero-title {
   font-size: 1rem;
   font-weight: 900;
 }
+
 .hero-subtitle {
   font-size: 0.7rem;
 }
@@ -192,6 +216,7 @@ onMounted(() => {
     font-size: 2rem;
     font-weight: 900;
   }
+
   .hero-subtitle {
     font-size: 1.25rem;
   }

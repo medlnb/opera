@@ -3,6 +3,12 @@ import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth.js'
 import { useValidators } from '@/utils/validators'
 
+const snackbar = ref({ show: false, message: '', color: 'success' })
+
+const showSnackbar = (message, color = 'snackbar') => {
+  snackbar.value = { show: true, message, color }
+}
+
 const config = useRuntimeConfig()
 const authStore = useAuthStore()
 
@@ -186,12 +192,6 @@ const changeAvatar = async file => {
     }
   }
 }
-
-const snackbar = ref({ show: false, message: '', color: 'success' })
-
-const showSnackbar = (message, color = 'snackbar') => {
-  snackbar.value = { show: true, message, color }
-}
 </script>
 
 <template>
@@ -330,7 +330,7 @@ const showSnackbar = (message, color = 'snackbar') => {
                   <template #prepend-inner>
                     <p
                       class="mb-0"
-                      style="margin-top: 1px;"
+                      style="margin-block-start: 1px;"
                     >
                       0
                     </p>
