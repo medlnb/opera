@@ -13,25 +13,18 @@ const snackbar = ref({ show: false, text: '', color: 'error' })
 const saving = ref(false)
 const uploadingCover = ref(false)
 const uploadingAvatar = ref(false)
+const uploadingTechnicalFile = ref(false)
 const loadingProduct = ref(false)
 const route = useRoute()
 const isEdit = computed(() => !!route.query.id)
 const formRef = ref()
 
+const technicalFileFilename = ref<string>('')
+const detachTechnicalFile = ref(false)
+
 // Validators
 const { requiredValidator } = useValidators()
 const arrayRequired = (val: unknown) => (Array.isArray(val) && val.length > 0) || 'At least one item is required'
-
-// UI error highlight for missing assets
-const showAssetErrors = ref(false)
-const coverInvalid = computed(() => showAssetErrors.value && !form.imageUrl)
-const avatarInvalid = computed(() => showAssetErrors.value && !form.avatar)
-
-const TYPE_OPTIONS = ['decor', 'buildings', 'coating']
-const DESTINATION_OPTIONS = ['Habitations', 'Bureaux', 'Hotel', 'Restaurants', 'Showroom', 'Magasins']
-const SUPPORT_OPTIONS = ['Platre', 'Ciment', 'Enduit', 'Brique']
-const MATERIEL_OPTIONS = ['Rouleau', 'Pinceau', 'Pistolet', 'Brosse']
-const ASPECT_OPTIONS = ['Mat', 'Satiné', 'Brillant', 'Velours']
 
 const form = reactive({
   imageUrl: '',
@@ -39,6 +32,7 @@ const form = reactive({
   title: '',
   type: null as string | null,
   definition: '',
+  technicalFile: null as string | null,
   destination: [] as string[],
   properties: [] as string[],
   variances: [{ quantity: '', price: 0 }] as { quantity: string; price: number }[],
@@ -59,6 +53,17 @@ const form = reactive({
   preparationSupport: '',
   colors: [{ name: '', code: '#000000' }] as { name: string; code: string }[],
 })
+
+// UI error highlight for missing assets
+const showAssetErrors = ref(false)
+const coverInvalid = computed(() => showAssetErrors.value && !form.imageUrl)
+const avatarInvalid = computed(() => showAssetErrors.value && !form.avatar)
+
+const TYPE_OPTIONS = ['decor', 'buildings', 'coating']
+const DESTINATION_OPTIONS = ['Habitations', 'Bureaux', 'Hotel', 'Restaurants', 'Showroom', 'Magasins']
+const SUPPORT_OPTIONS = ['Platre', 'Ciment', 'Enduit', 'Brique']
+const MATERIEL_OPTIONS = ['Eponge nature', 'tampon décore', 'Lisseuse', 'couteau', 'brosse', 'Pinceau', 'Lisseuse inox', 'Pinceau plat spalter', 'spatule plasque']
+const ASPECT_OPTIONS = ['Mitallise', 'Brillant', 'Soyeux', 'Lumineux', 'Marbre Ultra Brillant']
 
 onMounted(async () => {
   if (!isEdit.value)
@@ -96,6 +101,17 @@ onMounted(async () => {
       form.nettoyageMateriel = p.nettoyageMateriel || ''
       form.preparationSupport = p.preparationSupport || ''
       form.colors = Array.isArray(p.colors) && p.colors.length ? p.colors.map((c: any) => ({ name: c.name || '', code: c.code || '#000000' })) : [{ name: '', code: '#000000' }]
+
+      // Optional technical PDF
+      if (p.technicalFile) {
+        form.technicalFile = p.technicalFile?._id || p.technicalFile?.id || p.technicalFile
+        technicalFileFilename.value = p.technicalFile?.filename || ''
+      }
+      else {
+        form.technicalFile = null
+        technicalFileFilename.value = ''
+      }
+      detachTechnicalFile.value = false
     }
   }
   catch (err) {
@@ -137,6 +153,84 @@ async function uploadImage(file: File): Promise<string | null> {
     }
     reader.readAsDataURL(file)
   })
+}
+
+async function uploadTechnicalPdf(file: File): Promise<{ id: string; filename: string } | null> {
+  if (!file || file.type !== 'application/pdf') {
+    snackbar.value = { show: true, text: 'Please select a PDF file', color: 'error' }
+
+    return null
+  }
+
+  return new Promise(resolve => {
+    const reader = new FileReader()
+
+    reader.onload = async () => {
+      try {
+        const dataUri = reader.result as string
+
+        const res = await fetch(`${config.public.apiBaseUrl}/api/technical-files`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${authStore.token}`,
+          },
+          body: JSON.stringify({
+            file: dataUri,
+            filename: file.name,
+          }),
+        })
+
+        if (!res.ok)
+          throw new Error('Upload failed')
+
+        const data = await res.json()
+
+        resolve({ id: data.id, filename: data.filename })
+      }
+      catch {
+        snackbar.value = { show: true, text: 'PDF upload failed', color: 'error' }
+        resolve(null)
+      }
+    }
+
+    reader.onerror = () => {
+      snackbar.value = { show: true, text: 'Failed to read PDF file', color: 'error' }
+      resolve(null)
+    }
+
+    reader.readAsDataURL(file)
+  })
+}
+
+async function selectTechnicalFile() {
+  const input = document.createElement('input')
+
+  input.type = 'file'
+  input.accept = 'application/pdf'
+  input.onchange = async e => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file)
+      return
+
+    uploadingTechnicalFile.value = true
+
+    const uploaded = await uploadTechnicalPdf(file)
+    if (uploaded) {
+      form.technicalFile = uploaded.id
+      technicalFileFilename.value = uploaded.filename
+      detachTechnicalFile.value = false
+    }
+    uploadingTechnicalFile.value = false
+  }
+
+  input.click()
+}
+
+function detachTechnicalFileFromProduct() {
+  form.technicalFile = null
+  technicalFileFilename.value = ''
+  detachTechnicalFile.value = true
 }
 
 function handleCoverDrop(e: DragEvent) {
@@ -254,6 +348,10 @@ async function publishProduct() {
       ...form,
       variances: form.variances.filter(v => v.quantity),
       colors: form.colors.filter(c => c.name && c.code),
+
+      // Only send technicalFile when set, unless admin explicitly detached it.
+      ...(form.technicalFile ? { technicalFile: form.technicalFile } : {}),
+      ...(detachTechnicalFile.value ? { technicalFile: null } : {}),
     }
 
     const url = isEdit.value ? `${config.public.apiBaseUrl}/api/products/${String(route.query.id)}` : `${config.public.apiBaseUrl}/api/products`
@@ -563,16 +661,7 @@ function discard() {
                   :rules="[arrayRequired]"
                 />
               </VCol>
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppTextField
-                  v-model="form.teinte"
-                  label="Teinte (optionnel)"
-                  placeholder="e.g. Blanc"
-                />
-              </VCol>
+
               <VCol
                 cols="12"
                 md="6"
@@ -663,6 +752,58 @@ function discard() {
         md="4"
         cols="12"
       >
+        <!-- Technical File (PDF) -->
+        <VCard
+          title="Technical File (PDF)"
+          class="mb-6"
+        >
+          <VCardText>
+            <div class="d-flex flex-column gap-3">
+              <div class="d-flex flex-wrap gap-2 align-center">
+                <VBtn
+                  :loading="uploadingTechnicalFile"
+                  variant="tonal"
+                  prepend-icon="tabler-file-type-pdf"
+                  @click="selectTechnicalFile"
+                >
+                  {{ form.technicalFile ? 'Replace PDF' : 'Upload PDF' }}
+                </VBtn>
+
+                <VBtn
+                  v-if="form.technicalFile"
+                  color="primary"
+                  variant="outlined"
+                  prepend-icon="tabler-download"
+                  :href="`${config.public.apiBaseUrl}/api/technical-files?id=${form.technicalFile}`"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Download
+                </VBtn>
+
+                <VBtn
+                  v-if="form.technicalFile"
+                  color="error"
+                  variant="text"
+                  prepend-icon="tabler-trash"
+                  @click="detachTechnicalFileFromProduct"
+                >
+                  Detach
+                </VBtn>
+              </div>
+
+              <div class="text-caption text-medium-emphasis">
+                <template v-if="form.technicalFile">
+                  Attached: <strong>{{ technicalFileFilename || 'PDF file' }}</strong>
+                </template>
+                <template v-else>
+                  Optional. Upload a PDF technical file and it will be linked to this product.
+                </template>
+              </div>
+            </div>
+          </VCardText>
+        </VCard>
+
         <!-- Colors -->
         <VCard title="Colors">
           <VCardText>
@@ -686,7 +827,7 @@ function discard() {
                   <input
                     v-model="c.code"
                     type="color"
-                    style="width: 50px; height: 40px; border: none; cursor: pointer;"
+                    style=" border: none; block-size: 40px; cursor: pointer;inline-size: 50px;"
                   >
                 </div>
               </div>
@@ -779,9 +920,9 @@ function discard() {
 
 <style lang="scss" scoped>
 .preview-card {
+  overflow: hidden;
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .preview-cover {
@@ -794,27 +935,27 @@ function discard() {
   }
 
   .cover-placeholder {
-    height: 200px;
-    border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    block-size: 200px;
+    border-block-end: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   }
 
   .cover-remove-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    inset-block-start: 8px;
+    inset-inline-end: 8px;
   }
 }
 
 .preview-avatar {
   position: absolute;
-  bottom: -2rem;
-  left: 1rem;
-  width: 75px;
-  height: 75px;
-  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  block-size: 75px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 15%);
   cursor: pointer;
+  inline-size: 75px;
+  inset-block-end: -2rem;
+  inset-inline-start: 1rem;
   transition: transform 0.2s;
 
   &:hover {
@@ -822,15 +963,15 @@ function discard() {
   }
 
   .avatar-placeholder {
-    width: 100%;
-    height: 100%;
     background: #d3d3d357;
+    block-size: 100%;
+    inline-size: 100%;
   }
 
   .avatar-remove-btn {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    inset-block-start: 2px;
+    inset-inline-end: 2px;
   }
 }
 

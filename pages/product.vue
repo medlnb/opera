@@ -13,6 +13,14 @@ const panelStatus = ref()
 const favoriteLoading = ref(false)
 const addingToCart = ref(false)
 
+const technicalFileId = computed(() => {
+  const tf = productDetails.value?.technicalFile
+
+  return tf?._id || tf?.id || tf || null
+})
+
+const technicalFileName = computed(() => productDetails.value?.technicalFile?.filename || '')
+
 const order = ref({
   variance: null,
   color: null,
@@ -62,7 +70,7 @@ async function addToCart() {
     return navigateTo('/login')
   if (!productDetails.value?._id)
     return
-  if (order.value.variance == null) {
+  if (order.value.variance === null) {
     panelStatus.value = 1
 
     return
@@ -226,7 +234,7 @@ function toggleFavorite() {
                   <div
                     v-if="productLoading"
                     class="d-flex align-center justify-center product-image-placeholder"
-                    style="background-color: #f0f0f0; height: 360px;"
+                    style="background-color: #f0f0f0; block-size: 360px;"
                   >
                     <VProgressCircular
                       indeterminate
@@ -304,7 +312,7 @@ function toggleFavorite() {
                             <template #prepend>
                               <VCheckbox
                                 class="me-3"
-                                :model-value="index == order.color"
+                                :model-value="index === order.color"
                                 @update:model-value="() => selectColor(index)"
                               />
                             </template>
@@ -348,7 +356,7 @@ function toggleFavorite() {
                             <template #prepend>
                               <VCheckbox
                                 class="me-3"
-                                :model-value="order.variance == variance._id"
+                                :model-value="order.variance === variance._id"
                                 @update:model-value="() => selectVariance(variance._id)"
                               />
                             </template>
@@ -594,6 +602,30 @@ function toggleFavorite() {
                 </VChip>
               </div>
             </template>
+            <template v-if="technicalFileId">
+              <VDivider class="my-6" />
+              <h5 class="text-h5 mb-3">
+                Technical File
+              </h5>
+              <div class="d-flex flex-wrap gap-2 align-center">
+                <VBtn
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="tabler-file-type-pdf"
+                  :href="`${config.public.apiBaseUrl}/api/technical-files?id=${technicalFileId}`"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Download PDF
+                </VBtn>
+                <span
+                  v-if="technicalFileName"
+                  class="text-body-2 text-medium-emphasis"
+                >
+                  {{ technicalFileName }}
+                </span>
+              </div>
+            </template>
           </VCardText>
         </VCard>
       </template>
@@ -651,33 +683,36 @@ body .v-layout .v-application__wrap{
     }
   }
 }
+
 .product-image {
   position: relative;
-  height: 400px !important;
+  block-size: 400px !important;
 }
+
 .product-image-placeholder {
-  height: 400px !important;
+  block-size: 400px !important;
 }
 
 .product-avatar {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 100px;
-  height: 100px;
-  border-radius: 10px;
   padding: 8px;
+  border-radius: 10px;
+  block-size: 100px;
+  inline-size: 100px;
+  inset-block-end: 12px;
+  inset-inline-end: 12px;
 }
 
 @media (max-width: 600px) {
-  .product-image { height: 200px !important; }
-  .product-image-placeholder { height: 200px !important; }
+  .product-image { block-size: 200px !important; }
+  .product-image-placeholder { block-size: 200px !important; }
+
   .product-avatar {
-    right: 8px;
-    bottom: 8px;
-    width: 80px;
-    height: 80px;
     border-radius: 8px;
+    block-size: 80px;
+    inline-size: 80px;
+    inset-block-end: 8px;
+    inset-inline-end: 8px;
   }
 }
 </style>
