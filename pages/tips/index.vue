@@ -1,4 +1,6 @@
 <script setup>
+import tips from '@images/tips.webp'
+
 const config = useRuntimeConfig()
 const articles = ref([])
 const loading = ref(true)
@@ -41,7 +43,7 @@ onMounted(() => {
       style="position: relative;"
     >
       <VImg
-        src=" https://jazeerapaints.com/media/blockbuilder_blocktype/s/h/shutterstock_1745242574-fotor-2024062413448_2.png"
+        :src="tips"
         class="rounded w-100 hero-img"
         style="min-block-size: 150px;"
         height="250"

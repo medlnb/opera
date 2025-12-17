@@ -1,4 +1,6 @@
 <script setup>
+import inspiration from '@images/inspiration.webp'
+
 const config = useRuntimeConfig()
 const articles = ref([])
 const loading = ref(true)
@@ -41,7 +43,7 @@ onMounted(() => {
       style="position: relative;"
     >
       <VImg
-        src="https://jazeerapaints.com/media/blockbuilder_blocktype/s/h/shutterstock_1868800168-fotor-20240625141552_2.png"
+        :src="inspiration"
         class="rounded w-100 hero-img"
         style="min-block-size: 150px;"
         height="250"
