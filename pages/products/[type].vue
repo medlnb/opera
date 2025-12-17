@@ -59,7 +59,7 @@ const qSupports = computed({
 const type = computed({
   get: () => route.params.type,
   set: () => route.params.type,
-}) ?? 'interior'
+}) ?? 'decor'
 
 // navigation
 const pagination = ref({

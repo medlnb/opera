@@ -166,7 +166,7 @@ function formatDate(d) {
               </p>
               <VBtn
                 color="primary"
-                to="/products/interior"
+                to="/products/decor"
                 class="mt-4"
               >
                 Start Shopping

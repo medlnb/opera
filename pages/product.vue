@@ -27,6 +27,25 @@ const order = ref({
   qty: 1,
 })
 
+const isColorRequired = computed(() => (productDetails.value?.colors?.length ?? 0) > 0)
+const isColorSelected = computed(() => order.value.color !== null)
+
+const canAddToCart = computed(() => {
+  if (productLoading.value)
+    return false
+
+  if (!productDetails.value?._id)
+    return false
+
+  if (isColorRequired.value && !isColorSelected.value)
+    return false
+
+  if (order.value.variance === null)
+    return false
+
+  return true
+})
+
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
 const showSnackbar = (message, color = 'success') => {
@@ -56,7 +75,7 @@ onMounted(async () => {
 })
 
 function selectColor(i) {
-  order.value.color = order.value.color === i ? null : i
+  order.value.color = i
   panelStatus.value = undefined
 }
 
@@ -70,6 +89,14 @@ async function addToCart() {
     return navigateTo('/login')
   if (!productDetails.value?._id)
     return
+
+  if (isColorRequired.value && order.value.color === null) {
+    panelStatus.value = 0
+    showSnackbar('Please select a color', 'error')
+
+    return
+  }
+
   if (order.value.variance === null) {
     panelStatus.value = 1
 
@@ -424,6 +451,7 @@ function toggleFavorite() {
                       class="mt-2 flex-fill"
                       color="primary"
                       :loading="addingToCart"
+                      :disabled="!canAddToCart"
                       @click="addToCart"
                     >
                       Add to Cart

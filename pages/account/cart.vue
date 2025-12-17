@@ -144,7 +144,7 @@ const total = computed(() => {
           </p>
           <VBtn
             color="primary"
-            to="/products/interior"
+            to="/products/decor"
             class="mt-4"
           >
             Browse Products
@@ -154,7 +154,7 @@ const total = computed(() => {
         <template v-else>
           <VList lines="two">
             <VListItem
-              v-for="(item, index) in cartStore.items"
+              v-for="(item) in cartStore.items"
               :key="`${item.product}-${item.variance}-${item.color}`"
               class="py-4"
             >
