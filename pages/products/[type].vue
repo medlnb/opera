@@ -1,9 +1,11 @@
 <script setup>
 import { debounce } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import ProductCard from '@/components/ProductCard.vue'
 import { useAuthStore } from '@/stores/auth'
+import ProductCard from '@/components/ProductCard.vue'
 
+const { t, te } = useI18n({ useScope: 'global' })
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
 const products = ref()
@@ -12,7 +14,15 @@ const router = useRouter()
 const loading = ref(true)
 const filterDialog = ref(false)
 const filterLoading = ref(false)
-const DESTINATION_OPTIONS = ['Habitations', 'Bureaux', 'Hotel', 'Restaurants', 'Showroom', 'Magasins']
+
+const DESTINATION_OPTIONS = [
+  { value: 'Habitations', labelKey: 'products.filters.destination.habitations' },
+  { value: 'Bureaux', labelKey: 'products.filters.destination.offices' },
+  { value: 'Hotel', labelKey: 'products.filters.destination.hotel' },
+  { value: 'Restaurants', labelKey: 'products.filters.destination.restaurants' },
+  { value: 'Showroom', labelKey: 'products.filters.destination.showroom' },
+  { value: 'Magasins', labelKey: 'products.filters.destination.stores' },
+]
 
 // Bind dialog inputs directly to URL query
 // Debounced router push to avoid rapid query updates
@@ -49,7 +59,12 @@ const qDestination = computed({
   set: vals => debouncedPush({ ...route.query, destination: vals?.length ? vals.join(',') : undefined }),
 })
 
-const SUPPORT_OPTIONS = ['Platre', 'Ciment', 'Enduit', 'Brique']
+const SUPPORT_OPTIONS = [
+  { value: 'Platre', labelKey: 'products.filters.support.plaster' },
+  { value: 'Ciment', labelKey: 'products.filters.support.cement' },
+  { value: 'Enduit', labelKey: 'products.filters.support.render' },
+  { value: 'Brique', labelKey: 'products.filters.support.brick' },
+]
 
 const qSupports = computed({
   get: () => (route.query.supports?.toString() || '').split(',').filter(Boolean),
@@ -60,6 +75,19 @@ const type = computed({
   get: () => route.params.type,
   set: () => route.params.type,
 }) ?? 'decor'
+
+const typeTitle = computed(() => {
+  const raw = String(type.value || '')
+  const productKey = `nav.products.${raw || 'root'}`
+  if (te(productKey))
+    return t(productKey)
+
+  const colorKey = `colors.${raw}`
+  if (raw && te(colorKey))
+    return t(colorKey)
+
+  return raw ? raw.replace(/[-_]/g, ' ') : t('nav.products.root')
+})
 
 // navigation
 const pagination = ref({
@@ -141,14 +169,14 @@ const resetFilters = async () => {
       <template #title>
         <div class="d-flex align-center justify-space-between">
           <VCardTitle>
-            {{ type }}
+            {{ typeTitle }}
           </VCardTitle>
           <VBtn
             append-icon="tabler-filter"
             variant="text"
             @click="filterDialog = true"
           >
-            Filters
+            {{ t('products.filters.button') }}
           </VBtn>
         </div>
       </template>
@@ -177,10 +205,10 @@ const resetFilters = async () => {
           class="text-disabled mb-4"
         />
         <p class="text-h6 text-disabled">
-          No products found
+          {{ t('products.empty.title') }}
         </p>
         <p class="text-body-2 text-disabled">
-          Try adjusting your filters or check back later
+          {{ t('products.empty.subtitle') }}
         </p>
       </div>
 
@@ -216,7 +244,7 @@ const resetFilters = async () => {
       <VCard class="py-2">
         <VCardTitle class="d-flex align-center justify-space-between">
           <span class="d-flex align-center gap-3">
-            <span>Filter Products</span>
+            <span>{{ t('products.filters.title') }}</span>
             <VProgressCircular
               v-if="filterLoading"
               indeterminate
@@ -237,24 +265,24 @@ const resetFilters = async () => {
             <VCol cols="12">
               <AppTextField
                 v-model="qSearch"
-                label="Search (title/type)"
+                :label="t('products.filters.search_label')"
                 :disabled="filterLoading"
               />
             </VCol>
             <VCol cols="12">
               <h6 class="text-subtitle-1 mb-2">
-                Destination
+                {{ t('products.filters.destination.title') }}
               </h6>
               <div class="d-flex flex-wrap gap-3">
                 <VCheckbox
                   v-for="opt in DESTINATION_OPTIONS"
-                  :key="opt"
-                  :label="opt"
-                  :model-value="qDestination.includes(opt)"
+                  :key="opt.value"
+                  :label="t(opt.labelKey)"
+                  :model-value="qDestination.includes(opt.value)"
                   :disabled="filterLoading"
                   @update:model-value="(val) => {
                     const next = new Set(qDestination)
-                    if (val) next.add(opt); else next.delete(opt)
+                    if (val) next.add(opt.value); else next.delete(opt.value)
                     qDestination = Array.from(next)
                   }"
                 />
@@ -262,18 +290,18 @@ const resetFilters = async () => {
             </VCol>
             <VCol cols="12">
               <h6 class="text-subtitle-1 mb-2">
-                Supports
+                {{ t('products.filters.support.title') }}
               </h6>
               <div class="d-flex flex-wrap gap-3">
                 <VCheckbox
                   v-for="opt in SUPPORT_OPTIONS"
-                  :key="opt"
-                  :label="opt"
-                  :model-value="qSupports.includes(opt)"
+                  :key="opt.value"
+                  :label="t(opt.labelKey)"
+                  :model-value="qSupports.includes(opt.value)"
                   :disabled="filterLoading"
                   @update:model-value="(val) => {
                     const next = new Set(qSupports)
-                    if (val) next.add(opt); else next.delete(opt)
+                    if (val) next.add(opt.value); else next.delete(opt.value)
                     qSupports = Array.from(next)
                   }"
                 />
@@ -286,7 +314,7 @@ const resetFilters = async () => {
             :disabled="filterLoading"
             @click="resetFilters"
           >
-            Reset
+            {{ t('products.filters.reset') }}
           </VBtn>
         </VCardActions>
       </VCard>

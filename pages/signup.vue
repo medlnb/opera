@@ -1,11 +1,12 @@
 <script setup>
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import logo from '@images/logo-v2.svg'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth.js'
 import { useValidators } from '@/utils/validators'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
+import logo from '@images/logo-v2.svg'
 import registerMultistepBgDark from '@images/pages/register-multistep-bg-dark.png'
 import registerMultistepBgLight from '@images/pages/register-multistep-bg-light.png'
 
@@ -20,6 +21,8 @@ const router = useRouter()
 const recaptchaVerifier = ref()
 const confirmationResult = ref()
 const loading = ref(false)
+
+const { t } = useI18n({ useScope: 'global' })
 
 const registerMultistepBg = useGenerateImageVariant(registerMultistepBgLight, registerMultistepBgDark)
 const isPasswordVisible = ref(false)
@@ -51,18 +54,18 @@ onMounted(() => {
 })
 
 // Reordered: Personal info first, then phone verification
-const items = [
+const items = computed(() => [
   {
-    title: 'Personal',
-    subtitle: 'Enter Information',
+    title: t('auth.signup.steps.personal.title'),
+    subtitle: t('auth.signup.steps.personal.subtitle'),
     icon: 'tabler-users',
   },
   {
-    title: 'Phone Verification',
-    subtitle: 'Verify Your Phone',
+    title: t('auth.signup.steps.phone.title'),
+    subtitle: t('auth.signup.steps.phone.subtitle'),
     icon: 'tabler-phone',
   },
-]
+])
 
 const code = ref('')
 
@@ -112,7 +115,7 @@ function startCooldown() {
 
 async function sendCode() {
   if (!form.value.phone || form.value.phone.length !== 9)
-    return showSnackbar('Please enter a valid 9-digit phone number', 'error')
+    return showSnackbar(t('auth.errors.valid_phone_required'), 'error')
 
   try {
     loading.value = true
@@ -122,10 +125,10 @@ async function sendCode() {
 
     confirmationResult.value = result
     startCooldown()
-    showSnackbar(`Verification code sent to 0${form.value.phone}`, 'info')
+    showSnackbar(t('auth.signup.code_sent_to', { phone: `0${form.value.phone}` }), 'info')
   }
   catch (err) {
-    showSnackbar(err.message || 'Failed to send SMS', 'error')
+    showSnackbar(err.message || t('auth.errors.failed_to_send_sms'), 'error')
   }
   finally {
     loading.value = false
@@ -134,21 +137,21 @@ async function sendCode() {
 
 async function verifyCode() {
   if (!code.value || code.value.length !== 6)
-    return showSnackbar('Please enter the 6-digit verification code', 'error')
+    return showSnackbar(t('auth.errors.enter_6_digit_code'), 'error')
 
   try {
     loading.value = true
 
     const userCredential = await confirmationResult.value.confirm(code.value)
     if (userCredential.user) {
-      showSnackbar('Phone verified! Creating your account...', 'success')
+      showSnackbar(t('auth.signup.phone_verified_creating'), 'success')
 
       // Phone verified, now submit registration
       await onSubmit()
     }
   }
   catch (err) {
-    showSnackbar('Invalid code or verification failed', 'error')
+    showSnackbar(t('auth.errors.invalid_code_or_verification_failed'), 'error')
   }
   finally {
     loading.value = false
@@ -162,7 +165,7 @@ function goToPhoneStep() {
     if (result && typeof result.then === 'function') {
       result.then(r => {
         if (r.valid)
-          currentStep.value = 1; else showSnackbar('Please fix the highlighted errors', 'error')
+          currentStep.value = 1; else showSnackbar(t('auth.errors.fix_highlighted_errors'), 'error')
       })
 
       return
@@ -178,7 +181,7 @@ const onSubmit = async () => {
     if (res && typeof res.then === 'function') {
       const r = await res
       if (!r.valid) {
-        showSnackbar('Please fix the highlighted errors', 'error')
+        showSnackbar(t('auth.errors.fix_highlighted_errors'), 'error')
 
         return
       }
@@ -198,21 +201,21 @@ const onSubmit = async () => {
     })
 
     if (!res.ok)
-      throw new Error('Failed to register')
+      throw new Error(t('auth.errors.failed_to_register'))
     const data = await res.json()
     if (data?.token) {
       authStore.setToken(data.token)
       authStore.patchUser(data.user)
-      showSnackbar('Registration successful', 'success')
+      showSnackbar(t('auth.signup.registration_successful'), 'success')
       router.push('/')
     }
     else {
-      throw new Error('Registration failed')
+      throw new Error(t('auth.errors.registration_failed'))
     }
   }
   catch (err) {
     console.log(err)
-    showSnackbar('Registration failed', 'error')
+    showSnackbar(t('auth.errors.registration_failed'), 'error')
   }
   finally {
     loading.value = false
@@ -274,10 +277,10 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
             <!-- Step 1: Personal Information (now first) -->
             <VWindowItem>
               <h5 class="text-h5 mb-1">
-                Personal Information
+                {{ t('auth.signup.personal_info_title') }}
               </h5>
               <p class="text-sm">
-                Enter Your Personal Information
+                {{ t('auth.signup.personal_info_subtitle') }}
               </p>
 
               <VRow>
@@ -287,8 +290,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                 >
                   <AppTextField
                     v-model="form.firstName"
-                    label="First Name"
-                    placeholder="John"
+                    :label="t('auth.first_name')"
+                    :placeholder="t('auth.first_name_placeholder')"
                     :rules="[requiredValidator]"
                   />
                 </VCol>
@@ -299,8 +302,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                 >
                   <AppTextField
                     v-model="form.lastName"
-                    label="Last Name"
-                    placeholder="Doe"
+                    :label="t('auth.last_name')"
+                    :placeholder="t('auth.last_name_placeholder')"
                     :rules="[requiredValidator]"
                   />
                 </VCol>
@@ -310,8 +313,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                 >
                   <AppTextField
                     v-model="form.password"
-                    label="Password"
-                    placeholder="············"
+                    :label="t('auth.password')"
+                    :placeholder="t('auth.password_placeholder')"
                     :type="isPasswordVisible ? 'text' : 'password'"
                     :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
                     :rules="[requiredValidator, passwordValidator]"
@@ -325,8 +328,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                 >
                   <AppTextField
                     v-model="form.confirmPassword"
-                    label="Confirm Password"
-                    placeholder="············"
+                    :label="t('auth.confirm_password')"
+                    :placeholder="t('auth.password_placeholder')"
                     :type="isConfirmPasswordVisible ? 'text' : 'password'"
                     :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
                     :rules="[val => confirmPasswordValidator(val, form.password)]"
@@ -342,8 +345,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     v-model="form.state"
                     item-value="id"
                     item-title="label"
-                    label="Wilaya"
-                    placeholder="Select Wilaya"
+                    :label="t('auth.wilaya')"
+                    :placeholder="t('auth.select_wilaya')"
                     :items="stateOptions"
                     :rules="[requiredValidator]"
                   />
@@ -355,10 +358,10 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                 >
                   <AppSelect
                     v-model="form.city"
-                    label="City"
+                    :label="t('auth.city')"
                     item-value="id"
                     item-title="label"
-                    placeholder="Select City"
+                    :placeholder="t('auth.select_city')"
                     :items="cityOptions"
                     :rules="[requiredValidator]"
                   />
@@ -367,8 +370,8 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                 <VCol cols="12">
                   <AppTextField
                     v-model="form.address"
-                    label="Address"
-                    placeholder="1234 Main St, New York, NY 10001, USA"
+                    :label="t('auth.address')"
+                    :placeholder="t('auth.address_placeholder')"
                     :rules="[requiredValidator]"
                   />
                 </VCol>
@@ -378,18 +381,18 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
             <!-- Step 2: Phone Verification (now second) -->
             <VWindowItem>
               <h5 class="text-h5 mb-1">
-                Phone Verification
+                {{ t('auth.signup.phone_verification_title') }}
               </h5>
               <p class="text-sm text-medium-emphasis">
-                {{ !confirmationResult ? 'Enter your phone number to receive a verification code' : 'Enter the 6-digit code sent to your phone' }}
+                {{ !confirmationResult ? t('auth.signup.phone_step_description') : t('auth.signup.code_step_description') }}
               </p>
 
               <VRow>
                 <VCol cols="12">
                   <AppTextField
                     v-model="form.phone"
-                    label="Phone Number"
-                    placeholder="X XX XX XX XX"
+                    :label="t('auth.phone_number')"
+                    :placeholder="t('auth.phone_placeholder')"
                     maxlength="9"
                     :disabled="!!confirmationResult"
                     :rules="[requiredValidator, phoneValidator]"
@@ -398,7 +401,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     <template #prepend-inner>
                       <p
                         class="mb-0"
-                        style="margin-top: 1px;"
+                        style="margin-block-start: 1px;"
                       >
                         0
                       </p>
@@ -422,7 +425,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                         color="primary"
                       />
                       <p class="text-body-1 mt-2 mb-0">
-                        We sent a code to <strong>0{{ form.phone }}</strong>
+                        {{ t('auth.signup.sent_code_to') }} <strong>0{{ form.phone }}</strong>
                       </p>
                     </div>
 
@@ -437,7 +440,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
 
                     <div class="text-center">
                       <p class="text-body-2 text-medium-emphasis mb-2">
-                        Didn't receive the code?
+                        {{ t('auth.signup.didnt_receive_code') }}
                       </p>
                       <VBtn
                         variant="text"
@@ -446,7 +449,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                         :disabled="resendCooldown > 0 || loading"
                         @click="sendCode"
                       >
-                        {{ resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code' }}
+                        {{ resendCooldown > 0 ? t('auth.signup.resend_in', { seconds: resendCooldown }) : t('auth.signup.resend_code') }}
                       </VBtn>
                     </div>
                   </VCard>
@@ -468,7 +471,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
               icon="tabler-arrow-left"
               start
             />
-            Back
+            {{ t('common.back') }}
           </VBtn>
           <div v-else />
 
@@ -478,7 +481,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
             :loading="loading"
             @click="goToPhoneStep"
           >
-            Next
+            {{ t('common.next') }}
             <VIcon
               icon="tabler-arrow-right"
               end
@@ -497,7 +500,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
               icon="tabler-send"
               start
             />
-            Send Code
+            {{ t('auth.send_code') }}
           </VBtn>
 
           <VBtn
@@ -511,18 +514,18 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
               icon="tabler-check"
               start
             />
-            Verify & Create Account
+            {{ t('auth.signup.verify_create_account') }}
           </VBtn>
         </div>
         <div class="d-flex align-center justify-center mt-6">
-          <span>Already have an account?</span>
+          <span>{{ t('auth.already_have_account') }}</span>
           <NuxtLink
             class="text-sm mx-2"
             variant="plain"
             color="primary"
             to="/login"
           >
-            Log in
+            {{ t('auth.log_in') }}
           </NuxtLink>
         </div>
       </VCard>

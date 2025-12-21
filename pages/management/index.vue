@@ -1,8 +1,9 @@
 <script setup>
-import { debounce } from 'lodash'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { debounce } from 'lodash'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   admin: true,
@@ -11,13 +12,15 @@ definePageMeta({
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
 
-const headers = [
-  { title: 'Title', key: 'title', sortable: true },
-  { title: 'Type', key: 'type', sortable: true },
-  { title: 'Variances', key: 'variances', sortable: false },
-  { title: 'Colors', key: 'colors', sortable: false },
-  { title: 'Actions', key: 'actions', sortable: false },
-]
+const { t } = useI18n({ useScope: 'global' })
+
+const headers = computed(() => [
+  { title: t('management.products.table.title'), key: 'title', sortable: true },
+  { title: t('management.products.table.type'), key: 'type', sortable: true },
+  { title: t('management.products.table.variances'), key: 'variances', sortable: false },
+  { title: t('management.products.table.colors'), key: 'colors', sortable: false },
+  { title: t('management.common.table.actions'), key: 'actions', sortable: false },
+])
 
 const items = ref([])
 const loading = ref(false)
@@ -30,6 +33,11 @@ const deleting = ref(false)
 const productToDelete = ref(null)
 
 const TYPE_OPTIONS = ['decor', 'buildings', 'coating']
+
+const typeOptions = computed(() => TYPE_OPTIONS.map(value => ({
+  title: t(`management.products.types.${value}`),
+  value,
+})))
 
 const filters = reactive({
   search: '',
@@ -61,7 +69,7 @@ async function fetchProducts() {
 
     items.value = list.map(p => ({
       ...p,
-      title: p.title ?? p.name ?? 'Untitled',
+      title: p.title ?? p.name ?? t('common.unnamed'),
       type: p.type ?? p.category ?? '',
       variances: p.variances?.map(v => `${v.quantity} - ${v.price} Dzd`) ?? [],
       colors: p.colors ?? [],
@@ -69,7 +77,7 @@ async function fetchProducts() {
     totalItems.value = Number(data.pagination?.total ?? items.value.length)
   }
   catch (err) {
-    snackbar.value = { show: true, text: 'Failed to load products', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.snackbar.load_failed'), color: 'error' }
   }
   finally {
     loading.value = false
@@ -117,10 +125,10 @@ async function confirmDelete() {
       throw new Error('Failed to delete')
     items.value = items.value.filter(p => p._id !== productToDelete.value._id)
     totalItems.value = Math.max(0, totalItems.value - 1)
-    snackbar.value = { show: true, text: 'Product deleted', color: 'success' }
+    snackbar.value = { show: true, text: t('management.products.snackbar.deleted'), color: 'success' }
   }
   catch (err) {
-    snackbar.value = { show: true, text: 'Delete failed', color: 'error' }
+    snackbar.value = { show: true, text: t('management.common.delete_failed'), color: 'error' }
   }
   finally {
     deleting.value = false
@@ -138,7 +146,7 @@ function goEdit(item) {
 </script>
 
 <template>
-  <VCard title="Products Management">
+  <VCard :title="t('management.products.title')">
     <VCardText class="pb-0">
       <VRow>
         <VCol
@@ -147,7 +155,7 @@ function goEdit(item) {
         >
           <VTextField
             v-model="filters.search"
-            label="Search"
+            :label="t('management.products.filters.search')"
             clearable
             prepend-inner-icon="tabler-search"
           />
@@ -158,9 +166,11 @@ function goEdit(item) {
         >
           <VSelect
             v-model="filters.type"
-            :items="TYPE_OPTIONS"
-            label="Type"
-            placeholder="Select a type"
+            :items="typeOptions"
+            item-title="title"
+            item-value="value"
+            :label="t('management.products.filters.type')"
+            :placeholder="t('management.products.filters.select_type')"
             clearable
             width="200"
           />
@@ -216,7 +226,7 @@ function goEdit(item) {
             color="info"
             variant="tonal"
           >
-            {{ item.type || '—' }}
+            {{ item.type || t('management.common.value.na') }}
           </VChip>
         </template>
         <template #item.variances="{ item }">
@@ -254,17 +264,17 @@ function goEdit(item) {
               class="text-disabled mb-4"
             />
             <p class="text-h6 text-disabled">
-              No products found
+              {{ t('management.products.empty.title') }}
             </p>
             <p class="text-body-2 text-disabled">
-              Create a new product to get started
+              {{ t('management.products.empty.subtitle') }}
             </p>
             <VBtn
               color="primary"
               to="/management/product"
               class="mt-4"
             >
-              Add Product
+              {{ t('management.products.actions.add_product') }}
             </VBtn>
           </div>
         </template>
@@ -273,7 +283,7 @@ function goEdit(item) {
           <VDivider />
           <div class="d-flex align-center justify-space-between flex-wrap gap-3 pa-5 pt-3">
             <p class="text-sm text-medium-emphasis mb-0">
-              {{ paginationMeta({ page, itemsPerPage: perPage }, totalItems) }}
+              {{ paginationMeta({ page, itemsPerPage: perPage }, totalItems, t) }}
             </p>
 
             <VPagination
@@ -292,10 +302,10 @@ function goEdit(item) {
     max-width="420"
   >
     <VCard>
-      <VCardTitle>Delete Product</VCardTitle>
+      <VCardTitle>{{ t('management.products.deleteDialog.title') }}</VCardTitle>
       <VCardText>
-        Are you sure you want to delete
-        <strong>{{ productToDelete?.title || 'this product' }}</strong>?
+        {{ t('management.products.deleteDialog.confirm_prefix') }}
+        <strong>{{ productToDelete?.title || t('management.products.deleteDialog.item_fallback') }}</strong>{{ t('management.products.deleteDialog.confirm_suffix') }}
       </VCardText>
       <VCardActions class="d-flex justify-end">
         <VBtn
@@ -303,14 +313,14 @@ function goEdit(item) {
           :disabled="deleting"
           @click="deleteDialog = false"
         >
-          Cancel
+          {{ t('management.common.cancel') }}
         </VBtn>
         <VBtn
           color="error"
           :loading="deleting"
           @click="confirmDelete"
         >
-          Delete
+          {{ t('management.common.delete') }}
         </VBtn>
       </VCardActions>
     </VCard>

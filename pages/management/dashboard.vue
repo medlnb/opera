@@ -1,5 +1,6 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
@@ -10,6 +11,8 @@ const authStore = useAuthStore()
 const config = useRuntimeConfig()
 const loading = ref(true)
 const error = ref('')
+
+const { t, te, d } = useI18n({ useScope: 'global' })
 
 const stats = ref({
   totalRevenue: 0,
@@ -58,7 +61,7 @@ async function fetchDashboard() {
   }
   catch (err) {
     console.error('Dashboard fetch error:', err)
-    error.value = 'Failed to load dashboard data'
+    error.value = t('management.dashboard.errors.load_failed')
   }
   finally {
     loading.value = false
@@ -74,11 +77,31 @@ const formatCurrency = val => `${val?.toLocaleString()} DZD`
 
 const formatDate = date => {
   if (!date)
-    return '-'
-  const d = new Date(date)
+    return t('management.common.value.na')
 
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+  return d(new Date(date), {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
+
+const getOrderStatusLabel = status => {
+  const statusKey = String(status || '')
+
+  const managementKey = `management.orders.status.${statusKey}`
+  if (te(managementKey))
+    return t(managementKey)
+
+  const legacyKey = `orders.status.${statusKey}`
+  if (te(legacyKey))
+    return t(legacyKey)
+
+  return statusKey
+}
+
+const welcomeText = computed(() => t('management.dashboard.welcome', { name: authStore.user?.firstName || '' }))
 
 const getStatusColor = status => {
   const colors = {
@@ -106,9 +129,9 @@ const revenueGrowth = computed(() => {
     <div class="d-flex flex-wrap justify-space-between align-center gap-4 mb-6">
       <div>
         <h4 class="text-h4 font-weight-medium">
-          Dashboard
+          {{ t('management.dashboard.title') }}
         </h4>
-        <span class="text-body-2 text-disabled">Welcome back, {{ authStore.user?.firstName }}! Here's what's happening.</span>
+        <span class="text-body-2 text-disabled">{{ welcomeText }}</span>
       </div>
       <div class="d-flex gap-2">
         <VBtn
@@ -120,7 +143,7 @@ const revenueGrowth = computed(() => {
             icon="tabler-package"
             class="me-2"
           />
-          View Orders
+          {{ t('management.dashboard.actions.view_orders') }}
         </VBtn>
         <VBtn
           color="primary"
@@ -130,7 +153,7 @@ const revenueGrowth = computed(() => {
             icon="tabler-plus"
             class="me-2"
           />
-          Add Product
+          {{ t('management.dashboard.actions.add_product') }}
         </VBtn>
       </div>
     </div>
@@ -168,7 +191,7 @@ const revenueGrowth = computed(() => {
           icon="tabler-refresh"
           class="me-2"
         />
-        Retry
+        {{ t('management.dashboard.actions.retry') }}
       </VBtn>
     </VCard>
 
@@ -195,7 +218,7 @@ const revenueGrowth = computed(() => {
               </VAvatar>
               <div>
                 <div class="text-caption text-disabled">
-                  Total Revenue
+                  {{ t('management.dashboard.stats.total_revenue') }}
                 </div>
                 <div class="text-h5 font-weight-medium">
                   {{ formatCurrency(stats.totalRevenue) }}
@@ -224,7 +247,7 @@ const revenueGrowth = computed(() => {
               </VAvatar>
               <div>
                 <div class="text-caption text-disabled">
-                  Total Orders
+                  {{ t('management.dashboard.stats.total_orders') }}
                 </div>
                 <div class="text-h5 font-weight-medium">
                   {{ stats.totalOrders }}
@@ -236,7 +259,7 @@ const revenueGrowth = computed(() => {
                   color="warning"
                   class="mt-1"
                 >
-                  {{ stats.pendingOrders }} pending
+                  {{ t('management.dashboard.stats.pending_orders', { count: stats.pendingOrders }) }}
                 </VChip>
               </div>
             </VCardText>
@@ -262,12 +285,12 @@ const revenueGrowth = computed(() => {
               </VAvatar>
               <div>
                 <div class="text-caption text-disabled">
-                  Total Users
+                  {{ t('management.dashboard.stats.total_users') }}
                 </div>
                 <div class="text-h5 font-weight-medium">
                   {{ stats.totalUsers }}
                 </div>
-                <span class="text-caption text-success">+{{ stats.newUsersThisMonth }} this month</span>
+                <span class="text-caption text-success">{{ t('management.dashboard.stats.new_users_this_month', { count: stats.newUsersThisMonth }) }}</span>
               </div>
             </VCardText>
           </VCard>
@@ -292,7 +315,7 @@ const revenueGrowth = computed(() => {
               </VAvatar>
               <div>
                 <div class="text-caption text-disabled">
-                  Products
+                  {{ t('management.dashboard.stats.products') }}
                 </div>
                 <div class="text-h5 font-weight-medium">
                   {{ stats.totalProducts }}
@@ -311,7 +334,7 @@ const revenueGrowth = computed(() => {
         >
           <VCard>
             <VCardTitle class="d-flex align-center justify-space-between">
-              <span>Revenue Overview</span>
+              <span>{{ t('management.dashboard.sections.revenue_overview') }}</span>
               <VChip
                 label
                 size="small"
@@ -330,7 +353,7 @@ const revenueGrowth = computed(() => {
               <div class="d-flex gap-6 mb-6">
                 <div>
                   <div class="text-caption text-disabled">
-                    This Month
+                    {{ t('management.dashboard.sections.this_month') }}
                   </div>
                   <div class="text-h6 font-weight-medium text-primary">
                     {{ formatCurrency(stats.thisMonthRevenue) }}
@@ -338,7 +361,7 @@ const revenueGrowth = computed(() => {
                 </div>
                 <div>
                   <div class="text-caption text-disabled">
-                    Last Month
+                    {{ t('management.dashboard.sections.last_month') }}
                   </div>
                   <div class="text-h6 font-weight-medium">
                     {{ formatCurrency(stats.lastMonthRevenue) }}
@@ -346,7 +369,7 @@ const revenueGrowth = computed(() => {
                 </div>
                 <div>
                   <div class="text-caption text-disabled">
-                    Orders This Month
+                    {{ t('management.dashboard.sections.orders_this_month') }}
                   </div>
                   <div class="text-h6 font-weight-medium">
                     {{ stats.thisMonthOrders }}
@@ -378,7 +401,7 @@ const revenueGrowth = computed(() => {
           md="4"
         >
           <VCard class="h-100">
-            <VCardTitle>Orders by Status</VCardTitle>
+            <VCardTitle>{{ t('management.dashboard.sections.orders_by_status') }}</VCardTitle>
             <VDivider />
             <VCardText>
               <div class="d-flex flex-column gap-4">
@@ -392,7 +415,7 @@ const revenueGrowth = computed(() => {
                       :color="getStatusColor(status)"
                       size="10"
                     />
-                    <span class="text-capitalize">{{ status }}</span>
+                    <span>{{ getOrderStatusLabel(status) }}</span>
                   </div>
                   <VChip
                     label
@@ -410,7 +433,7 @@ const revenueGrowth = computed(() => {
                   {{ stats.totalOrders }}
                 </div>
                 <div class="text-caption text-disabled">
-                  Total Orders
+                  {{ t('management.dashboard.sections.total_orders') }}
                 </div>
               </div>
             </VCardText>
@@ -426,14 +449,14 @@ const revenueGrowth = computed(() => {
         >
           <VCard>
             <VCardTitle class="d-flex align-center justify-space-between">
-              <span>Recent Orders</span>
+              <span>{{ t('management.dashboard.sections.recent_orders') }}</span>
               <VBtn
                 variant="text"
                 color="primary"
                 size="small"
                 to="/management/orders"
               >
-                View All
+                {{ t('management.dashboard.actions.view_all') }}
                 <VIcon
                   icon="tabler-arrow-right"
                   class="ms-1"
@@ -444,11 +467,11 @@ const revenueGrowth = computed(() => {
             <VTable>
               <thead>
                 <tr>
-                  <th>Order</th>
-                  <th>Customer</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Date</th>
+                  <th>{{ t('management.dashboard.table.order') }}</th>
+                  <th>{{ t('management.dashboard.table.customer') }}</th>
+                  <th>{{ t('management.dashboard.table.total') }}</th>
+                  <th>{{ t('management.dashboard.table.status') }}</th>
+                  <th>{{ t('management.dashboard.table.date') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -475,7 +498,7 @@ const revenueGrowth = computed(() => {
                       :color="getStatusColor(order.status)"
                       variant="tonal"
                     >
-                      {{ order.status }}
+                      {{ getOrderStatusLabel(order.status) }}
                     </VChip>
                   </td>
                   <td class="text-caption">
@@ -492,14 +515,14 @@ const revenueGrowth = computed(() => {
         >
           <VCard>
             <VCardTitle class="d-flex align-center justify-space-between">
-              <span>Top Products</span>
+              <span>{{ t('management.dashboard.sections.top_products') }}</span>
               <VBtn
                 variant="text"
                 color="primary"
                 size="small"
                 to="/management"
               >
-                View All
+                {{ t('management.dashboard.actions.view_all') }}
                 <VIcon
                   icon="tabler-arrow-right"
                   class="ms-1"
@@ -528,7 +551,7 @@ const revenueGrowth = computed(() => {
                   <VListItemTitle class="font-weight-medium">
                     {{ product.title }}
                   </VListItemTitle>
-                  <VListItemSubtitle>{{ product.sales }} sales</VListItemSubtitle>
+                  <VListItemSubtitle>{{ t('management.dashboard.sales', { count: product.sales }) }}</VListItemSubtitle>
                   <template #append>
                     <span class="text-primary font-weight-medium">{{ formatCurrency(product.revenue) }}</span>
                   </template>

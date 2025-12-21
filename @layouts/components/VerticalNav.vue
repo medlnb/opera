@@ -52,7 +52,7 @@ const handleNavScroll = (evt: Event) => {
   isVerticalNavScrolled.value = (evt.target as HTMLElement).scrollTop > 0
 }
 
-const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
+const appLogoUrl = new URL('../../assets/images/logo.svg', import.meta.url).href
 </script>
 
 <template>
@@ -76,15 +76,23 @@ const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
           to="/"
           class="app-logo app-title-wrapper"
         >
-          <VNodeRenderer :nodes="layoutConfig.app.logo" />
-          <Transition name="vertical-nav-app-title">
+          <VImg
+            :src="appLogoUrl"
+            height="52"
+            width="120"
+            class="mx-auto w-100"
+          />
+
+          <!--
+            <Transition name="vertical-nav-app-title">
             <h1
-              v-show="!hideTitleAndIcon"
-              class="app-logo-title leading-normal"
+            v-show="!hideTitleAndIcon"
+            class="app-logo-title leading-normal"
             >
-              {{ layoutConfig.app.title }}
+            {{ layoutConfig.app.title }}
             </h1>
-          </Transition>
+            </Transition>
+          -->
         </NuxtLink>
         <!-- 👉 Vertical nav actions -->
         <!-- Show toggle collapsible in >md and close button in <md -->
@@ -188,7 +196,9 @@ const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
   }
 
   .app-title-wrapper {
+    flex: 1 1 auto;
     margin-inline-end: auto;
+    min-inline-size: 0;
   }
 
   .nav-items {

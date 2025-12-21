@@ -6,78 +6,78 @@ export function useNavItems() {
 
     return [
       {
-        title: 'Home',
+        title: 'nav.home',
         to: { name: 'index' },
         icon: { icon: 'tabler-smart-home' },
       },
       {
-        title: 'Colors',
+        title: 'nav.colors',
         to: { name: 'colors' },
         icon: { icon: 'tabler-palette' },
       },
       {
-        title: 'Products',
+        title: 'nav.products.root',
         icon: { icon: 'tabler-paint' },
         children: [
           {
-            title: 'Decor',
+            title: 'nav.products.decor',
             to: { name: 'products-type', params: { type: 'decor' } },
           },
           {
-            title: 'Buildings',
+            title: 'nav.products.buildings',
             to: { name: 'products-type', params: { type: 'buildings' } },
           },
           {
-            title: 'Coating',
+            title: 'nav.products.coating',
             to: { name: 'products-type', params: { type: 'coating' } },
           },
         ],
       },
       {
-        title: 'Tips',
+        title: 'nav.tips',
         to: { name: 'tips' },
         icon: { icon: 'tabler-bulb' },
       },
       {
-        title: 'Inspirations',
+        title: 'nav.inspirations',
         to: { name: 'inspirations' },
         icon: { icon: 'tabler-sparkles' },
       },
       {
         to: { name: 'room-painter' },
-        title: 'Virtual Painter',
+        title: 'nav.virtual_painter',
         icon: { icon: 'tabler-brush' },
       },
       (user as any)?.role as string === 'admin' && {
-        title: 'Management',
+        title: 'nav.management.root',
         icon: { icon: 'tabler-user-shield' },
         children: [
           {
-            title: 'Dashboard',
+            title: 'nav.management.dashboard',
             to: { name: 'management-dashboard' },
           },
           {
-            title: 'Products',
+            title: 'nav.management.products',
             to: { name: 'management' },
           },
           {
-            title: 'New Product',
+            title: 'nav.management.new_product',
             to: { name: 'management-product' },
           },
           {
-            title: 'Articles',
+            title: 'nav.management.articles',
             to: { name: 'management-articles' },
           },
           {
-            title: 'New Article',
+            title: 'nav.management.new_article',
             to: { name: 'management-newArticle' },
           },
           {
-            title: 'Orders',
+            title: 'nav.management.orders',
             to: { name: 'management-orders' },
           },
           {
-            title: 'Users',
+            title: 'nav.management.users',
             to: { name: 'management-users' },
           },
         ],

@@ -1,8 +1,11 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import branchsData from '@/data/branchs.json'
 
 const searchQuery = ref('')
 const selectedBranch = ref(null)
+
+const { t } = useI18n({ useScope: 'global' })
 
 const filteredBranches = computed(() => {
   if (!searchQuery.value)
@@ -42,13 +45,13 @@ const copyPhone = async phone => {
             size="48"
             class="me-2"
           />
-          Contact Us
+          {{ t('contact.title') }}
         </h1>
         <p
           class="text-body-1 text-white-50 mb-4 mx-auto"
-          style="max-width: 600px;"
+          style="max-inline-size: 600px;"
         >
-          Find your nearest Opera Peinture branch. We have {{ totalBranches }} locations across Algeria ready to serve you.
+          {{ t('contact.hero_description', { total: totalBranches }) }}
         </p>
       </VCardText>
     </VCard>
@@ -75,10 +78,10 @@ const copyPhone = async phone => {
             />
           </VAvatar>
           <h3 class="text-h5 font-weight-bold mb-2">
-            {{ totalBranches }}+ Branches
+            {{ t('contact.branches_count', { total: totalBranches }) }}
           </h3>
           <p class="text-body-2 text-medium-emphasis">
-            Nationwide coverage across Algeria
+            {{ t('contact.nationwide_coverage') }}
           </p>
         </VCard>
       </VCol>
@@ -102,10 +105,10 @@ const copyPhone = async phone => {
             />
           </VAvatar>
           <h3 class="text-h5 font-weight-bold mb-2">
-            Working Hours
+            {{ t('contact.working_hours') }}
           </h3>
           <p class="text-body-2 text-medium-emphasis">
-            Saturday - Thursday: 8:00 AM - 6:00 PM
+            {{ t('contact.working_hours_details') }}
           </p>
         </VCard>
       </VCol>
@@ -129,10 +132,10 @@ const copyPhone = async phone => {
             />
           </VAvatar>
           <h3 class="text-h5 font-weight-bold mb-2">
-            Support
+            {{ t('contact.support') }}
           </h3>
           <p class="text-body-2 text-medium-emphasis">
-            Call any branch for assistance
+            {{ t('contact.support_details') }}
           </p>
         </VCard>
       </VCol>
@@ -146,16 +149,16 @@ const copyPhone = async phone => {
             icon="tabler-map-2"
             class="me-2"
           />
-          Our Branches
+          {{ t('contact.our_branches') }}
         </span>
         <VSpacer />
         <VTextField
           v-model="searchQuery"
-          placeholder="Search by city..."
+          :placeholder="t('contact.search_by_city')"
           prepend-inner-icon="tabler-search"
           density="compact"
           variant="outlined"
-          style="max-width: 300px;"
+          style="max-inline-size: 300px;"
           clearable
           hide-details
         />
@@ -175,10 +178,10 @@ const copyPhone = async phone => {
             class="mb-4"
           />
           <h3 class="text-h6 text-medium-emphasis">
-            No branches found
+            {{ t('contact.no_branches_found') }}
           </h3>
           <p class="text-body-2 text-disabled">
-            Try a different search term
+            {{ t('contact.try_different_search') }}
           </p>
         </div>
 
@@ -218,7 +221,7 @@ const copyPhone = async phone => {
                     <h4 class="text-subtitle-1 font-weight-bold">
                       {{ branch.city }}
                     </h4>
-                    <span class="text-caption text-medium-emphasis">Algeria</span>
+                    <span class="text-caption text-medium-emphasis">{{ t('contact.country') }}</span>
                   </div>
                 </div>
 
@@ -231,7 +234,7 @@ const copyPhone = async phone => {
                       size="14"
                       class="me-1"
                     />
-                    Phone Numbers
+                    {{ t('contact.phone_numbers') }}
                   </div>
                   <div
                     v-for="phone in branch.phones"
@@ -255,7 +258,7 @@ const copyPhone = async phone => {
                           activator="parent"
                           location="top"
                         >
-                          Call
+                          {{ t('contact.call') }}
                         </VTooltip>
                       </VBtn>
                       <VBtn
@@ -273,7 +276,7 @@ const copyPhone = async phone => {
                           activator="parent"
                           location="top"
                         >
-                          Copy
+                          {{ t('contact.copy') }}
                         </VTooltip>
                       </VBtn>
                     </div>
@@ -292,7 +295,7 @@ const copyPhone = async phone => {
                     class="me-2"
                     size="18"
                   />
-                  View on Map
+                  {{ t('contact.view_on_map') }}
                 </VBtn>
               </VCardText>
             </VCard>
@@ -304,7 +307,7 @@ const copyPhone = async phone => {
 
       <VCardText class="d-flex align-center justify-space-between flex-wrap gap-2 pa-4">
         <span class="text-body-2 text-medium-emphasis">
-          Showing {{ filteredBranches.length }} of {{ totalBranches }} branches
+          {{ t('contact.showing_branches', { shown: filteredBranches.length, total: totalBranches }) }}
         </span>
       </VCardText>
     </VCard>
@@ -318,8 +321,8 @@ const copyPhone = async phone => {
 
   .hero-bg {
     position: absolute;
-    inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    inset: 0;
   }
 }
 
@@ -329,8 +332,8 @@ const copyPhone = async phone => {
 
   &:hover {
     border-color: rgb(var(--v-theme-primary)) !important;
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.15);
+    transform: translateY(-2px);
   }
 }
 </style>

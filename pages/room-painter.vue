@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 const router = useRouter()
+
+const { t } = useI18n()
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
@@ -519,7 +523,7 @@ const colorPalette = [
             prepend-icon="tabler-arrow-left"
             @click="handleBack"
           >
-            Back
+            {{ t('common.back') }}
           </VBtn>
 
           <VDivider vertical />
@@ -528,7 +532,7 @@ const colorPalette = [
             icon="tabler-paint"
             size="28"
           />
-          Room Wall Painter
+          {{ t('room_painter.title') }}
         </div>
 
         <VChip
@@ -536,11 +540,11 @@ const colorPalette = [
           color="primary"
           variant="tonal"
         >
-          Painting enabled
+          {{ t('room_painter.painting_enabled') }}
         </VChip>
       </VCardTitle>
       <VCardText>
-        Upload a photo of your room and paint the walls with different colors to visualize your ideas!
+        {{ t('room_painter.description') }}
       </VCardText>
     </VCard>
 
@@ -557,10 +561,10 @@ const colorPalette = [
           class="mb-4"
         />
         <h3 class="text-h5 mb-2">
-          Upload Room Image
+          {{ t('room_painter.upload.title') }}
         </h3>
         <p class="text-body-1 text-medium-emphasis mb-6">
-          Choose a photo of your room to start painting the walls
+          {{ t('room_painter.upload.subtitle') }}
         </p>
 
         <VBtn
@@ -569,7 +573,7 @@ const colorPalette = [
           prepend-icon="tabler-photo"
           @click="triggerFilePicker"
         >
-          Select Image
+          {{ t('room_painter.upload.select_image') }}
         </VBtn>
 
         <input
@@ -596,7 +600,7 @@ const colorPalette = [
                 icon="tabler-palette"
                 class="me-2"
               />
-              Paint Controls
+              {{ t('room_painter.controls.title') }}
             </VCardTitle>
 
             <VCardText>
@@ -612,28 +616,28 @@ const colorPalette = [
                     value="paint"
                     prepend-icon="tabler-brush"
                   >
-                    Paint
+                    {{ t('room_painter.controls.paint') }}
                   </VBtn>
                   <VBtn
                     value="erase"
                     prepend-icon="tabler-eraser"
                   >
-                    Depaint
+                    {{ t('room_painter.controls.depaint') }}
                   </VBtn>
                 </VBtnToggle>
 
                 <p class="text-caption text-medium-emphasis mt-2">
-                  Depaint = click a painted wall area to restore the original photo there.
+                  {{ t('room_painter.controls.depaint_help') }}
                 </p>
 
                 <p class="text-caption text-medium-emphasis mt-2">
-                  Tip: use Ctrl+Z to undo.
+                  {{ t('room_painter.controls.tip_undo') }}
                 </p>
               </div>
 
               <!-- Color Picker -->
               <div class="mb-4">
-                <label class="text-sm font-weight-medium mb-2 d-block">Selected Color</label>
+                <label class="text-sm font-weight-medium mb-2 d-block">{{ t('room_painter.controls.selected_color') }}</label>
                 <input
                   v-model="selectedColor"
                   type="color"
@@ -643,7 +647,7 @@ const colorPalette = [
 
               <!-- Color Palette -->
               <div class="mb-6">
-                <label class="text-sm font-weight-medium mb-2 d-block">Quick Colors</label>
+                <label class="text-sm font-weight-medium mb-2 d-block">{{ t('room_painter.controls.quick_colors') }}</label>
                 <div class="color-palette">
                   <button
                     v-for="color in colorPalette"
@@ -659,7 +663,7 @@ const colorPalette = [
               <!-- Tolerance Slider -->
               <div class="mb-6">
                 <label class="text-sm font-weight-medium mb-2 d-block">
-                  Detection Sensitivity: {{ tolerance }}
+                  {{ t('room_painter.controls.detection_sensitivity', { value: tolerance }) }}
                 </label>
                 <VSlider
                   v-model="tolerance"
@@ -670,7 +674,7 @@ const colorPalette = [
                   color="primary"
                 />
                 <p class="text-caption text-medium-emphasis">
-                  Higher values select larger areas with similar colors
+                  {{ t('room_painter.controls.detection_help') }}
                 </p>
               </div>
 
@@ -685,7 +689,7 @@ const colorPalette = [
                   prepend-icon="tabler-arrow-back-up"
                   @click="undoLastEdit"
                 >
-                  Undo
+                  {{ t('room_painter.controls.undo') }}
                 </VBtn>
                 <VBtn
                   :disabled="!canRedo"
@@ -694,7 +698,7 @@ const colorPalette = [
                   prepend-icon="tabler-arrow-forward-up"
                   @click="redoLastUndo"
                 >
-                  Redo
+                  {{ t('room_painter.controls.redo') }}
                 </VBtn>
               </div>
 
@@ -707,7 +711,7 @@ const colorPalette = [
                   block
                   @click="resetImage"
                 >
-                  Reset Image
+                  {{ t('room_painter.controls.reset_image') }}
                 </VBtn>
 
                 <VBtn
@@ -717,7 +721,7 @@ const colorPalette = [
                   block
                   @click="downloadImage"
                 >
-                  Download Result
+                  {{ t('room_painter.controls.download_result') }}
                 </VBtn>
 
                 <VBtn
@@ -727,7 +731,7 @@ const colorPalette = [
                   block
                   @click="clearImage"
                 >
-                  Upload New Image
+                  {{ t('room_painter.controls.upload_new_image') }}
                 </VBtn>
               </div>
             </VCardText>
@@ -741,23 +745,23 @@ const colorPalette = [
                 class="me-2"
                 size="20"
               />
-              How to Use
+              {{ t('room_painter.how_to_use.title') }}
             </VCardTitle>
             <VCardText>
               <ol class="text-sm ps-4">
                 <li class="mb-2">
-                  Choose Paint or Depaint
+                  {{ t('room_painter.how_to_use.step_1') }}
                 </li>
                 <li class="mb-2">
-                  Choose a color from the palette or picker
+                  {{ t('room_painter.how_to_use.step_2') }}
                 </li>
                 <li class="mb-2">
-                  Click on any wall to paint it
+                  {{ t('room_painter.how_to_use.step_3') }}
                 </li>
                 <li class="mb-2">
-                  Adjust sensitivity for better edge detection
+                  {{ t('room_painter.how_to_use.step_4') }}
                 </li>
-                <li>Download your design when done!</li>
+                <li>{{ t('room_painter.how_to_use.step_5') }}</li>
               </ol>
             </VCardText>
           </VCard>
@@ -816,14 +820,14 @@ const colorPalette = [
                 prepend-icon="tabler-brush"
                 size="small"
               >
-                Paint
+                {{ t('room_painter.controls.paint') }}
               </VBtn>
               <VBtn
                 value="erase"
                 prepend-icon="tabler-eraser"
                 size="small"
               >
-                Depaint
+                {{ t('room_painter.controls.depaint') }}
               </VBtn>
             </VBtnToggle>
 
@@ -835,7 +839,7 @@ const colorPalette = [
               prepend-icon="tabler-arrow-back-up"
               @click="undoLastEdit"
             >
-              Undo
+              {{ t('room_painter.controls.undo') }}
             </VBtn>
             <VBtn
               :disabled="!canRedo"
@@ -845,14 +849,14 @@ const colorPalette = [
               prepend-icon="tabler-arrow-forward-up"
               @click="redoLastUndo"
             >
-              Redo
+              {{ t('room_painter.controls.redo') }}
             </VBtn>
 
             <input
               v-model="selectedColor"
               type="color"
               class="color-picker color-picker--sm"
-              aria-label="Selected color"
+              :aria-label="t('room_painter.aria.selected_color')"
             >
           </div>
 
@@ -875,7 +879,7 @@ const colorPalette = [
               prepend-icon="tabler-refresh"
               @click="resetImage"
             >
-              Reset
+              {{ t('room_painter.mobile.reset') }}
             </VBtn>
 
             <VBtn
@@ -885,7 +889,7 @@ const colorPalette = [
               prepend-icon="tabler-download"
               @click="downloadImage"
             >
-              Download
+              {{ t('room_painter.mobile.download') }}
             </VBtn>
 
             <VBtn
@@ -895,7 +899,7 @@ const colorPalette = [
               prepend-icon="tabler-photo"
               @click="clearImage"
             >
-              New
+              {{ t('room_painter.mobile.new') }}
             </VBtn>
           </div>
         </VCard>

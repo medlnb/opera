@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { I18nLanguage } from '@layouts/types'
 
 interface Props {
@@ -10,7 +11,9 @@ const props = withDefaults(defineProps<Props>(), {
   location: 'bottom end',
 })
 
-const { locale } = useI18n({ useScope: 'global' })
+const { locale, t, te } = useI18n({ useScope: 'global' })
+
+const getLanguageLabel = (label: string) => (te(label) ? t(label) : label)
 </script>
 
 <template>
@@ -40,7 +43,7 @@ const { locale } = useI18n({ useScope: 'global' })
           @click="locale = lang.i18nLang"
         >
           <!-- Language label -->
-          <VListItemTitle>{{ lang.label }}</VListItemTitle>
+          <VListItemTitle>{{ getLanguageLabel(lang.label) }}</VListItemTitle>
         </VListItem>
       </VList>
     </VMenu>

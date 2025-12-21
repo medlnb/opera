@@ -1,19 +1,20 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
 
 const authStore = useAuthStore()
 
+const { t } = useI18n({ useScope: 'global' })
+
 const items = [
-  { title: 'My Orders', to: { name: '/account/orders' }, icon: { icon: 'tabler-shopping-cart' } },
-  { title: 'My Cart', to: { name: '/account/cart' }, icon: { icon: 'tabler-shopping-bag' } },
-  { title: 'My Favorites', to: { name: '/account/favorites' }, icon: { icon: 'tabler-heart' } },
-  { title: 'Account', to: { name: '/settings/account' }, icon: { icon: 'tabler-user' } },
+  { title: 'user.my_orders', to: { name: '/account/orders' }, icon: { icon: 'tabler-shopping-cart' } },
+  { title: 'user.my_cart', to: { name: '/account/cart' }, icon: { icon: 'tabler-shopping-bag' } },
+  { title: 'user.my_favorites', to: { name: '/account/favorites' }, icon: { icon: 'tabler-heart' } },
+  { title: 'user.account', to: { name: '/settings/account' }, icon: { icon: 'tabler-user' } },
 ]
 
 const logout = () => {
   authStore.logout()
-
-  // Refresh current page instead of redirecting to login
   window.location.reload()
 }
 </script>
@@ -27,7 +28,7 @@ const logout = () => {
       to="/login"
       prepend-icon="tabler-user"
     >
-      Log in
+      {{ t('auth.log_in') }}
     </VBtn>
   </template>
 
@@ -101,7 +102,7 @@ const logout = () => {
               />
             </template>
 
-            <VListItemTitle>{{ item.title }}</VListItemTitle>
+            <VListItemTitle>{{ t(item.title) }}</VListItemTitle>
           </VListItem>
 
           <!-- Divider -->
@@ -117,7 +118,7 @@ const logout = () => {
               />
             </template>
 
-            <VListItemTitle>Logout</VListItemTitle>
+            <VListItemTitle>{{ t('user.logout') }}</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>

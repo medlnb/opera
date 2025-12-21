@@ -1,5 +1,6 @@
 <script setup>
 import tips from '@images/tips.webp'
+import { useI18n } from 'vue-i18n'
 
 const config = useRuntimeConfig()
 const articles = ref([])
@@ -7,6 +8,8 @@ const loading = ref(true)
 const page = ref(1)
 const perPage = ref(12)
 const totalArticles = ref(0)
+
+const { t, d } = useI18n()
 
 const fetchArticles = async () => {
   loading.value = true
@@ -64,10 +67,10 @@ onMounted(() => {
       >
         <div class="text-center px-4">
           <p class="mb-1 hero-title text-white">
-            Tips & Advice
+            {{ t('tips_page.hero_title') }}
           </p>
           <p class="mb-0 hero-subtitle text-white">
-            Discover helpful tips and tricks for your painting projects
+            {{ t('tips_page.hero_subtitle') }}
           </p>
         </div>
       </div>
@@ -96,10 +99,10 @@ onMounted(() => {
         class="text-disabled mb-4"
       />
       <h3 class="text-h6 text-disabled mb-2">
-        No tips available yet
+        {{ t('tips_page.empty.title') }}
       </h3>
       <p class="text-body-2 text-disabled">
-        Check back soon for helpful tips!
+        {{ t('tips_page.empty.subtitle') }}
       </p>
     </VCard>
 
@@ -138,7 +141,7 @@ onMounted(() => {
                   size="14"
                   class="me-1"
                 />
-                {{ new Date(article.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}
+                {{ d(new Date(article.createdAt), 'short') }}
               </div>
             </VCardText>
           </VCard>

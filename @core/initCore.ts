@@ -1,4 +1,5 @@
 import { useStorage } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
 import { useTheme } from 'vuetify'
 import { useConfigStore } from '@core/stores/config'
 import { cookieRef, namespaceConfig } from '@layouts/stores/config'

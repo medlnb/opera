@@ -1,7 +1,8 @@
 <script setup>
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -11,6 +12,11 @@ definePageMeta({
 const router = useRouter()
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
+const { t, te, locale } = useI18n({ useScope: 'global' })
+
+useHead(() => ({
+  title: t('management.orders.title'),
+}))
 
 // Reactive state
 const orders = ref([])
@@ -23,25 +29,31 @@ const itemsPerPage = ref(10)
 const statusFilter = ref('all')
 
 // Status options
-const statusOptions = [
-  { title: 'All Statuses', value: 'all' },
-  { title: 'Pending', value: 'pending' },
-  { title: 'Confirmed', value: 'confirmed' },
-  { title: 'Shipped', value: 'shipped' },
-  { title: 'Delivered', value: 'delivered' },
-  { title: 'Cancelled', value: 'cancelled' },
-]
+const getStatusLabel = status => {
+  const key = `management.orders.status.${String(status || '')}`
+
+  return te(key) ? t(key) : String(status || '')
+}
+
+const statusOptions = computed(() => [
+  { title: t('management.orders.filters.all_statuses'), value: 'all' },
+  { title: getStatusLabel('pending'), value: 'pending' },
+  { title: getStatusLabel('confirmed'), value: 'confirmed' },
+  { title: getStatusLabel('shipped'), value: 'shipped' },
+  { title: getStatusLabel('delivered'), value: 'delivered' },
+  { title: getStatusLabel('cancelled'), value: 'cancelled' },
+])
 
 // Table headers
-const headers = [
-  { title: 'Order ID', key: 'orderId', sortable: false },
-  { title: 'Customer', key: 'user', sortable: false },
-  { title: 'Items', key: 'items', sortable: false },
-  { title: 'Total', key: 'total', sortable: false },
-  { title: 'Status', key: 'status', sortable: false },
-  { title: 'Date', key: 'createdAt', sortable: false },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
-]
+const headers = computed(() => [
+  { title: t('management.orders.table.order_id'), key: 'orderId', sortable: false },
+  { title: t('management.orders.table.customer'), key: 'user', sortable: false },
+  { title: t('management.orders.table.items'), key: 'items', sortable: false },
+  { title: t('management.orders.table.total'), key: 'total', sortable: false },
+  { title: t('management.orders.table.status'), key: 'status', sortable: false },
+  { title: t('management.orders.table.date'), key: 'createdAt', sortable: false },
+  { title: t('management.common.table.actions'), key: 'actions', sortable: false, align: 'end' },
+])
 
 // Fetch orders
 const fetchOrders = async () => {
@@ -78,10 +90,10 @@ const fetchOrders = async () => {
 // Format date
 const formatDate = date => {
   if (!date)
-    return '-'
+    return t('management.common.value.na')
   const d = new Date(date)
 
-  return d.toLocaleDateString('en-US', {
+  return d.toLocaleDateString(locale.value || undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -89,6 +101,13 @@ const formatDate = date => {
     minute: '2-digit',
   })
 }
+
+const noOrdersSubtitle = computed(() => {
+  if (statusFilter.value === 'all')
+    return t('management.orders.empty.none')
+
+  return t('management.orders.empty.filtered', { status: getStatusLabel(statusFilter.value) })
+})
 
 // Get status color
 const getStatusColor = status => {
@@ -137,7 +156,7 @@ onMounted(() => {
 <template>
   <div>
     <VCard
-      title="Orders Management"
+      :title="t('management.orders.title')"
       class="mb-6"
     >
       <VDivider class="my-4" />
@@ -147,7 +166,7 @@ onMounted(() => {
           <VSelect
             v-model="statusFilter"
             :items="statusOptions"
-            label="Status"
+            :label="t('management.common.status')"
             density="compact"
             style="min-inline-size: 180px;"
           />
@@ -202,7 +221,7 @@ onMounted(() => {
           <span
             v-else
             class="text-disabled"
-          >-</span>
+          >{{ t('management.common.value.na') }}</span>
         </template>
 
         <template #item.items="{ item }">
@@ -211,7 +230,7 @@ onMounted(() => {
             size="small"
             color="secondary"
           >
-            {{ item.items?.length || 0 }} items
+            {{ t('management.orders.table.items_count', { count: item.items?.length || 0 }) }}
           </VChip>
         </template>
 
@@ -228,7 +247,7 @@ onMounted(() => {
             :color="getStatusColor(item.status)"
             variant="tonal"
           >
-            {{ item.status }}
+            {{ getStatusLabel(item.status) }}
           </VChip>
         </template>
 
@@ -253,10 +272,10 @@ onMounted(() => {
               class="text-disabled mb-4"
             />
             <p class="text-h6 text-disabled">
-              No orders found
+              {{ t('management.orders.empty.title') }}
             </p>
             <p class="text-body-2 text-disabled">
-              {{ statusFilter === 'all' ? 'No orders have been placed yet' : `No ${statusFilter} orders found` }}
+              {{ noOrdersSubtitle }}
             </p>
           </div>
         </template>
@@ -266,7 +285,7 @@ onMounted(() => {
 
           <div class="d-flex align-center justify-space-between flex-wrap gap-3 pa-5 pt-3">
             <p class="text-sm text-medium-emphasis mb-0">
-              {{ paginationMeta({ page, itemsPerPage }, totalOrders) }}
+              {{ paginationMeta({ page, itemsPerPage }, totalOrders, t) }}
             </p>
 
             <VPagination

@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
@@ -15,6 +16,7 @@ definePageMeta({
 
 const loading = ref(false)
 const authStore = useAuthStore()
+const { t } = useI18n({ useScope: 'global' })
 
 const form = ref({
   phone: '',
@@ -35,7 +37,7 @@ const submit = async () => {
   try {
     loading.value = true
     if (!form.value.phone || !form.value.password)
-      return showSnackbar('Phone and password are required', 'error')
+      return showSnackbar(t('auth.errors.phone_password_required'), 'error')
 
     const res = await fetch(`${config.public.apiBaseUrl}/api/auth/login`, {
       method: 'POST',
@@ -45,7 +47,7 @@ const submit = async () => {
 
     if (!res.ok) {
       const msg = await res.text()
-      throw new Error(msg || 'Login failed')
+      throw new Error(msg || t('auth.errors.login_failed'))
     }
     const data = await res.json()
     if (data?.token)
@@ -57,7 +59,7 @@ const submit = async () => {
   }
   catch (err) {
     console.error(err)
-    showSnackbar('Invalid credentials', 'error')
+    showSnackbar(t('auth.errors.invalid_credentials'), 'error')
   }
   finally {
     loading.value = false
@@ -106,7 +108,7 @@ const { phoneValidator } = useValidators()
       >
         <VCardText>
           <h4 class="text-h4 mb-1">
-            Welcome to <NuxtLink
+            {{ t('auth.welcome_to') }} <NuxtLink
               to="/"
               class="text-capitalize"
             >
@@ -114,7 +116,7 @@ const { phoneValidator } = useValidators()
             </NuxtLink>! 👋🏻
           </h4>
           <p class="mb-0">
-            Please sign-in to your account and start the adventure
+            {{ t('auth.sign_in_prompt') }}
           </p>
         </VCardText>
         <VCardText>
@@ -123,8 +125,8 @@ const { phoneValidator } = useValidators()
               <VCol cols="12">
                 <AppTextField
                   v-model="form.phone"
-                  label="Phone Number"
-                  placeholder="X XX XX XX XX"
+                  :label="t('auth.phone_number')"
+                  :placeholder="t('auth.phone_placeholder')"
                   maxlength="9"
                   :rules="[phoneValidator]"
                   @input="form.phone = form.phone.replace(/\D/g, '')"
@@ -144,8 +146,8 @@ const { phoneValidator } = useValidators()
               <VCol cols="12">
                 <AppTextField
                   v-model="form.password"
-                  label="Password"
-                  placeholder="············"
+                  :label="t('auth.password')"
+                  :placeholder="t('auth.password_placeholder')"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
@@ -157,7 +159,7 @@ const { phoneValidator } = useValidators()
                     class="text-primary ms-2 mb-1"
                     to="/forgot-password"
                   >
-                    Forgot Password?
+                    {{ t('auth.forgot_password') }}
                   </NuxtLink>
                 </div>
 
@@ -166,7 +168,7 @@ const { phoneValidator } = useValidators()
                   type="submit"
                   :loading="loading"
                 >
-                  Login
+                  {{ t('auth.login') }}
                 </VBtn>
               </VCol>
 
@@ -174,13 +176,13 @@ const { phoneValidator } = useValidators()
                 cols="12"
                 class="text-center text-base"
               >
-                <span>New on our platform?</span>
+                <span>{{ t('auth.new_on_platform') }}</span>
 
                 <NuxtLink
                   class="text-primary ms-2"
                   href="/signup"
                 >
-                  Create an account
+                  {{ t('auth.create_account') }}
                 </NuxtLink>
               </VCol>
             </VRow>

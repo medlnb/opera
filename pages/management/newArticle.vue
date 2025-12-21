@@ -1,7 +1,8 @@
 <script setup>
-import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 definePageMeta({
   admin: true,
@@ -11,14 +12,20 @@ const authStore = useAuthStore()
 const route = useRoute()
 const config = useRuntimeConfig()
 
+const { t } = useI18n({ useScope: 'global' })
+
+const articleId = computed(() => route.query.id)
+const isEdit = computed(() => !!articleId.value)
+
+useHead(() => ({
+  title: isEdit.value ? t('management.articles.editor.title_edit') : t('management.articles.editor.title_create'),
+}))
+
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
-
-const articleId = computed(() => route.query.id)
-const isEdit = computed(() => !!articleId.value)
 
 // Article metadata
 const title = ref('')
@@ -33,10 +40,21 @@ const showAssetErrors = ref(false)
 const coverInvalid = computed(() => showAssetErrors.value && !imageUrl.value)
 
 // Article type options
-const typeOptions = [
-  { title: 'Tip', value: 'tip' },
-  { title: 'Inspiration', value: 'inspiration' },
-]
+const typeOptions = computed(() => [
+  { title: t('management.articles.type.tip'), value: 'tip' },
+  { title: t('management.articles.type.inspiration'), value: 'inspiration' },
+])
+
+const getBlockTypeLabel = type => {
+  if (type === 'title')
+    return t('management.articles.editor.block.type.title')
+  if (type === 'text')
+    return t('management.articles.editor.block.type.text')
+  if (type === 'image')
+    return t('management.articles.editor.block.type.image')
+
+  return String(type || '')
+}
 
 // Block types: 'title', 'text', 'image'
 const blocks = ref([])
@@ -105,7 +123,7 @@ async function uploadImage(index, file) {
     reader.readAsDataURL(file)
   }
   catch {
-    showSnackbar('Image upload failed', 'error')
+    showSnackbar(t('management.articles.editor.snackbar.image_upload_failed'), 'error')
   }
   finally {
     uploadingImage.value = null
@@ -148,12 +166,12 @@ async function uploadCoverImage(file) {
       const data = await res.json()
 
       imageUrl.value = data.id
-      showSnackbar('Cover image uploaded successfully', 'success')
+      showSnackbar(t('management.articles.editor.snackbar.cover_uploaded'), 'success')
     }
     reader.readAsDataURL(file)
   }
   catch {
-    showSnackbar('Cover image upload failed', 'error')
+    showSnackbar(t('management.articles.editor.snackbar.cover_upload_failed'), 'error')
   }
   finally {
     uploadingCover.value = false
@@ -182,14 +200,14 @@ async function savePage() {
   if (formRef.value && typeof formRef.value.validate === 'function') {
     const res = await formRef.value.validate()
     if (!res.valid) {
-      showSnackbar('Please fix the highlighted errors', 'error')
+      showSnackbar(t('management.articles.editor.snackbar.fix_errors'), 'error')
 
       return
     }
   }
 
   if (!imageUrl.value) {
-    showSnackbar('Cover image is required', 'error')
+    showSnackbar(t('management.articles.editor.snackbar.cover_required'), 'error')
 
     return
   }
@@ -229,14 +247,14 @@ async function savePage() {
       throw new Error('Failed to save')
     const data = await res.json()
 
-    showSnackbar(isEdit.value ? 'Article updated successfully' : 'Article created successfully', 'success')
+  showSnackbar(isEdit.value ? t('management.articles.editor.snackbar.updated') : t('management.articles.editor.snackbar.created'), 'success')
 
     // If creating new, redirect to edit mode
     if (!isEdit.value && data.data?._id)
       navigateTo(`/management/newArticle?id=${data.data._id}`)
   }
   catch {
-    showSnackbar('Failed to save article', 'error')
+    showSnackbar(t('management.articles.editor.snackbar.save_failed'), 'error')
   }
   finally {
     saving.value = false
@@ -263,7 +281,7 @@ async function loadArticle() {
     }
   }
   catch {
-    showSnackbar('Failed to load article', 'error')
+    showSnackbar(t('management.articles.editor.snackbar.load_failed'), 'error')
   }
   finally {
     loading.value = false
@@ -280,9 +298,9 @@ onMounted(() => {
     <div class="d-flex flex-wrap justify-space-between align-center gap-4 mb-6">
       <div>
         <h4 class="text-h4 font-weight-medium">
-          {{ isEdit ? 'Edit Article' : 'Create Article' }}
+          {{ isEdit ? t('management.articles.editor.title_edit') : t('management.articles.editor.title_create') }}
         </h4>
-        <span class="text-body-2 text-disabled">Add titles, text, and images to build your article</span>
+        <span class="text-body-2 text-disabled">{{ t('management.articles.editor.subtitle') }}</span>
       </div>
       <div class="d-flex gap-2">
         <VBtn
@@ -293,7 +311,7 @@ onMounted(() => {
             icon="tabler-arrow-left"
             class="me-2"
           />
-          Back to List
+          {{ t('management.articles.editor.actions.back_to_list') }}
         </VBtn>
         <VBtn
           :loading="saving"
@@ -304,7 +322,7 @@ onMounted(() => {
             icon="tabler-device-floppy"
             class="me-2"
           />
-          {{ isEdit ? 'Update' : 'Create' }}
+          {{ isEdit ? t('management.articles.editor.actions.update') : t('management.articles.editor.actions.create') }}
         </VBtn>
       </div>
     </div>
@@ -324,7 +342,7 @@ onMounted(() => {
     <template v-else>
       <!-- Article Metadata -->
       <VCard class="mb-6">
-        <VCardTitle>Article Information</VCardTitle>
+        <VCardTitle>{{ t('management.articles.editor.sections.article_information') }}</VCardTitle>
         <VDivider />
         <VCardText>
           <VForm ref="formRef">
@@ -335,8 +353,8 @@ onMounted(() => {
               >
                 <VTextField
                   v-model="title"
-                  label="Article Title"
-                  placeholder="Enter article title..."
+                  :label="t('management.articles.editor.fields.article_title')"
+                  :placeholder="t('management.articles.editor.fields.article_title_placeholder')"
                   variant="outlined"
                   :rules="[requiredValidator]"
                   required
@@ -349,7 +367,9 @@ onMounted(() => {
                 <VSelect
                   v-model="articleType"
                   :items="typeOptions"
-                  label="Article Type"
+                  item-title="title"
+                  item-value="value"
+                  :label="t('management.articles.editor.fields.article_type')"
                   variant="outlined"
                   :rules="[requiredValidator]"
                   required
@@ -357,7 +377,7 @@ onMounted(() => {
               </VCol>
               <VCol cols="12">
                 <div class="cover-image-section">
-                  <label class="text-body-2 font-weight-medium mb-2 d-block">Cover Image *</label>
+                  <label class="text-body-2 font-weight-medium mb-2 d-block">{{ t('management.articles.editor.fields.cover_image') }}</label>
                   <div
                     v-if="!imageUrl"
                     class="cover-dropzone d-flex flex-column align-center justify-center"
@@ -377,7 +397,7 @@ onMounted(() => {
                         size="32"
                         class="text-disabled mb-1"
                       />
-                      <span class="text-caption text-disabled">Upload cover</span>
+                      <span class="text-caption text-disabled">{{ t('management.articles.editor.fields.upload_cover') }}</span>
                     </template>
                   </div>
                   <div
@@ -408,14 +428,14 @@ onMounted(() => {
                       :loading="uploadingCover"
                       @click="selectCoverImage"
                     >
-                      Replace
+                      {{ t('management.articles.editor.actions.replace') }}
                     </VBtn>
                   </div>
                   <p
                     v-if="coverInvalid"
                     class="text-error text-caption mt-2"
                   >
-                    Cover image is required
+                    {{ t('management.articles.editor.fields.cover_required') }}
                   </p>
                 </div>
               </VCol>
@@ -436,10 +456,10 @@ onMounted(() => {
             class="text-disabled mb-4"
           />
           <p class="text-h6 text-disabled">
-            No content yet
+            {{ t('management.articles.editor.empty.title') }}
           </p>
           <p class="text-body-2 text-disabled">
-            Click the buttons above to start building your page
+            {{ t('management.articles.editor.empty.subtitle') }}
           </p>
         </VCardText>
       </VCard>
@@ -462,7 +482,7 @@ onMounted(() => {
                 :color="block.type === 'title' ? 'primary' : block.type === 'text' ? 'info' : 'success'"
                 label
               >
-                {{ block.type === 'title' ? 'Title' : block.type === 'text' ? 'Text' : 'Image' }}
+                {{ getBlockTypeLabel(block.type) }}
               </VChip>
               <div class="d-flex gap-1">
                 <VBtn
@@ -508,8 +528,8 @@ onMounted(() => {
             <VTextField
               v-if="block.type === 'title'"
               v-model="block.content"
-              label="Title"
-              placeholder="Enter title text..."
+              :label="t('management.articles.editor.block.title.label')"
+              :placeholder="t('management.articles.editor.block.title.placeholder')"
               variant="outlined"
             />
 
@@ -517,8 +537,8 @@ onMounted(() => {
             <VTextarea
               v-else-if="block.type === 'text'"
               v-model="block.content"
-              label="Text Content"
-              placeholder="Enter your text content..."
+              :label="t('management.articles.editor.block.text.label')"
+              :placeholder="t('management.articles.editor.block.text.placeholder')"
               variant="outlined"
               rows="4"
               auto-grow
@@ -543,7 +563,7 @@ onMounted(() => {
                     size="48"
                     class="text-disabled mb-2"
                   />
-                  <span class="text-body-2 text-disabled">Click to upload image</span>
+                  <span class="text-body-2 text-disabled">{{ t('management.articles.editor.block.image.upload_prompt') }}</span>
                 </template>
               </div>
               <div
@@ -571,7 +591,7 @@ onMounted(() => {
                   size="small"
                   @click="selectImageFile(index)"
                 >
-                  Replace Image
+                  {{ t('management.articles.editor.block.image.replace') }}
                 </VBtn>
               </div>
             </div>
@@ -587,21 +607,21 @@ onMounted(() => {
             prepend-icon="tabler-heading"
             @click="addBlock('title')"
           >
-            Add Title
+            {{ t('management.articles.editor.add_block.add_title') }}
           </VBtn>
           <VBtn
             variant="tonal"
             prepend-icon="tabler-align-left"
             @click="addBlock('text')"
           >
-            Add Text
+            {{ t('management.articles.editor.add_block.add_text') }}
           </VBtn>
           <VBtn
             variant="tonal"
             prepend-icon="tabler-photo"
             @click="addBlock('image')"
           >
-            Add Image
+            {{ t('management.articles.editor.add_block.add_image') }}
           </VBtn>
         </VCardText>
       </VCard>
@@ -611,7 +631,7 @@ onMounted(() => {
         v-if="blocks.length > 0"
         class="mt-6"
       >
-        <VCardTitle>Preview</VCardTitle>
+        <VCardTitle>{{ t('management.articles.editor.sections.preview') }}</VCardTitle>
         <VDivider />
         <VCardText class="preview-content">
           <template

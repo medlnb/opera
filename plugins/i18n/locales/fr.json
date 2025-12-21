@@ -1,0 +1,843 @@
+{
+    "lang": {
+        "english": "Anglais",
+        "french": "Français",
+        "arabic": "Arabe"
+    },
+    "common": {
+        "back_to_home": "Retour à l'accueil",
+        "back": "Retour",
+        "next": "Suivant",
+        "unnamed": "Sans nom",
+        "pagination": {
+            "showing": "Affichage de {start} à {end} sur {total} entrées"
+        }
+    },
+    "colors_page": {
+        "hero_title": "Bienvenue dans le spectre des couleurs",
+        "hero_subtitle": "Explorez des teintes qui donnent vie à votre vision",
+        "empty": {
+            "title": "Aucune couleur disponible",
+            "subtitle": "Revenez plus tard pour découvrir de nouvelles couleurs"
+        },
+        "errors": {
+            "load_failed": "Échec du chargement des couleurs"
+        }
+    },
+    "tips_page": {
+        "hero_title": "Conseils & Astuces",
+        "hero_subtitle": "Découvrez des conseils et astuces utiles pour vos projets de peinture",
+        "empty": {
+            "title": "Aucun conseil disponible pour le moment"
+        },
+        "editor": {
+            "title_create": "Créer un article",
+            "title_edit": "Modifier l'article",
+            "subtitle": "Ajoutez des titres, du texte et des images pour créer votre article",
+            "actions": {
+                "back_to_list": "Retour à la liste",
+                "create": "Créer",
+                "update": "Mettre à jour",
+                "replace": "Remplacer"
+            },
+            "sections": {
+                "article_information": "Informations sur l'article",
+                "preview": "Aperçu"
+            },
+            "fields": {
+                "article_title": "Titre de l'article",
+                "article_title_placeholder": "Saisir le titre de l'article...",
+                "article_type": "Type d'article",
+                "cover_image": "Image de couverture *",
+                "upload_cover": "Téléverser la couverture",
+                "cover_required": "L'image de couverture est obligatoire"
+            },
+            "empty": {
+                "title": "Aucun contenu pour le moment",
+                "subtitle": "Cliquez sur les boutons ci-dessus pour commencer à construire votre page"
+            },
+            "block": {
+                "type": {
+                    "title": "Titre",
+                    "text": "Texte",
+                    "image": "Image"
+                },
+                "title": {
+                    "label": "Titre",
+                    "placeholder": "Saisir le texte du titre..."
+                },
+                "text": {
+                    "label": "Contenu texte",
+                    "placeholder": "Saisir votre contenu..."
+                },
+                "image": {
+                    "upload_prompt": "Cliquer pour téléverser une image",
+                    "replace": "Remplacer l'image"
+                }
+            },
+            "add_block": {
+                "add_title": "Ajouter un titre",
+                "add_text": "Ajouter du texte",
+                "add_image": "Ajouter une image"
+            },
+            "snackbar": {
+                "image_upload_failed": "Échec du téléversement de l'image",
+                "cover_uploaded": "Image de couverture téléversée avec succès",
+                "cover_upload_failed": "Échec du téléversement de l'image de couverture",
+                "fix_errors": "Veuillez corriger les erreurs surlignées",
+                "cover_required": "L'image de couverture est obligatoire",
+                "updated": "Article mis à jour avec succès",
+                "created": "Article créé avec succès",
+                "save_failed": "Échec de l'enregistrement de l'article",
+                "load_failed": "Échec du chargement de l'article"
+            },
+            "subtitle": "Revenez bientôt pour des conseils utiles !"
+        }
+    },
+    "inspirations_page": {
+        "hero_title": "Galerie d'inspiration",
+        "hero_subtitle": "Découvrez des idées pour inspirer votre prochain projet de peinture",
+        "empty": {
+            "title": "Aucune inspiration disponible pour le moment",
+            "subtitle": "Revenez bientôt pour des idées inspirantes !"
+        }
+    },
+    "room_painter": {
+        "title": "Peinture des murs",
+        "painting_enabled": "Peinture activée",
+        "description": "Importez une photo de votre pièce et peignez les murs avec différentes couleurs pour visualiser vos idées !",
+        "upload": {
+            "title": "Importer une image",
+            "subtitle": "Choisissez une photo de votre pièce pour commencer à peindre les murs",
+            "select_image": "Sélectionner une image"
+        },
+        "controls": {
+            "title": "Commandes de peinture",
+            "paint": "Peindre",
+            "depaint": "Dépeindre",
+            "depaint_help": "Dépeindre = cliquez sur une zone déjà peinte pour restaurer la photo d'origine à cet endroit.",
+            "tip_undo": "Astuce : utilisez Ctrl+Z pour annuler.",
+            "selected_color": "Couleur sélectionnée",
+            "quick_colors": "Couleurs rapides",
+            "detection_sensitivity": "Sensibilité de détection : {value}",
+            "detection_help": "Des valeurs plus élevées sélectionnent des zones plus grandes avec des couleurs similaires",
+            "undo": "Annuler",
+            "redo": "Rétablir",
+            "reset_image": "Réinitialiser l'image",
+            "download_result": "Télécharger le résultat",
+            "upload_new_image": "Importer une nouvelle image"
+        },
+        "how_to_use": {
+            "title": "Mode d'emploi",
+            "step_1": "Choisissez Peindre ou Dépeindre",
+            "step_2": "Choisissez une couleur depuis la palette ou le sélecteur",
+            "step_3": "Cliquez sur un mur pour le peindre",
+            "step_4": "Ajustez la sensibilité pour une meilleure détection des bords",
+            "step_5": "Téléchargez votre design une fois terminé !"
+        },
+        "mobile": {
+            "reset": "Réinitialiser",
+            "download": "Télécharger",
+            "new": "Nouveau"
+        },
+        "aria": {
+            "selected_color": "Couleur sélectionnée"
+        }
+    },
+    "nav": {
+        "home": "Accueil",
+        "colors": "Couleurs",
+        "products": {
+            "root": "Produits",
+            "decor": "Décor",
+            "buildings": "Bâtiment",
+            "coating": "Revêtement"
+        },
+        "tips": "Conseils",
+        "inspirations": "Inspirations",
+        "virtual_painter": "Peintre virtuel",
+        "management": {
+            "root": "Administration",
+            "dashboard": "Tableau de bord",
+            "products": "Produits",
+            "new_product": "Nouveau produit",
+            "articles": "Articles",
+            "new_article": "Nouvel article",
+            "orders": "Commandes",
+            "users": "Utilisateurs"
+        }
+    },
+    "user": {
+        "my_orders": "Mes commandes",
+        "my_cart": "Mon panier",
+        "my_favorites": "Mes favoris",
+        "account": "Compte",
+        "logout": "Déconnexion"
+    },
+    "footer": {
+        "made_with": "Fait avec",
+        "by": "par",
+        "license": "Licence",
+        "more_themes": "Plus de thèmes",
+        "documentation": "Documentation"
+    },
+    "errors": {
+        "page_not_found_title": "Page introuvable",
+        "page_not_found_description": "Nous n'avons pas pu trouver la page que vous recherchez.",
+        "generic_title": "Oups ! Une erreur s'est produite.",
+        "generic_description": "Nous y travaillons et nous la corrigerons dès que possible.",
+        "coming_soon_alt": "Bientôt disponible"
+    },
+    "auth": {
+        "welcome_to": "Bienvenue sur",
+        "sign_in_prompt": "Connectez-vous à votre compte pour commencer",
+        "phone_number": "Numéro de téléphone",
+        "phone_placeholder": "X XX XX XX XX",
+        "password": "Mot de passe",
+        "password_placeholder": "············",
+        "forgot_password": "Mot de passe oublié ?",
+        "login": "Se connecter",
+        "log_in": "Connexion",
+        "create_account": "Créer un compte",
+        "new_on_platform": "Nouveau sur notre plateforme ?",
+        "already_have_account": "Vous avez déjà un compte ?",
+        "send_code": "Envoyer le code",
+        "verify_code": "Vérifier le code",
+        "reset_password": "Réinitialiser le mot de passe",
+        "back_to_login": "Retour à la connexion",
+        "verification_code": "Code de vérification",
+        "verification_code_placeholder": "- - - - - -",
+        "new_password": "Nouveau mot de passe",
+        "confirm_password": "Confirmer le mot de passe",
+        "first_name": "Prénom",
+        "first_name_placeholder": "Jean",
+        "last_name": "Nom",
+        "last_name_placeholder": "Dupont",
+        "wilaya": "Wilaya",
+        "select_wilaya": "Sélectionner la wilaya",
+        "city": "Ville",
+        "select_city": "Sélectionner la ville",
+        "address": "Adresse",
+        "address_placeholder": "Adresse",
+        "signup": {
+            "steps": {
+                "personal": {
+                    "title": "Personnel",
+                    "subtitle": "Saisir les informations"
+                },
+                "phone": {
+                    "title": "Vérification du téléphone",
+                    "subtitle": "Vérifiez votre téléphone"
+                }
+            },
+            "personal_info_title": "Informations personnelles",
+            "personal_info_subtitle": "Saisissez vos informations personnelles",
+            "phone_verification_title": "Vérification du téléphone",
+            "phone_step_description": "Entrez votre numéro de téléphone pour recevoir un code de vérification",
+            "code_step_description": "Entrez le code à 6 chiffres envoyé sur votre téléphone",
+            "sent_code_to": "Nous avons envoyé un code à",
+            "didnt_receive_code": "Vous n'avez pas reçu le code ?",
+            "resend_in": "Renvoyer dans {seconds}s",
+            "resend_code": "Renvoyer le code",
+            "verify_create_account": "Vérifier et créer un compte",
+            "code_sent_to": "Code de vérification envoyé à {phone}",
+            "phone_verified_creating": "Téléphone vérifié ! Création de votre compte...",
+            "registration_successful": "Inscription réussie"
+        },
+        "forgot": {
+            "title": "Mot de passe oublié ?",
+            "step_phone_description": "Entrez votre numéro de téléphone et nous vous enverrons un code de vérification",
+            "step_code_description": "Entrez le code de vérification envoyé sur votre téléphone",
+            "step_password_description": "Créez un nouveau mot de passe pour votre compte",
+            "code_sent": "Code de vérification envoyé",
+            "phone_verified_set_password": "Téléphone vérifié ! Définissez maintenant votre nouveau mot de passe",
+            "password_reset_success": "Mot de passe réinitialisé avec succès ! Redirection vers la connexion..."
+        },
+        "errors": {
+            "phone_password_required": "Le téléphone et le mot de passe sont requis",
+            "login_failed": "Échec de la connexion",
+            "invalid_credentials": "Identifiants invalides",
+            "valid_phone_required": "Veuillez entrer un numéro de téléphone valide à 9 chiffres",
+            "failed_to_send_sms": "Échec de l'envoi du SMS",
+            "enter_6_digit_code": "Veuillez entrer le code à 6 chiffres",
+            "invalid_code_or_verification_failed": "Code invalide ou échec de la vérification",
+            "fix_highlighted_errors": "Veuillez corriger les erreurs indiquées",
+            "password_min_length": "Le mot de passe doit contenir au moins 6 caractères",
+            "passwords_do_not_match": "Les mots de passe ne correspondent pas",
+            "failed_to_reset_password": "Échec de la réinitialisation du mot de passe",
+            "failed_to_register": "Échec de l'inscription",
+            "registration_failed": "Échec de l'inscription"
+        }
+    },
+    "contact": {
+        "title": "Contactez-nous",
+        "hero_description": "Trouvez l'agence Opera Peinture la plus proche. Nous avons {total} points de vente à travers l'Algérie prêts à vous servir.",
+        "branches_count": "{total}+ agences",
+        "nationwide_coverage": "Couverture nationale à travers l'Algérie",
+        "working_hours": "Heures d'ouverture",
+        "working_hours_details": "Samedi - Jeudi : 8h00 - 18h00",
+        "support": "Assistance",
+        "support_details": "Appelez n'importe quelle agence pour obtenir de l'aide",
+        "our_branches": "Nos agences",
+        "search_by_city": "Rechercher par ville...",
+        "no_branches_found": "Aucune agence trouvée",
+        "try_different_search": "Essayez un autre terme de recherche",
+        "country": "Algérie",
+        "phone_numbers": "Numéros de téléphone",
+        "call": "Appeler",
+        "copy": "Copier",
+        "view_on_map": "Voir sur la carte",
+        "showing_branches": "Affichage de {shown} sur {total} agences"
+    },
+    "home": {
+        "hero": {
+            "title_prefix": "Travaillez avec un produit",
+            "title_highlight": "Excellent",
+            "title_suffix": "",
+            "description": "Opera Peinture propose des peintures de haute qualité, alliant innovation, durabilité et respect de l'environnement pour tous vos projets de peinture.",
+            "explore_products": "Découvrir les produits",
+            "view_colors": "Voir les couleurs"
+        },
+        "stats": {
+            "sales_points": "Points de vente",
+            "products_manufactured": "Produits fabriqués",
+            "years_experience": "Années d'expérience"
+        },
+        "about": {
+            "overline": "À propos",
+            "title": "Qui sommes-nous ?",
+            "p1": "Fondée en 2014 à Batna, Opera Paints est spécialisée dans la fabrication, la production et l'exportation de peintures de haute qualité répondant aux normes de durabilité et de sécurité environnementale.",
+            "p2": "Depuis sa création, l'entreprise s'est imposée comme l'un des leaders du secteur en Algérie et en Afrique du Nord. Opera Paints propose plus de 60 produits différents, dont des peintures architecturales et décoratives, pour répondre aux besoins de ses clients.",
+            "p3": "Aujourd'hui, ses produits sont disponibles dans plus de 80 points de vente en Algérie, ainsi qu'en Côte d'Ivoire et au Burkina Faso.",
+            "learn_more": "En savoir plus"
+        },
+        "why": {
+            "overline": "Pourquoi nous choisir",
+            "title": "Notre engagement pour l'excellence"
+        },
+        "features": {
+            "quality_title": "Qualité inégalée",
+            "quality_description": "Nos produits sont fabriqués avec des matériaux premium pour garantir un rendu impeccable et durable.",
+            "innovation_title": "Innovation continue",
+            "innovation_description": "Nous intégrons les dernières technologies et tendances du marché pour offrir des solutions de peinture adaptées aux besoins modernes.",
+            "resistance_title": "Résistance exceptionnelle",
+            "resistance_description": "Face aux intempéries, aux UV ou aux taches, nos peintures sont conçues pour durer et protéger vos murs.",
+            "satisfaction_title": "Satisfaction client",
+            "satisfaction_description": "Votre satisfaction est notre priorité. Nous vous accompagnons à chaque étape pour garantir un résultat final au-delà de vos attentes."
+        },
+        "cta": {
+            "title": "Prêt à transformer votre espace ?",
+            "description": "Découvrez notre large gamme de peintures premium et trouvez la couleur parfaite pour votre prochain projet.",
+            "shop_now": "Acheter maintenant",
+            "get_inspired": "S'inspirer"
+        }
+    },
+    "products": {
+        "empty": {
+            "title": "Aucun produit trouvé",
+            "subtitle": "Essayez de modifier vos filtres ou revenez plus tard"
+        },
+        "filters": {
+            "button": "Filtres",
+            "title": "Filtrer les produits",
+            "search_label": "Rechercher (titre/type)",
+            "destination": {
+                "title": "Destination",
+                "habitations": "Habitations",
+                "offices": "Bureaux",
+                "hotel": "Hôtel",
+                "restaurants": "Restaurants",
+                "showroom": "Showroom",
+                "stores": "Magasins"
+            },
+            "support": {
+                "title": "Supports",
+                "plaster": "Plâtre",
+                "cement": "Ciment",
+                "render": "Enduit",
+                "brick": "Brique"
+            },
+            "reset": "Réinitialiser"
+        }
+    },
+    "management": {
+        "articles": {
+            "title": "Gestion des articles",
+            "actions": {
+                "create": "Créer un article"
+            },
+            "search_placeholder": "Rechercher des articles...",
+            "filters": {
+                "all_types": "Tous les types"
+            },
+            "type": {
+                "tip": "Conseils",
+                "inspiration": "Inspiration"
+            },
+            "table": {
+                "title": "Titre",
+                "type": "Type",
+                "date": "Date"
+            },
+            "empty": {
+                "title": "Aucun article trouvé",
+                "none": "Créez votre premier article pour commencer",
+                "filtered": "Aucun article {type} trouvé"
+            },
+            "deleteDialog": {
+                "title": "Supprimer l'article ?",
+                "confirm": "Voulez-vous vraiment supprimer cet article ?",
+                "warning": "Cette action est irréversible."
+            },
+            "editor": {
+                "title_create": "Créer un article",
+                "title_edit": "Modifier l'article",
+                "subtitle": "Ajoutez des titres, du texte et des images pour créer votre article",
+                "actions": {
+                    "back_to_list": "Retour à la liste",
+                    "create": "Créer",
+                    "update": "Mettre à jour",
+                    "replace": "Remplacer"
+                },
+                "sections": {
+                    "article_information": "Informations sur l'article",
+                    "preview": "Aperçu"
+                },
+                "fields": {
+                    "article_title": "Titre de l'article",
+                    "article_title_placeholder": "Saisir le titre de l'article...",
+                    "article_type": "Type d'article",
+                    "cover_image": "Image de couverture *",
+                    "upload_cover": "Téléverser la couverture",
+                    "cover_required": "L'image de couverture est obligatoire"
+                },
+                "empty": {
+                    "title": "Aucun contenu pour le moment",
+                    "subtitle": "Cliquez sur les boutons ci-dessus pour commencer à créer votre page"
+                },
+                "block": {
+                    "type": {
+                        "title": "Titre",
+                        "text": "Texte",
+                        "image": "Image"
+                    },
+                    "title": {
+                        "label": "Titre",
+                        "placeholder": "Saisir le texte du titre..."
+                    },
+                    "text": {
+                        "label": "Contenu",
+                        "placeholder": "Saisir votre contenu..."
+                    },
+                    "image": {
+                        "upload_prompt": "Cliquer pour téléverser une image",
+                        "replace": "Remplacer l'image"
+                    }
+                },
+                "add_block": {
+                    "add_title": "Ajouter un titre",
+                    "add_text": "Ajouter du texte",
+                    "add_image": "Ajouter une image"
+                },
+                "snackbar": {
+                    "image_upload_failed": "Échec du téléversement de l'image",
+                    "cover_uploaded": "Image de couverture téléversée avec succès",
+                    "cover_upload_failed": "Échec du téléversement de l'image de couverture",
+                    "fix_errors": "Veuillez corriger les erreurs surlignées",
+                    "cover_required": "L'image de couverture est obligatoire",
+                    "updated": "Article mis à jour avec succès",
+                    "created": "Article créé avec succès",
+                    "save_failed": "Échec de l'enregistrement de l'article",
+                    "load_failed": "Échec du chargement de l'article"
+                }
+            }
+        },
+        "dashboard": {
+            "title": "Tableau de bord",
+            "welcome": "Bon retour, {name} ! Voici ce qui se passe.",
+            "actions": {
+                "view_orders": "Voir les commandes",
+                "add_product": "Ajouter un produit",
+                "retry": "Réessayer",
+                "view_all": "Voir tout"
+            },
+            "stats": {
+                "total_revenue": "Chiffre d'affaires total",
+                "total_orders": "Total des commandes",
+                "pending_orders": "{count} en attente",
+                "total_users": "Total des utilisateurs",
+                "new_users_this_month": "+{count} ce mois-ci",
+                "products": "Produits"
+            },
+            "sections": {
+                "revenue_overview": "Aperçu des revenus",
+                "this_month": "Ce mois-ci",
+                "last_month": "Mois dernier",
+                "orders_this_month": "Commandes ce mois-ci",
+                "orders_by_status": "Commandes par statut",
+                "total_orders": "Total des commandes",
+                "recent_orders": "Commandes récentes",
+                "top_products": "Meilleurs produits"
+            },
+            "table": {
+                "order": "Commande",
+                "customer": "Client",
+                "total": "Total",
+                "status": "Statut",
+                "date": "Date"
+            },
+            "sales": "{count} ventes",
+            "errors": {
+                "load_failed": "Échec du chargement des données du tableau de bord"
+            }
+        },
+        "products": {
+            "title": "Gestion des produits",
+            "filters": {
+                "search": "Rechercher",
+                "type": "Type",
+                "select_type": "Sélectionner un type"
+            },
+            "types": {
+                "decor": "Décor",
+                "buildings": "Bâtiments",
+                "coating": "Revêtement"
+            },
+            "table": {
+                "title": "Titre",
+                "type": "Type",
+                "variances": "Variantes",
+                "colors": "Couleurs"
+            },
+            "editor": {
+                "title_create": "Ajouter un nouveau produit",
+                "title_edit": "Modifier le produit",
+                "subtitle_create": "Renseignez les détails du produit ci-dessous",
+                "subtitle_edit": "Mettez à jour les détails du produit ci-dessous",
+                "actions": {
+                    "discard": "Annuler",
+                    "publish": "Publier le produit",
+                    "save_changes": "Enregistrer"
+                },
+                "sections": {
+                    "preview": "Aperçu du produit",
+                    "product_information": "Informations sur le produit",
+                    "technical_characteristics": "Caractéristiques techniques",
+                    "application": "Mise en œuvre",
+                    "colors": "Couleurs",
+                    "variances": "Variantes"
+                },
+                "preview": {
+                    "click_to_add_cover": "Cliquer pour ajouter une couverture",
+                    "cover_required": "L'image de couverture est obligatoire",
+                    "avatar_required": "L'avatar est obligatoire"
+                },
+                "fields": {
+                    "title": "Titre",
+                    "title_placeholder": "Titre du produit",
+                    "definition": "Définition",
+                    "definition_placeholder": "Définition du produit",
+                    "type": "Type",
+                    "properties": "Propriétés",
+                    "properties_placeholder": "Ajouter des propriétés"
+                },
+                "technical": {
+                    "density": "Densité",
+                    "coverage": "Rendement",
+                    "drying_time": "Temps de séchage",
+                    "viscosity_optional": "Viscosité (optionnel)",
+                    "aspect": {
+                        "title": "Aspect du film sec",
+                        "metallized": "Métallisé",
+                        "glossy": "Brillant",
+                        "silky": "Soyeux",
+                        "luminous": "Lumineux",
+                        "ultra_gloss_marble": "Marbre ultra brillant"
+                    }
+                },
+                "application": {
+                    "dilution": "Dilution",
+                    "material": {
+                        "title": "Matériel d'application",
+                        "sponge_nature": "Éponge naturelle",
+                        "decorative_stamp": "Tampon décor",
+                        "trowel": "Lisseuse",
+                        "knife": "Couteau",
+                        "brush": "Brosse",
+                        "paintbrush": "Pinceau",
+                        "stainless_trowel": "Lisseuse inox",
+                        "flat_brush_spalter": "Pinceau plat spalter",
+                        "plastic_spatula": "Spatule plastique"
+                    },
+                    "cleaning_optional": "Nettoyage matériel (optionnel)",
+                    "surface_preparation_optional": "Préparation support (optionnel)"
+                },
+                "colors": {
+                    "name": "Nom",
+                    "name_placeholder": "Nom de la couleur",
+                    "code": "Code",
+                    "add": "Ajouter une couleur"
+                },
+                "variances": {
+                    "quantity": "Quantité",
+                    "quantity_placeholder": "ex : 1L, 5kg",
+                    "price_dzd": "Prix (DZD)",
+                    "add": "Ajouter une variante"
+                },
+                "technical_file": {
+                    "title": "Fiche technique (PDF)",
+                    "upload": "Téléverser le PDF",
+                    "replace": "Remplacer le PDF",
+                    "download": "Télécharger",
+                    "detach": "Détacher",
+                    "attached": "Attaché :",
+                    "file_fallback": "Fichier PDF",
+                    "optional_help": "Optionnel. Téléversez un PDF et il sera lié à ce produit."
+                },
+                "placeholders": {
+                    "example": "ex : {example}",
+                    "water": "Eau"
+                },
+                "validation": {
+                    "at_least_one_item": "Au moins un élément est requis"
+                },
+                "snackbar": {
+                    "load_failed": "Échec du chargement du produit",
+                    "image_upload_failed": "Échec du téléversement de l'image",
+                    "pdf_select_required": "Veuillez sélectionner un fichier PDF",
+                    "pdf_upload_failed": "Échec du téléversement du PDF",
+                    "pdf_read_failed": "Impossible de lire le fichier PDF",
+                    "fix_errors": "Veuillez corriger les erreurs surlignées",
+                    "cover_required": "L'image de couverture est obligatoire",
+                    "avatar_required": "L'avatar est obligatoire",
+                    "color_required": "Au moins une couleur est requise",
+                    "color_invalid": "Chaque couleur doit avoir un nom et un code",
+                    "variance_required": "Au moins une variante est requise",
+                    "variance_invalid": "Chaque variante nécessite une quantité et un prix positif",
+                    "created": "Produit créé",
+                    "updated": "Produit mis à jour",
+                    "save_failed": "Échec de l'enregistrement du produit"
+                }
+            },
+            "empty": {
+                "title": "Aucun produit trouvé",
+                "subtitle": "Créez un nouveau produit pour commencer"
+            },
+            "actions": {
+                "add_product": "Ajouter un produit"
+            },
+            "deleteDialog": {
+                "title": "Supprimer le produit",
+                "confirm_prefix": "Voulez-vous vraiment supprimer ",
+                "confirm_suffix": " ?",
+                "item_fallback": "ce produit"
+            },
+            "snackbar": {
+                "load_failed": "Échec du chargement des produits",
+                "deleted": "Produit supprimé"
+            }
+        },
+        "common": {
+            "status": "Statut",
+            "cancel": "Annuler",
+            "delete": "Supprimer",
+            "action_failed": "Échec de l'action",
+            "delete_failed": "Échec de la suppression",
+            "value": {
+                "na": "-"
+            },
+            "table": {
+                "actions": "Actions"
+            }
+        },
+        "users": {
+            "title": "Gestion des utilisateurs",
+            "search_placeholder": "Rechercher des utilisateurs...",
+            "filters": {
+                "banned": {
+                    "all": "Tous les utilisateurs"
+                }
+            },
+            "table": {
+                "user": "Utilisateur",
+                "phone": "Téléphone",
+                "role": "Rôle",
+                "status": "Statut",
+                "joined": "Inscrit"
+            },
+            "role": {
+                "admin": "Admin",
+                "user": "Utilisateur"
+            },
+            "status": {
+                "active": "Actif",
+                "banned": "Banni"
+            },
+            "actions": {
+                "ban": "Bannir",
+                "unban": "Débannir"
+            },
+            "empty": {
+                "title": "Aucun utilisateur trouvé",
+                "none": "Aucun utilisateur enregistré",
+                "filtered": "Essayez de modifier votre recherche"
+            },
+            "banDialog": {
+                "ban_title": "Bannir l'utilisateur ?",
+                "unban_title": "Débannir l'utilisateur ?",
+                "ban_confirm": "Êtes-vous sûr de vouloir bannir cet utilisateur ?",
+                "unban_confirm": "Êtes-vous sûr de vouloir débannir cet utilisateur ?",
+                "warning": "L'utilisateur ne pourra pas se connecter tant qu'il est banni."
+            },
+            "deleteDialog": {
+                "title": "Supprimer le compte utilisateur ?",
+                "confirm": "Êtes-vous sûr de vouloir supprimer définitivement le compte de cet utilisateur ?",
+                "warning": "Cette action est irréversible. Toutes les données de l'utilisateur seront perdues."
+            },
+            "snackbar": {
+                "banned": "Utilisateur banni avec succès",
+                "unbanned": "Utilisateur débanni avec succès",
+                "deleted": "Utilisateur supprimé avec succès"
+            },
+            "details": {
+                "back_to_users": "Retour aux utilisateurs",
+                "not_found_title": "Utilisateur introuvable",
+                "not_found_subtitle": "L'utilisateur que vous recherchez n'existe pas.",
+                "location": "Localisation",
+                "address": "Adresse",
+                "orders_history": "Historique des commandes",
+                "orders_count": "{count} commandes",
+                "no_orders_yet": "Aucune commande",
+                "snackbar": {
+                    "load_failed": "Échec du chargement des détails de l'utilisateur"
+                }
+            }
+        },
+        "orders": {
+            "title": "Gestion des commandes",
+            "filters": {
+                "all_statuses": "Tous les statuts"
+            },
+            "table": {
+                "order_id": "N° commande",
+                "customer": "Client",
+                "items": "Articles",
+                "items_count": "{count} articles",
+                "total": "Total",
+                "status": "Statut",
+                "date": "Date"
+            },
+            "status": {
+                "pending": "En attente",
+                "confirmed": "Confirmée",
+                "shipped": "Expédiée",
+                "delivered": "Livrée",
+                "cancelled": "Annulée"
+            },
+            "details": {
+                "back_to_orders": "Retour aux commandes",
+                "not_found_title": "Commande introuvable",
+                "not_found_subtitle": "La commande que vous recherchez n'existe pas.",
+                "order_number": "Commande n°{id}",
+                "placed_on": "Passée le {date}",
+                "order_items": "Articles de la commande",
+                "unknown_product": "Produit inconnu",
+                "table": {
+                    "product": "Produit",
+                    "variance": "Variante",
+                    "color": "Couleur",
+                    "qty": "Qté",
+                    "price": "Prix",
+                    "total": "Total"
+                },
+                "update_status": "Mettre à jour le statut",
+                "order_status": "Statut de la commande",
+                "update_status_action": "Mettre à jour",
+                "customer_information": "Informations client",
+                "name": "Nom",
+                "phone": "Téléphone",
+                "location": "Localisation",
+                "address": "Adresse",
+                "view_customer": "Voir le client",
+                "customer_not_available": "Informations client indisponibles",
+                "order_timeline": "Historique de la commande",
+                "timeline": {
+                    "order_placed": "Commande passée"
+                },
+                "snackbar": {
+                    "load_failed": "Échec du chargement des détails de la commande",
+                    "status_updated": "Statut de la commande mis à jour avec succès",
+                    "status_update_failed": "Échec de la mise à jour du statut de la commande"
+                }
+            },
+            "empty": {
+                "title": "Aucune commande trouvée",
+                "none": "Aucune commande n'a encore été passée",
+                "filtered": "Aucune commande {status} trouvée"
+            }
+        }
+    },
+    "orders": {
+        "title": "Gestion des commandes",
+        "filters": {
+            "all_statuses": "Tous les statuts"
+        },
+        "table": {
+            "order_id": "N° commande",
+            "customer": "Client",
+            "items": "Articles",
+            "items_count": "{count} articles",
+            "total": "Total",
+            "status": "Statut",
+            "date": "Date"
+        },
+        "status": {
+            "pending": "En attente",
+            "confirmed": "Confirmée",
+            "shipped": "Expédiée",
+            "delivered": "Livrée",
+            "cancelled": "Annulée"
+        },
+        "details": {
+            "back_to_orders": "Retour aux commandes",
+            "not_found_title": "Commande introuvable",
+            "not_found_subtitle": "La commande que vous recherchez n'existe pas.",
+            "order_number": "Commande n°{id}",
+            "placed_on": "Passée le {date}",
+            "order_items": "Articles de la commande",
+            "unknown_product": "Produit inconnu",
+            "table": {
+                "product": "Produit",
+                "variance": "Variante",
+                "color": "Couleur",
+                "qty": "Qté",
+                "price": "Prix",
+                "total": "Total"
+            },
+            "update_status": "Mettre à jour le statut",
+            "order_status": "Statut de la commande",
+            "update_status_action": "Mettre à jour",
+            "customer_information": "Informations client",
+            "name": "Nom",
+            "phone": "Téléphone",
+            "location": "Localisation",
+            "address": "Adresse",
+            "view_customer": "Voir le client",
+            "customer_not_available": "Informations client indisponibles",
+            "order_timeline": "Historique de la commande",
+            "timeline": {
+                "order_placed": "Commande passée"
+            },
+            "snackbar": {
+                "load_failed": "Échec du chargement des détails de la commande",
+                "status_updated": "Statut de la commande mis à jour avec succès",
+                "status_update_failed": "Échec de la mise à jour du statut de la commande"
+            }
+        },
+        "empty": {
+            "title": "Aucune commande trouvée",
+            "none": "Aucune commande n'a encore été passée",
+            "filtered": "Aucune commande {status} trouvée"
+        }
+    }
+}

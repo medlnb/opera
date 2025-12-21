@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NuxtError } from 'nuxt/app'
+import { useI18n } from 'vue-i18n'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import misc404 from '@images/pages/404.png'
 import miscMaskDark from '@images/pages/misc-mask-dark.png'
@@ -15,6 +16,8 @@ const props = defineProps<{
 
 const authThemeMask = useGenerateImageVariant(miscMaskLight, miscMaskDark)
 
+const { t } = useI18n({ useScope: 'global' })
+
 const isDev = process.dev
 
 const errToShow = computed(() => {
@@ -22,8 +25,8 @@ const errToShow = computed(() => {
 
   if (is404) {
     return {
-      title: 'Page Not Found',
-      description: 'We couldn\'t find the page you are looking for.',
+      title: t('errors.page_not_found_title'),
+      description: t('errors.page_not_found_description'),
     }
   }
 
@@ -35,8 +38,8 @@ const errToShow = computed(() => {
   }
 
   return {
-    title: 'Oops! Something went wrong.',
-    description: 'We are working on it and we\'ll get it fixed as soon as we can',
+    title: t('errors.generic_title'),
+    description: t('errors.generic_description'),
   }
 })
 
@@ -62,14 +65,14 @@ const handleError = () => clearError({ redirect: '/' })
         class="mb-12"
         @click="handleError"
       >
-        Back to Home
+        {{ t('common.back_to_home') }}
       </VBtn>
 
       <!-- 👉 Image -->
       <div class="misc-avatar w-100 text-center">
         <VImg
           :src="misc404"
-          alt="Coming Soon"
+          :alt="t('errors.coming_soon_alt')"
           :max-width="200"
           class="mx-auto"
         />

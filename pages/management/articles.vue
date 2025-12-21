@@ -1,8 +1,9 @@
 <script setup>
-import { debounce } from 'lodash'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useApi } from '@/composables/useApi'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { debounce } from 'lodash'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -10,6 +11,8 @@ definePageMeta({
 })
 
 const router = useRouter()
+
+const { t, te, d } = useI18n({ useScope: 'global' })
 
 // Reactive state
 const articles = ref([])
@@ -25,20 +28,26 @@ const itemsPerPage = ref(10)
 const search = ref('')
 const typeFilter = ref('all') // 'all', 'tip', 'inspiration'
 
+const getTypeLabel = type => {
+  const key = `management.articles.type.${String(type || '')}`
+
+  return te(key) ? t(key) : String(type || '')
+}
+
 // Type options
-const typeOptions = [
-  { title: 'All Types', value: 'all' },
-  { title: 'Tips', value: 'tip' },
-  { title: 'Inspiration', value: 'inspiration' },
-]
+const typeOptions = computed(() => [
+  { title: t('management.articles.filters.all_types'), value: 'all' },
+  { title: getTypeLabel('tip'), value: 'tip' },
+  { title: getTypeLabel('inspiration'), value: 'inspiration' },
+])
 
 // Table headers
-const headers = [
-  { title: 'Title', key: 'title', sortable: false },
-  { title: 'Type', key: 'for', sortable: false },
-  { title: 'Date', key: 'createdAt', sortable: false },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
-]
+const headers = computed(() => [
+  { title: t('management.articles.table.title'), key: 'title', sortable: false },
+  { title: t('management.articles.table.type'), key: 'for', sortable: false },
+  { title: t('management.articles.table.date'), key: 'createdAt', sortable: false },
+  { title: t('management.common.table.actions'), key: 'actions', sortable: false, align: 'end' },
+])
 
 // Fetch articles
 const fetchArticles = async () => {
@@ -72,15 +81,17 @@ const fetchArticles = async () => {
 // Format date
 const formatDate = date => {
   if (!date)
-    return '-'
-  const d = new Date(date)
+    return t('management.common.value.na')
 
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+  return d(new Date(date), 'short')
 }
+
+const noArticlesSubtitle = computed(() => {
+  if (typeFilter.value === 'all')
+    return t('management.articles.empty.none')
+
+  return t('management.articles.empty.filtered', { type: getTypeLabel(typeFilter.value) })
+})
 
 // Edit article
 const editArticle = article => {
@@ -159,7 +170,7 @@ onMounted(() => {
 <template>
   <div>
     <VCard
-      title="Articles Management"
+      :title="t('management.articles.title')"
       class="mb-6"
     >
       <template #append>
@@ -171,7 +182,7 @@ onMounted(() => {
             icon="tabler-plus"
             class="me-2"
           />
-          Create Article
+          {{ t('management.articles.actions.create') }}
         </VBtn>
       </template>
 
@@ -181,7 +192,7 @@ onMounted(() => {
         <div class="d-flex gap-4 flex-wrap align-center">
           <VTextField
             v-model="search"
-            placeholder="Search articles..."
+            :placeholder="t('management.articles.search_placeholder')"
             density="compact"
             style="max-inline-size: 300px; min-inline-size: 200px;"
             clearable
@@ -243,7 +254,7 @@ onMounted(() => {
             :color="getTypeColor(item.for)"
             variant="tonal"
           >
-            {{ item.for }}
+            {{ getTypeLabel(item.for) }}
           </VChip>
         </template>
 
@@ -277,10 +288,10 @@ onMounted(() => {
               class="text-disabled mb-4"
             />
             <p class="text-h6 text-disabled">
-              No articles found
+              {{ t('management.articles.empty.title') }}
             </p>
             <p class="text-body-2 text-disabled">
-              {{ typeFilter === 'all' ? 'Create your first article to get started' : `No ${typeFilter} articles found` }}
+              {{ noArticlesSubtitle }}
             </p>
             <VBtn
               color="primary"
@@ -291,7 +302,7 @@ onMounted(() => {
                 icon="tabler-plus"
                 class="me-2"
               />
-              Create Article
+              {{ t('management.articles.actions.create') }}
             </VBtn>
           </div>
         </template>
@@ -301,7 +312,7 @@ onMounted(() => {
 
           <div class="d-flex align-center justify-space-between flex-wrap gap-3 pa-5 pt-3">
             <p class="text-sm text-medium-emphasis mb-0">
-              {{ paginationMeta({ page, itemsPerPage }, totalArticles) }}
+              {{ paginationMeta({ page, itemsPerPage }, totalArticles, t) }}
             </p>
 
             <VPagination
@@ -321,11 +332,11 @@ onMounted(() => {
     >
       <VCard>
         <VCardTitle class="text-h5">
-          Delete Article?
+          {{ t('management.articles.deleteDialog.title') }}
         </VCardTitle>
         <VCardText>
           <div class="mb-2">
-            Are you sure you want to delete this article?
+            {{ t('management.articles.deleteDialog.confirm') }}
           </div>
           <div
             v-if="articleToDelete"
@@ -334,7 +345,7 @@ onMounted(() => {
             "{{ articleToDelete.title }}"
           </div>
           <div class="text-body-2 text-error mt-3">
-            This action cannot be undone.
+            {{ t('management.articles.deleteDialog.warning') }}
           </div>
         </VCardText>
         <VCardActions>
@@ -343,7 +354,7 @@ onMounted(() => {
             variant="text"
             @click="deleteDialog = false"
           >
-            Cancel
+            {{ t('management.common.cancel') }}
           </VBtn>
           <VBtn
             color="error"
@@ -351,7 +362,7 @@ onMounted(() => {
             :loading="deleting"
             @click="confirmDelete"
           >
-            Delete
+            {{ t('management.common.delete') }}
           </VBtn>
         </VCardActions>
       </VCard>

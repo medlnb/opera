@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 definePageMeta({
   admin: true,
@@ -9,14 +10,20 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
+const { t } = useI18n({ useScope: 'global' })
+
+const route = useRoute()
+const isEdit = computed(() => !!route.query.id)
+
+useHead(() => ({
+  title: isEdit.value ? t('management.products.editor.title_edit') : t('management.products.editor.title_create'),
+}))
 const snackbar = ref({ show: false, text: '', color: 'error' })
 const saving = ref(false)
 const uploadingCover = ref(false)
 const uploadingAvatar = ref(false)
 const uploadingTechnicalFile = ref(false)
 const loadingProduct = ref(false)
-const route = useRoute()
-const isEdit = computed(() => !!route.query.id)
 const formRef = ref()
 
 const technicalFileFilename = ref<string>('')
@@ -24,7 +31,7 @@ const detachTechnicalFile = ref(false)
 
 // Validators
 const { requiredValidator } = useValidators()
-const arrayRequired = (val: unknown) => (Array.isArray(val) && val.length > 0) || 'At least one item is required'
+const arrayRequired = (val: unknown) => (Array.isArray(val) && val.length > 0) || t('management.products.editor.validation.at_least_one_item')
 
 const form = reactive({
   imageUrl: '',
@@ -64,6 +71,47 @@ const DESTINATION_OPTIONS = ['Habitations', 'Bureaux', 'Hotel', 'Restaurants', '
 const SUPPORT_OPTIONS = ['Platre', 'Ciment', 'Enduit', 'Brique']
 const MATERIEL_OPTIONS = ['Eponge nature', 'tampon décore', 'Lisseuse', 'couteau', 'brosse', 'Pinceau', 'Lisseuse inox', 'Pinceau plat spalter', 'spatule plasque']
 const ASPECT_OPTIONS = ['Mitallise', 'Brillant', 'Soyeux', 'Lumineux', 'Marbre Ultra Brillant']
+
+const typeOptions = computed(() => TYPE_OPTIONS.map(value => ({
+  title: t(`management.products.types.${value}`),
+  value,
+})))
+
+const destinationOptions = computed(() => [
+  { title: t('products.filters.destination.habitations'), value: 'Habitations' },
+  { title: t('products.filters.destination.offices'), value: 'Bureaux' },
+  { title: t('products.filters.destination.hotel'), value: 'Hotel' },
+  { title: t('products.filters.destination.restaurants'), value: 'Restaurants' },
+  { title: t('products.filters.destination.showroom'), value: 'Showroom' },
+  { title: t('products.filters.destination.stores'), value: 'Magasins' },
+])
+
+const supportOptions = computed(() => [
+  { title: t('products.filters.support.plaster'), value: 'Platre' },
+  { title: t('products.filters.support.cement'), value: 'Ciment' },
+  { title: t('products.filters.support.render'), value: 'Enduit' },
+  { title: t('products.filters.support.brick'), value: 'Brique' },
+])
+
+const materielOptions = computed(() => [
+  { title: t('management.products.editor.application.material.sponge_nature'), value: 'Eponge nature' },
+  { title: t('management.products.editor.application.material.decorative_stamp'), value: 'tampon décore' },
+  { title: t('management.products.editor.application.material.trowel'), value: 'Lisseuse' },
+  { title: t('management.products.editor.application.material.knife'), value: 'couteau' },
+  { title: t('management.products.editor.application.material.brush'), value: 'brosse' },
+  { title: t('management.products.editor.application.material.paintbrush'), value: 'Pinceau' },
+  { title: t('management.products.editor.application.material.stainless_trowel'), value: 'Lisseuse inox' },
+  { title: t('management.products.editor.application.material.flat_brush_spalter'), value: 'Pinceau plat spalter' },
+  { title: t('management.products.editor.application.material.plastic_spatula'), value: 'spatule plasque' },
+])
+
+const aspectOptions = computed(() => [
+  { title: t('management.products.editor.technical.aspect.metallized'), value: 'Mitallise' },
+  { title: t('management.products.editor.technical.aspect.glossy'), value: 'Brillant' },
+  { title: t('management.products.editor.technical.aspect.silky'), value: 'Soyeux' },
+  { title: t('management.products.editor.technical.aspect.luminous'), value: 'Lumineux' },
+  { title: t('management.products.editor.technical.aspect.ultra_gloss_marble'), value: 'Marbre Ultra Brillant' },
+])
 
 onMounted(async () => {
   if (!isEdit.value)
@@ -115,7 +163,7 @@ onMounted(async () => {
     }
   }
   catch (err) {
-    snackbar.value = { show: true, text: 'Failed to load product', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.load_failed'), color: 'error' }
   }
   finally {
     loadingProduct.value = false
@@ -147,7 +195,7 @@ async function uploadImage(file: File): Promise<string | null> {
         resolve(data.id)
       }
       catch {
-        snackbar.value = { show: true, text: 'Image upload failed', color: 'error' }
+        snackbar.value = { show: true, text: t('management.products.editor.snackbar.image_upload_failed'), color: 'error' }
         resolve(null)
       }
     }
@@ -157,7 +205,7 @@ async function uploadImage(file: File): Promise<string | null> {
 
 async function uploadTechnicalPdf(file: File): Promise<{ id: string; filename: string } | null> {
   if (!file || file.type !== 'application/pdf') {
-    snackbar.value = { show: true, text: 'Please select a PDF file', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.pdf_select_required'), color: 'error' }
 
     return null
   }
@@ -189,13 +237,13 @@ async function uploadTechnicalPdf(file: File): Promise<{ id: string; filename: s
         resolve({ id: data.id, filename: data.filename })
       }
       catch {
-        snackbar.value = { show: true, text: 'PDF upload failed', color: 'error' }
+        snackbar.value = { show: true, text: t('management.products.editor.snackbar.pdf_upload_failed'), color: 'error' }
         resolve(null)
       }
     }
 
     reader.onerror = () => {
-      snackbar.value = { show: true, text: 'Failed to read PDF file', color: 'error' }
+      snackbar.value = { show: true, text: t('management.products.editor.snackbar.pdf_read_failed'), color: 'error' }
       resolve(null)
     }
 
@@ -317,30 +365,30 @@ async function publishProduct() {
     if (v && typeof v.then === 'function') {
       const r = await v
       if (!r.valid)
-        return snackbar.value = { show: true, text: 'Please fix the highlighted errors', color: 'error' }
+        return snackbar.value = { show: true, text: t('management.products.editor.snackbar.fix_errors'), color: 'error' }
     }
   }
 
   // Manual checks for assets and nested arrays according to schema
   if (!form.imageUrl)
-    snackbar.value = { show: true, text: 'Cover image is required', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.cover_required'), color: 'error' }
 
   if (!form.avatar)
-    snackbar.value = { show: true, text: 'Avatar is required', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.avatar_required'), color: 'error' }
 
   if (!Array.isArray(form.colors) || form.colors.length === 0)
-    snackbar.value = { show: true, text: 'At least one color is required', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.color_required'), color: 'error' }
 
   const invalidColor = form.colors.find(c => !c.name || !c.code)
   if (invalidColor)
-    snackbar.value = { show: true, text: 'Each color must have name and code', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.color_invalid'), color: 'error' }
 
   if (!Array.isArray(form.variances) || form.variances.length === 0)
-    snackbar.value = { show: true, text: 'At least one variance is required', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_required'), color: 'error' }
 
   const invalidVariance = form.variances.find(v => !v.quantity || Number(v.price) <= 0)
   if (invalidVariance)
-    snackbar.value = { show: true, text: 'Each variance requires quantity and positive price', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_invalid'), color: 'error' }
 
   saving.value = true
   try {
@@ -369,11 +417,11 @@ async function publishProduct() {
     if (!res.ok)
       throw new Error('Failed to save product')
 
-    snackbar.value = { show: true, text: isEdit.value ? 'Product updated' : 'Product created', color: 'success' }
+    snackbar.value = { show: true, text: isEdit.value ? t('management.products.editor.snackbar.updated') : t('management.products.editor.snackbar.created'), color: 'success' }
     navigateTo('/management')
   }
   catch (err) {
-    snackbar.value = { show: true, text: 'Failed to save product', color: 'error' }
+    snackbar.value = { show: true, text: t('management.products.editor.snackbar.save_failed'), color: 'error' }
   }
   finally {
     saving.value = false
@@ -389,9 +437,9 @@ function discard() {
   <div class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
     <div class="d-flex flex-column justify-center">
       <h4 class="text-h4 font-weight-medium">
-        {{ isEdit ? 'Edit product' : 'Add a new product' }}
+        {{ isEdit ? t('management.products.editor.title_edit') : t('management.products.editor.title_create') }}
       </h4>
-      <span>{{ isEdit ? 'Update the product details below' : 'Fill in the product details below' }}</span>
+      <span>{{ isEdit ? t('management.products.editor.subtitle_edit') : t('management.products.editor.subtitle_create') }}</span>
     </div>
     <div class="d-flex gap-4 align-center flex-wrap">
       <VBtn
@@ -399,20 +447,20 @@ function discard() {
         color="secondary"
         @click="discard"
       >
-        Discard
+        {{ t('management.products.editor.actions.discard') }}
       </VBtn>
       <VBtn
         :loading="saving"
         @click="publishProduct"
       >
-        {{ isEdit ? 'Save Changes' : 'Publish Product' }}
+        {{ isEdit ? t('management.products.editor.actions.save_changes') : t('management.products.editor.actions.publish') }}
       </VBtn>
     </div>
   </div>
 
   <VCard
     class="mb-6"
-    title="Product Preview"
+    :title="t('management.products.editor.sections.preview')"
   >
     <VCardText>
       <div class="preview-card">
@@ -458,7 +506,7 @@ function discard() {
                 size="40"
                 class="text-disabled"
               />
-              <span class="text-body-2 text-disabled">Click to add cover</span>
+              <span class="text-body-2 text-disabled">{{ t('management.products.editor.preview.click_to_add_cover') }}</span>
             </div>
           </template>
 
@@ -515,13 +563,13 @@ function discard() {
             v-if="coverInvalid"
             class="text-error text-caption mb-1"
           >
-            Cover image is required
+            {{ t('management.products.editor.preview.cover_required') }}
           </p>
           <p
             v-if="avatarInvalid"
             class="text-error text-caption mb-0"
           >
-            Avatar is required
+            {{ t('management.products.editor.preview.avatar_required') }}
           </p>
         </div>
       </div>
@@ -534,23 +582,23 @@ function discard() {
         <!-- Product Information -->
         <VCard
           class="mb-6"
-          title="Product Information"
+          :title="t('management.products.editor.sections.product_information')"
         >
           <VCardText>
             <VRow>
               <VCol cols="12">
                 <AppTextField
                   v-model="form.title"
-                  label="Title"
-                  placeholder="Product title"
+                  :label="t('management.products.editor.fields.title')"
+                  :placeholder="t('management.products.editor.fields.title_placeholder')"
                   :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol cols="12">
                 <VTextarea
                   v-model="form.definition"
-                  label="Definition"
-                  placeholder="Product definition"
+                  :label="t('management.products.editor.fields.definition')"
+                  :placeholder="t('management.products.editor.fields.definition_placeholder')"
                   rows="3"
                   :rules="[requiredValidator]"
                 />
@@ -560,12 +608,14 @@ function discard() {
                 md="6"
               >
                 <VLabel class="mb-1">
-                  Type
+                  {{ t('management.products.editor.fields.type') }}
                 </VLabel>
                 <VSelect
                   v-model="form.type"
-                  :items="TYPE_OPTIONS"
-                  placeholder="Select type"
+                  :items="typeOptions"
+                  item-title="title"
+                  item-value="value"
+                  :placeholder="t('management.products.filters.select_type')"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -574,11 +624,13 @@ function discard() {
                 md="6"
               >
                 <VLabel class="mb-1">
-                  Destination
+                  {{ t('products.filters.destination.title') }}
                 </VLabel>
                 <VSelect
                   v-model="form.destination"
-                  :items="DESTINATION_OPTIONS"
+                  :items="destinationOptions"
+                  item-title="title"
+                  item-value="value"
                   multiple
                   chips
                   closable-chips
@@ -590,14 +642,14 @@ function discard() {
                 md="6"
               >
                 <VLabel class="mb-1">
-                  Properties
+                  {{ t('management.products.editor.fields.properties') }}
                 </VLabel>
                 <VCombobox
                   v-model="form.properties"
                   multiple
                   chips
                   closable-chips
-                  placeholder="Add properties"
+                  :placeholder="t('management.products.editor.fields.properties_placeholder')"
                   :rules="[arrayRequired]"
                 />
               </VCol>
@@ -608,7 +660,7 @@ function discard() {
         <!-- Caracteristiques Technique -->
         <VCard
           class="mb-6"
-          title="Caractéristiques Techniques"
+          :title="t('management.products.editor.sections.technical_characteristics')"
         >
           <VCardText>
             <VRow>
@@ -618,8 +670,8 @@ function discard() {
               >
                 <AppTextField
                   v-model="form.densite"
-                  label="Densité"
-                  placeholder="e.g. 1.2"
+                  :label="t('management.products.editor.technical.density')"
+                  :placeholder="t('management.products.editor.placeholders.example', { example: '1.2' })"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -629,8 +681,8 @@ function discard() {
               >
                 <AppTextField
                   v-model="form.rendement"
-                  label="Rendement"
-                  placeholder="e.g. 10m²/L"
+                  :label="t('management.products.editor.technical.coverage')"
+                  :placeholder="t('management.products.editor.placeholders.example', { example: '10m²/L' })"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -640,8 +692,8 @@ function discard() {
               >
                 <AppTextField
                   v-model="form.tempsSachage"
-                  label="Temps de Séchage"
-                  placeholder="e.g. 2h"
+                  :label="t('management.products.editor.technical.drying_time')"
+                  :placeholder="t('management.products.editor.placeholders.example', { example: '2h' })"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -650,11 +702,13 @@ function discard() {
                 md="6"
               >
                 <VLabel class="mb-1">
-                  Aspect du Film Sec
+                  {{ t('management.products.editor.technical.aspect.title') }}
                 </VLabel>
                 <VSelect
                   v-model="form.aspectdifilmsec"
-                  :items="ASPECT_OPTIONS"
+                  :items="aspectOptions"
+                  item-title="title"
+                  item-value="value"
                   multiple
                   chips
                   closable-chips
@@ -668,8 +722,8 @@ function discard() {
               >
                 <AppTextField
                   v-model="form.viscosite"
-                  label="Viscosité (optionnel)"
-                  placeholder="e.g. 100 KU"
+                  :label="t('management.products.editor.technical.viscosity_optional')"
+                  :placeholder="t('management.products.editor.placeholders.example', { example: '100 KU' })"
                 />
               </VCol>
             </VRow>
@@ -679,7 +733,7 @@ function discard() {
         <!-- Mise en Oeuvre -->
         <VCard
           class="mb-6"
-          title="Mise en Œuvre"
+          :title="t('management.products.editor.sections.application')"
         >
           <VCardText>
             <VRow>
@@ -689,8 +743,8 @@ function discard() {
               >
                 <AppTextField
                   v-model="form.dilution"
-                  label="Dilution"
-                  placeholder="e.g. 5-10% eau"
+                  :label="t('management.products.editor.application.dilution')"
+                  :placeholder="t('management.products.editor.placeholders.example', { example: '5-10% eau' })"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -699,11 +753,13 @@ function discard() {
                 md="6"
               >
                 <VLabel class="mb-1">
-                  Supports
+                  {{ t('products.filters.support.title') }}
                 </VLabel>
                 <VSelect
                   v-model="form.supports"
-                  :items="SUPPORT_OPTIONS"
+                  :items="supportOptions"
+                  item-title="title"
+                  item-value="value"
                   multiple
                   chips
                   closable-chips
@@ -715,11 +771,13 @@ function discard() {
                 md="6"
               >
                 <VLabel class="mb-1">
-                  Matériel d'Application
+                  {{ t('management.products.editor.application.material.title') }}
                 </VLabel>
                 <VSelect
                   v-model="form.materielApplication"
-                  :items="MATERIEL_OPTIONS"
+                  :items="materielOptions"
+                  item-title="title"
+                  item-value="value"
                   multiple
                   chips
                   closable-chips
@@ -732,14 +790,14 @@ function discard() {
               >
                 <AppTextField
                   v-model="form.nettoyageMateriel"
-                  label="Nettoyage Matériel (optionnel)"
-                  placeholder="e.g. Eau"
+                  :label="t('management.products.editor.application.cleaning_optional')"
+                  :placeholder="t('management.products.editor.placeholders.example', { example: t('management.products.editor.placeholders.water') })"
                 />
               </VCol>
               <VCol cols="12">
                 <VTextarea
                   v-model="form.preparationSupport"
-                  label="Préparation Support (optionnel)"
+                  :label="t('management.products.editor.application.surface_preparation_optional')"
                   rows="2"
                 />
               </VCol>
@@ -754,7 +812,7 @@ function discard() {
       >
         <!-- Technical File (PDF) -->
         <VCard
-          title="Technical File (PDF)"
+          :title="t('management.products.editor.technical_file.title')"
           class="mb-6"
         >
           <VCardText>
@@ -766,7 +824,7 @@ function discard() {
                   prepend-icon="tabler-file-type-pdf"
                   @click="selectTechnicalFile"
                 >
-                  {{ form.technicalFile ? 'Replace PDF' : 'Upload PDF' }}
+                  {{ form.technicalFile ? t('management.products.editor.technical_file.replace') : t('management.products.editor.technical_file.upload') }}
                 </VBtn>
 
                 <VBtn
@@ -778,7 +836,7 @@ function discard() {
                   target="_blank"
                   rel="noopener"
                 >
-                  Download
+                  {{ t('management.products.editor.technical_file.download') }}
                 </VBtn>
 
                 <VBtn
@@ -788,16 +846,16 @@ function discard() {
                   prepend-icon="tabler-trash"
                   @click="detachTechnicalFileFromProduct"
                 >
-                  Detach
+                  {{ t('management.products.editor.technical_file.detach') }}
                 </VBtn>
               </div>
 
               <div class="text-caption text-medium-emphasis">
                 <template v-if="form.technicalFile">
-                  Attached: <strong>{{ technicalFileFilename || 'PDF file' }}</strong>
+                  {{ t('management.products.editor.technical_file.attached') }} <strong>{{ technicalFileFilename || t('management.products.editor.technical_file.file_fallback') }}</strong>
                 </template>
                 <template v-else>
-                  Optional. Upload a PDF technical file and it will be linked to this product.
+                  {{ t('management.products.editor.technical_file.optional_help') }}
                 </template>
               </div>
             </div>
@@ -805,7 +863,7 @@ function discard() {
         </VCard>
 
         <!-- Colors -->
-        <VCard title="Colors">
+        <VCard :title="t('management.products.editor.sections.colors')">
           <VCardText>
             <div
               v-for="(c, idx) in form.colors"
@@ -814,14 +872,14 @@ function discard() {
             >
               <AppTextField
                 v-model="c.name"
-                label="Name"
-                placeholder="Color name"
+                :label="t('management.products.editor.colors.name')"
+                :placeholder="t('management.products.editor.colors.name_placeholder')"
                 class="flex-grow-1"
                 :rules="[requiredValidator]"
               />
               <div>
                 <VLabel class="mb-1">
-                  Code
+                  {{ t('management.products.editor.colors.code') }}
                 </VLabel>
                 <div>
                   <input
@@ -846,7 +904,7 @@ function discard() {
               variant="tonal"
               @click="addColor"
             >
-              Add Color
+              {{ t('management.products.editor.colors.add') }}
             </VBtn>
           </VCardText>
         </VCard>
@@ -854,7 +912,7 @@ function discard() {
         <!-- Variances -->
         <VCard
           class="mt-6"
-          title="Variances"
+          :title="t('management.products.editor.sections.variances')"
         >
           <VCardText>
             <VRow
@@ -866,15 +924,15 @@ function discard() {
               <VCol :cols="form.variances.length > 1 ? 5 : 6">
                 <AppTextField
                   v-model="v.quantity"
-                  label="Quantity"
-                  placeholder="e.g. 1L, 5kg"
+                  :label="t('management.products.editor.variances.quantity')"
+                  :placeholder="t('management.products.editor.variances.quantity_placeholder')"
                   :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol :cols="form.variances.length > 1 ? 5 : 6">
                 <AppTextField
                   v-model.number="v.price"
-                  label="Price (DZD)"
+                  :label="t('management.products.editor.variances.price_dzd')"
                   type="number"
                   :rules="[requiredValidator]"
                   @input="v.price = Number(String(v.price).replace(/[^0-9]/g, ''))"
@@ -901,7 +959,7 @@ function discard() {
               variant="tonal"
               @click="addVariance"
             >
-              Add Variance
+              {{ t('management.products.editor.variances.add') }}
             </VBtn>
           </VCardText>
         </VCard>

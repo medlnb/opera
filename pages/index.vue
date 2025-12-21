@@ -1,36 +1,40 @@
 <script setup>
-const stats = [
-  { value: '80+', label: 'Sales Points' },
-  { value: '61+', label: 'Products Manufactured' },
-  { value: '10+', label: 'Years Experience' },
-]
+import { useI18n } from 'vue-i18n'
 
-const features = [
+const { t } = useI18n({ useScope: 'global' })
+
+const stats = computed(() => [
+  { value: '80+', label: t('home.stats.sales_points') },
+  { value: '61+', label: t('home.stats.products_manufactured') },
+  { value: '10+', label: t('home.stats.years_experience') },
+])
+
+const features = computed(() => [
   {
     icon: 'tabler-award',
-    title: 'Unmatched Quality',
-    description: 'Our products are made with premium materials to ensure a flawless and durable finish.',
+    title: t('home.features.quality_title'),
+    description: t('home.features.quality_description'),
     color: 'primary',
   },
   {
     icon: 'tabler-bulb',
-    title: 'Continuous Innovation',
-    description: 'We integrate the latest technologies and market trends to offer paint solutions that meet modern demands.',
+    title: t('home.features.innovation_title'),
+    description: t('home.features.innovation_description'),
     color: 'success',
   },
   {
     icon: 'tabler-shield-check',
-    title: 'Exceptional Resistance',
-    description: 'Whether against weather, UV rays, or stains, our paints are designed to last and protect your walls.',
+    title: t('home.features.resistance_title'),
+    description: t('home.features.resistance_description'),
     color: 'warning',
   },
   {
     icon: 'tabler-heart-handshake',
-    title: 'Customer Satisfaction',
-    description: 'Your satisfaction is our priority. We support you at every step to ensure the final result exceeds your expectations.',
+    title: t('home.features.satisfaction_title'),
+    description: t('home.features.satisfaction_description'),
     color: 'info',
   },
-]
+])
 </script>
 
 <template>
@@ -40,13 +44,13 @@ const features = [
       <div class="hero-bg" />
       <VCardText class="hero-content text-center py-12 px-4 position-relative">
         <h1 class="text-h3 text-md-h2 font-weight-bold mb-4 text-white">
-          Work with an <span class="text-primary">Excellent</span> Product
+          {{ t('home.hero.title_prefix') }} <span class="text-primary">{{ t('home.hero.title_highlight') }}</span> {{ t('home.hero.title_suffix') }}
         </h1>
         <p
           class="text-body-1 text-white-50 mb-6 mx-auto"
-          style="max-width: 600px;"
+          style="max-inline-size: 600px;"
         >
-          Opera Peinture offers high-quality paints, combining innovation, durability, and eco-friendliness for all your painting projects.
+          {{ t('home.hero.description') }}
         </p>
         <div class="d-flex flex-wrap justify-center gap-4">
           <VBtn
@@ -58,7 +62,7 @@ const features = [
               icon="tabler-paint"
               class="me-2"
             />
-            Explore Products
+            {{ t('home.hero.explore_products') }}
           </VBtn>
           <VBtn
             variant="outlined"
@@ -70,7 +74,7 @@ const features = [
               icon="tabler-palette"
               class="me-2"
             />
-            View Colors
+            {{ t('home.hero.view_colors') }}
           </VBtn>
         </div>
       </VCardText>
@@ -125,19 +129,19 @@ const features = [
         >
           <VCardText class="pa-6 pa-md-8 d-flex flex-column justify-center h-100">
             <div class="text-overline text-primary mb-2">
-              About Us
+              {{ t('home.about.overline') }}
             </div>
             <h2 class="text-h4 font-weight-bold mb-4">
-              Who are we?
+              {{ t('home.about.title') }}
             </h2>
             <p class="text-body-1 text-medium-emphasis mb-4">
-              Founded in 2014 in Batna, Opera Paints specializes in the manufacturing, production, and export of high-quality paints that meet durability and environmental safety standards.
+              {{ t('home.about.p1') }}
             </p>
             <p class="text-body-1 text-medium-emphasis mb-4">
-              Since its inception, the company has established itself as one of the leaders in the industry in Algeria and North Africa. Opera Paints offers more than 60 different products, including architectural and decorative paints, to meet the needs of its customers.
+              {{ t('home.about.p2') }}
             </p>
             <p class="text-body-1 text-medium-emphasis mb-6">
-              Currently, its products are available in over 80 points of sale in Algeria, as well as in Côte d'Ivoire and Burkina Faso.
+              {{ t('home.about.p3') }}
             </p>
             <div>
               <VBtn
@@ -145,7 +149,7 @@ const features = [
                 variant="tonal"
                 to="/tips"
               >
-                Learn More
+                {{ t('home.about.learn_more') }}
                 <VIcon
                   icon="tabler-arrow-right"
                   class="ms-2"
@@ -161,10 +165,10 @@ const features = [
     <div class="mb-6">
       <div class="text-center mb-6">
         <div class="text-overline text-primary mb-2">
-          Why Choose Us
+          {{ t('home.why.overline') }}
         </div>
         <h2 class="text-h4 font-weight-bold">
-          Our Commitment to Excellence
+          {{ t('home.why.title') }}
         </h2>
       </div>
       <VRow>
@@ -203,13 +207,13 @@ const features = [
       <div class="cta-bg" />
       <VCardText class="text-center py-12 px-4 position-relative">
         <h2 class="text-h4 font-weight-bold mb-4">
-          Ready to Transform Your Space?
+          {{ t('home.cta.title') }}
         </h2>
         <p
           class="text-body-1 text-medium-emphasis mb-6 mx-auto"
-          style="max-width: 500px;"
+          style="max-inline-size: 500px;"
         >
-          Explore our wide range of premium paints and find the perfect color for your next project.
+          {{ t('home.cta.description') }}
         </p>
         <div class="d-flex flex-wrap justify-center gap-4">
           <VBtn
@@ -221,7 +225,7 @@ const features = [
               icon="tabler-shopping-cart"
               class="me-2"
             />
-            Shop Now
+            {{ t('home.cta.shop_now') }}
           </VBtn>
           <VBtn
             variant="outlined"
@@ -232,7 +236,7 @@ const features = [
               icon="tabler-sparkles"
               class="me-2"
             />
-            Get Inspired
+            {{ t('home.cta.get_inspired') }}
           </VBtn>
         </div>
       </VCardText>
@@ -248,10 +252,10 @@ const features = [
 
 .hero-bg {
   position: absolute;
-  inset: 0;
   background-image: url("https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1200");
-  background-size: cover;
   background-position: center;
+  background-size: cover;
+  inset: 0;
   opacity: 0.15;
 }
 
@@ -260,7 +264,7 @@ const features = [
 }
 
 .text-white-50 {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: rgb(255 255 255 / 80%) !important;
 }
 
 .stat-card {
@@ -268,12 +272,8 @@ const features = [
 }
 
 .stat-card:hover {
+  box-shadow: 0 8px 24px rgb(var(--v-theme-primary) / 15%);
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(var(--v-theme-primary), 0.15);
-}
-
-.about-image :deep(.v-img__img) {
-  object-position: center;
 }
 
 .feature-card {
@@ -281,8 +281,8 @@ const features = [
 }
 
 .feature-card:hover {
+  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .cta-section {
@@ -296,8 +296,9 @@ const features = [
 
 .cta-bg {
   position: absolute;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgb(var(--v-theme-primary) / 10%) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgb(var(--v-theme-primary) / 10%) 0%, transparent 50%);
   inset: 0;
-  background-image: radial-gradient(circle at 20% 50%, rgba(var(--v-theme-primary), 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 50%, rgba(var(--v-theme-primary), 0.1) 0%, transparent 50%);
 }
 </style>

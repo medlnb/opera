@@ -1,8 +1,9 @@
 <script setup>
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -13,6 +14,8 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
+
+const { t, te, d } = useI18n({ useScope: 'global' })
 
 const user = ref(null)
 const orders = ref([])
@@ -33,15 +36,21 @@ const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
 
+const getStatusLabel = status => {
+  const key = `management.orders.status.${String(status || '')}`
+
+  return te(key) ? t(key) : String(status || '')
+}
+
 // Orders table headers
-const orderHeaders = [
-  { title: 'Order ID', key: 'orderId', sortable: false },
-  { title: 'Items', key: 'items', sortable: false },
-  { title: 'Total', key: 'total', sortable: false },
-  { title: 'Status', key: 'status', sortable: false },
-  { title: 'Date', key: 'createdAt', sortable: false },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
-]
+const orderHeaders = computed(() => [
+  { title: t('management.orders.table.order_id'), key: 'orderId', sortable: false },
+  { title: t('management.orders.table.items'), key: 'items', sortable: false },
+  { title: t('management.orders.table.total'), key: 'total', sortable: false },
+  { title: t('management.orders.table.status'), key: 'status', sortable: false },
+  { title: t('management.orders.table.date'), key: 'createdAt', sortable: false },
+  { title: t('management.common.table.actions'), key: 'actions', sortable: false, align: 'end' },
+])
 
 // Get status color
 const getStatusColor = status => {
@@ -88,14 +97,9 @@ const displayLocation = computed(() => {
 // Format date
 const formatDate = date => {
   if (!date)
-    return '-'
-  const d = new Date(date)
+    return t('management.common.value.na')
 
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+  return d(new Date(date), 'short')
 }
 
 // Fetch user details
@@ -117,7 +121,7 @@ const fetchUser = async () => {
   }
   catch (error) {
     console.error('Failed to fetch user:', error)
-    showSnackbar('Failed to load user details', 'error')
+    showSnackbar(t('management.users.details.snackbar.load_failed'), 'error')
   }
   finally {
     loading.value = false
@@ -176,7 +180,7 @@ const confirmBan = async () => {
 
     if (res.ok) {
       showSnackbar(
-        user.value.banned ? 'User unbanned successfully' : 'User banned successfully',
+        user.value.banned ? t('management.users.snackbar.unbanned') : t('management.users.snackbar.banned'),
         'success',
       )
       user.value.banned = !user.value.banned
@@ -185,12 +189,12 @@ const confirmBan = async () => {
     else {
       const data = await res.json()
 
-      showSnackbar(data.message || 'Action failed', 'error')
+      showSnackbar(data.message || t('management.common.action_failed'), 'error')
     }
   }
   catch (error) {
     console.error('Failed to ban/unban user:', error)
-    showSnackbar('Action failed', 'error')
+    showSnackbar(t('management.common.action_failed'), 'error')
   }
   finally {
     actionLoading.value = false
@@ -213,19 +217,19 @@ const confirmDelete = async () => {
     })
 
     if (res.ok || res.status === 204) {
-      showSnackbar('User deleted successfully', 'success')
+      showSnackbar(t('management.users.snackbar.deleted'), 'success')
       deleteDialog.value = false
       router.push('/management/users')
     }
     else {
       const data = await res.json()
 
-      showSnackbar(data.message || 'Delete failed', 'error')
+      showSnackbar(data.message || t('management.common.delete_failed'), 'error')
     }
   }
   catch (error) {
     console.error('Failed to delete user:', error)
-    showSnackbar('Delete failed', 'error')
+    showSnackbar(t('management.common.delete_failed'), 'error')
   }
   finally {
     actionLoading.value = false
@@ -271,7 +275,7 @@ onMounted(() => {
         icon="tabler-arrow-left"
         class="me-2"
       />
-      Back to Users
+      {{ t('management.users.details.back_to_users') }}
     </VBtn>
 
     <!-- Loading State -->
@@ -297,10 +301,10 @@ onMounted(() => {
         class="text-disabled mb-4"
       />
       <h3 class="text-h6 text-disabled mb-2">
-        User not found
+        {{ t('management.users.details.not_found_title') }}
       </h3>
       <p class="text-body-2 text-disabled mb-4">
-        The user you're looking for doesn't exist.
+        {{ t('management.users.details.not_found_subtitle') }}
       </p>
       <VBtn
         color="primary"
@@ -310,7 +314,7 @@ onMounted(() => {
           icon="tabler-arrow-left"
           class="me-2"
         />
-        Back to Users
+        {{ t('management.users.details.back_to_users') }}
       </VBtn>
     </VCard>
 
@@ -342,7 +346,7 @@ onMounted(() => {
                   :color="user.role === 'admin' ? 'error' : 'secondary'"
                   variant="tonal"
                 >
-                  {{ user.role || 'user' }}
+                  {{ user.role || t('management.users.role.user') }}
                 </VChip>
                 <VChip
                   label
@@ -350,7 +354,7 @@ onMounted(() => {
                   :color="user.banned ? 'error' : 'success'"
                   variant="tonal"
                 >
-                  {{ user.banned ? 'Banned' : 'Active' }}
+                  {{ user.banned ? t('management.users.status.banned') : t('management.users.status.active') }}
                 </VChip>
               </div>
             </VCardText>
@@ -365,10 +369,10 @@ onMounted(() => {
                   />
                   <div>
                     <div class="text-caption text-disabled">
-                      Phone
+                      {{ t('management.users.table.phone') }}
                     </div>
                     <div class="font-weight-medium">
-                      {{ user.phone || '-' }}
+                      {{ user.phone || t('management.common.value.na') }}
                     </div>
                   </div>
                 </div>
@@ -380,10 +384,10 @@ onMounted(() => {
                   />
                   <div>
                     <div class="text-caption text-disabled">
-                      Location
+                      {{ t('management.users.details.location') }}
                     </div>
                     <div class="font-weight-medium">
-                      {{ displayLocation || '-' }}
+                      {{ displayLocation || t('management.common.value.na') }}
                     </div>
                   </div>
                 </div>
@@ -395,10 +399,10 @@ onMounted(() => {
                   />
                   <div>
                     <div class="text-caption text-disabled">
-                      Address
+                      {{ t('management.users.details.address') }}
                     </div>
                     <div class="font-weight-medium">
-                      {{ user.address || '-' }}
+                      {{ user.address || t('management.common.value.na') }}
                     </div>
                   </div>
                 </div>
@@ -410,7 +414,7 @@ onMounted(() => {
                   />
                   <div>
                     <div class="text-caption text-disabled">
-                      Joined
+                      {{ t('management.users.table.joined') }}
                     </div>
                     <div class="font-weight-medium">
                       {{ formatDate(user.createdAt) }}
@@ -435,7 +439,7 @@ onMounted(() => {
                   :icon="user.banned ? 'tabler-lock-open' : 'tabler-lock'"
                   class="me-2"
                 />
-                {{ user.banned ? 'Unban' : 'Ban' }}
+                {{ user.banned ? t('management.users.actions.unban') : t('management.users.actions.ban') }}
               </VBtn>
               <VBtn
                 color="error"
@@ -447,7 +451,7 @@ onMounted(() => {
                   icon="tabler-trash"
                   class="me-2"
                 />
-                Delete
+                {{ t('management.common.delete') }}
               </VBtn>
             </VCardText>
           </VCard>
@@ -460,13 +464,13 @@ onMounted(() => {
         >
           <VCard>
             <VCardTitle class="d-flex align-center justify-space-between">
-              <span>Orders History</span>
+              <span>{{ t('management.users.details.orders_history') }}</span>
               <VChip
                 label
                 color="primary"
                 size="small"
               >
-                {{ totalOrders }} orders
+                {{ t('management.users.details.orders_count', { count: totalOrders }) }}
               </VChip>
             </VCardTitle>
             <VDivider />
@@ -503,7 +507,7 @@ onMounted(() => {
                   size="small"
                   color="secondary"
                 >
-                  {{ item.items?.length || 0 }} items
+                  {{ t('management.orders.table.items_count', { count: item.items?.length || 0 }) }}
                 </VChip>
               </template>
 
@@ -520,7 +524,7 @@ onMounted(() => {
                   :color="getStatusColor(item.status)"
                   variant="tonal"
                 >
-                  {{ item.status }}
+                  {{ getStatusLabel(item.status) }}
                 </VChip>
               </template>
 
@@ -545,7 +549,7 @@ onMounted(() => {
                     class="text-disabled mb-4"
                   />
                   <p class="text-body-1 text-disabled">
-                    No orders yet
+                    {{ t('management.users.details.no_orders_yet') }}
                   </p>
                 </div>
               </template>
@@ -555,7 +559,7 @@ onMounted(() => {
 
                 <div class="d-flex align-center justify-space-between flex-wrap gap-3 pa-5 pt-3">
                   <p class="text-sm text-medium-emphasis mb-0">
-                    {{ paginationMeta({ page, itemsPerPage }, totalOrders) }}
+                    {{ paginationMeta({ page, itemsPerPage }, totalOrders, t) }}
                   </p>
 
                   <VPagination
@@ -578,11 +582,11 @@ onMounted(() => {
     >
       <VCard>
         <VCardTitle class="text-h5">
-          {{ user?.banned ? 'Unban User?' : 'Ban User?' }}
+          {{ user?.banned ? t('management.users.banDialog.unban_title') : t('management.users.banDialog.ban_title') }}
         </VCardTitle>
         <VCardText>
           <div class="mb-2">
-            Are you sure you want to {{ user?.banned ? 'unban' : 'ban' }} this user?
+            {{ user?.banned ? t('management.users.banDialog.unban_confirm') : t('management.users.banDialog.ban_confirm') }}
           </div>
           <div
             v-if="user"
@@ -594,7 +598,7 @@ onMounted(() => {
             v-if="!user?.banned"
             class="text-body-2 text-warning mt-3"
           >
-            The user will not be able to log in while banned.
+            {{ t('management.users.banDialog.warning') }}
           </div>
         </VCardText>
         <VCardActions>
@@ -603,7 +607,7 @@ onMounted(() => {
             variant="text"
             @click="banDialog = false"
           >
-            Cancel
+            {{ t('management.common.cancel') }}
           </VBtn>
           <VBtn
             :color="user?.banned ? 'success' : 'warning'"
@@ -611,7 +615,7 @@ onMounted(() => {
             :loading="actionLoading"
             @click="confirmBan"
           >
-            {{ user?.banned ? 'Unban' : 'Ban' }}
+            {{ user?.banned ? t('management.users.actions.unban') : t('management.users.actions.ban') }}
           </VBtn>
         </VCardActions>
       </VCard>
@@ -624,11 +628,11 @@ onMounted(() => {
     >
       <VCard>
         <VCardTitle class="text-h5">
-          Delete User Account?
+          {{ t('management.users.deleteDialog.title') }}
         </VCardTitle>
         <VCardText>
           <div class="mb-2">
-            Are you sure you want to permanently delete this user's account?
+            {{ t('management.users.deleteDialog.confirm') }}
           </div>
           <div
             v-if="user"
@@ -637,7 +641,7 @@ onMounted(() => {
             {{ user.firstName }} {{ user.lastName }}
           </div>
           <div class="text-body-2 text-error mt-3">
-            This action cannot be undone. All user data will be lost.
+            {{ t('management.users.deleteDialog.warning') }}
           </div>
         </VCardText>
         <VCardActions>
@@ -646,7 +650,7 @@ onMounted(() => {
             variant="text"
             @click="deleteDialog = false"
           >
-            Cancel
+            {{ t('management.common.cancel') }}
           </VBtn>
           <VBtn
             color="error"
@@ -654,7 +658,7 @@ onMounted(() => {
             :loading="actionLoading"
             @click="confirmDelete"
           >
-            Delete
+            {{ t('management.common.delete') }}
           </VBtn>
         </VCardActions>
       </VCard>

@@ -1,0 +1,953 @@
+{
+    "lang": {
+        "english": "الإنجليزية",
+        "french": "الفرنسية",
+        "arabic": "العربية"
+    },
+    "common": {
+        "back_to_home": "العودة إلى الصفحة الرئيسية",
+        "back": "رجوع",
+        "next": "التالي",
+        "unnamed": "بدون اسم",
+        "pagination": {
+            "showing": "عرض {start} إلى {end} من أصل {total} سجل"
+        }
+    },
+    "colors_page": {
+        "hero_title": "مرحبًا بك في طيف الألوان",
+        "hero_subtitle": "استكشف الدرجات التي تُحيي رؤيتك",
+        "editor": {
+            "title_create": "إضافة منتج جديد",
+            "title_edit": "تعديل المنتج",
+            "subtitle_create": "أدخل تفاصيل المنتج أدناه",
+            "subtitle_edit": "حدّث تفاصيل المنتج أدناه",
+            "actions": {
+                "discard": "إلغاء",
+                "publish": "نشر المنتج",
+                "save_changes": "حفظ التغييرات"
+            },
+            "sections": {
+                "preview": "معاينة المنتج",
+                "product_information": "معلومات المنتج",
+                "technical_characteristics": "الخصائص التقنية",
+                "application": "طريقة التطبيق",
+                "colors": "الألوان",
+                "variances": "الخيارات"
+            },
+            "preview": {
+                "click_to_add_cover": "انقر لإضافة صورة الغلاف",
+                "cover_required": "صورة الغلاف مطلوبة",
+                "avatar_required": "الصورة الرمزية مطلوبة"
+            },
+            "fields": {
+                "title": "العنوان",
+                "title_placeholder": "عنوان المنتج",
+                "definition": "التعريف",
+                "definition_placeholder": "تعريف المنتج",
+                "type": "النوع",
+                "properties": "الخصائص",
+                "properties_placeholder": "أضف الخصائص"
+            },
+            "technical": {
+                "density": "الكثافة",
+                "coverage": "المردود",
+                "drying_time": "وقت التجفيف",
+                "viscosity_optional": "اللزوجة (اختياري)",
+                "aspect": {
+                    "title": "مظهر الطبقة الجافة",
+                    "metallized": "معدني",
+                    "glossy": "لامع",
+                    "silky": "حريري",
+                    "luminous": "مضيء",
+                    "ultra_gloss_marble": "رخام شديد اللمعان"
+                }
+            },
+            "application": {
+                "dilution": "التخفيف",
+                "material": {
+                    "title": "أدوات التطبيق",
+                    "sponge_nature": "إسفنجة طبيعية",
+                    "decorative_stamp": "ختم ديكور",
+                    "trowel": "مسطرين",
+                    "knife": "سكين",
+                    "brush": "فرشاة",
+                    "paintbrush": "فرشاة دهان",
+                    "stainless_trowel": "مسطرين ستانلس",
+                    "flat_brush_spalter": "فرشاة مسطحة",
+                    "plastic_spatula": "ملعقة بلاستيكية"
+                },
+                "cleaning_optional": "تنظيف الأدوات (اختياري)",
+                "surface_preparation_optional": "تحضير السطح (اختياري)"
+            },
+            "colors": {
+                "name": "الاسم",
+                "name_placeholder": "اسم اللون",
+                "code": "الرمز",
+                "add": "إضافة لون"
+            },
+            "variances": {
+                "quantity": "الكمية",
+                "quantity_placeholder": "مثال: 1L، 5kg",
+                "price_dzd": "السعر (دج)",
+                "add": "إضافة خيار"
+            },
+            "technical_file": {
+                "title": "الملف التقني (PDF)",
+                "upload": "رفع ملف PDF",
+                "replace": "استبدال ملف PDF",
+                "download": "تنزيل",
+                "detach": "إزالة",
+                "attached": "مرفق:",
+                "file_fallback": "ملف PDF",
+                "optional_help": "اختياري. ارفع ملف PDF وسيتم ربطه بهذا المنتج."
+            },
+            "placeholders": {
+                "example": "مثال: {example}",
+                "water": "ماء"
+            },
+            "validation": {
+                "at_least_one_item": "مطلوب عنصر واحد على الأقل"
+            },
+            "snackbar": {
+                "load_failed": "فشل تحميل المنتج",
+                "image_upload_failed": "فشل رفع الصورة",
+                "pdf_select_required": "يرجى اختيار ملف PDF",
+                "pdf_upload_failed": "فشل رفع ملف PDF",
+                "pdf_read_failed": "تعذر قراءة ملف PDF",
+                "fix_errors": "يرجى تصحيح الأخطاء المميزة",
+                "cover_required": "صورة الغلاف مطلوبة",
+                "avatar_required": "الصورة الرمزية مطلوبة",
+                "color_required": "مطلوب لون واحد على الأقل",
+                "color_invalid": "يجب أن يكون لكل لون اسم ورمز",
+                "variance_required": "مطلوب خيار واحد على الأقل",
+                "variance_invalid": "يجب أن تحتوي كل خيار على كمية وسعر موجب",
+                "created": "تم إنشاء المنتج",
+                "updated": "تم تحديث المنتج",
+                "save_failed": "فشل حفظ المنتج"
+            }
+        },
+        "empty": {
+            "title": "لا توجد ألوان متاحة",
+            "subtitle": "عد لاحقًا لاكتشاف ألوان جديدة"
+        },
+        "errors": {
+            "load_failed": "فشل تحميل الألوان"
+        }
+    },
+    "tips_page": {
+        "hero_title": "نصائح وإرشادات",
+        "hero_subtitle": "اكتشف نصائح وحيلًا مفيدة لمشاريع الطلاء الخاصة بك",
+        "empty": {
+            "title": "لا توجد نصائح متاحة بعد",
+            "subtitle": "عد قريبًا للحصول على نصائح مفيدة!"
+        }
+    },
+    "inspirations_page": {
+        "hero_title": "معرض الإلهام",
+        "hero_subtitle": "اكتشف أفكارًا تُلهم مشروع الطلاء القادم",
+        "empty": {
+            "title": "لا توجد إلهامات متاحة بعد",
+            "subtitle": "عد قريبًا لاكتشاف أفكار ملهمة!"
+        }
+    },
+    "room_painter": {
+        "title": "تلوين جدران الغرفة",
+        "painting_enabled": "تم تفعيل الطلاء",
+        "description": "قم برفع صورة لغرفتك وغيّر ألوان الجدران لتصوّر أفكارك بسهولة!",
+        "upload": {
+            "title": "رفع صورة الغرفة",
+            "subtitle": "اختر صورة لغرفتك للبدء في تلوين الجدران",
+            "select_image": "اختيار صورة"
+        },
+        "controls": {
+            "title": "أدوات الطلاء",
+            "paint": "طلاء",
+            "depaint": "إزالة الطلاء",
+            "depaint_help": "إزالة الطلاء = انقر على جزء مطلي من الجدار لاسترجاع الصورة الأصلية في ذلك المكان.",
+            "tip_undo": "نصيحة: استخدم Ctrl+Z للتراجع.",
+            "selected_color": "اللون المحدد",
+            "quick_colors": "ألوان سريعة",
+            "detection_sensitivity": "حساسية الاكتشاف: {value}",
+            "detection_help": "القيم الأعلى تحدد مناطق أكبر بألوان متقاربة",
+            "undo": "تراجع",
+            "redo": "إعادة",
+            "reset_image": "إعادة ضبط الصورة",
+            "download_result": "تحميل النتيجة",
+            "upload_new_image": "رفع صورة جديدة"
+        },
+        "how_to_use": {
+            "title": "طريقة الاستخدام",
+            "step_1": "اختر الطلاء أو إزالة الطلاء",
+            "step_2": "اختر لونًا من اللوحة أو أداة الاختيار",
+            "step_3": "انقر على أي جدار لتلوينه",
+            "step_4": "اضبط الحساسية لتحسين اكتشاف الحواف",
+            "step_5": "حمّل تصميمك عند الانتهاء!"
+        },
+        "mobile": {
+            "reset": "إعادة ضبط",
+            "download": "تحميل",
+            "new": "جديد"
+        },
+        "aria": {
+            "selected_color": "اللون المحدد"
+        }
+    },
+    "nav": {
+        "home": "الرئيسية",
+        "colors": "الألوان",
+        "products": {
+            "root": "المنتجات",
+            "decor": "ديكور",
+            "buildings": "البناء",
+            "coating": "الطلاءات"
+        },
+        "tips": "نصائح",
+        "inspirations": "إلهام",
+        "virtual_painter": "الرسام الافتراضي",
+        "management": {
+            "root": "الإدارة",
+            "dashboard": "لوحة التحكم",
+            "products": "المنتجات",
+            "new_product": "منتج جديد",
+            "articles": "مقالات",
+            "new_article": "مقال جديد",
+            "orders": "الطلبات",
+            "users": "المستخدمون"
+        }
+    },
+    "user": {
+        "my_orders": "طلباتي",
+        "my_cart": "سلّتي",
+        "my_favorites": "المفضلة",
+        "account": "الحساب",
+        "logout": "تسجيل الخروج"
+    },
+    "footer": {
+        "made_with": "صُنع بـ",
+        "by": "بواسطة",
+        "license": "الرخصة",
+        "more_themes": "مزيد من القوالب",
+        "documentation": "التوثيق"
+    },
+    "errors": {
+        "page_not_found_title": "الصفحة غير موجودة",
+        "page_not_found_description": "لم نتمكن من العثور على الصفحة التي تبحث عنها.",
+        "generic_title": "عذرًا! حدث خطأ ما.",
+        "generic_description": "نعمل على إصلاح المشكلة في أقرب وقت ممكن.",
+        "coming_soon_alt": "قريبًا"
+    },
+    "auth": {
+        "welcome_to": "مرحبًا بك في",
+        "sign_in_prompt": "سجّل الدخول إلى حسابك وابدأ رحلتك",
+        "phone_number": "رقم الهاتف",
+        "phone_placeholder": "X XX XX XX XX",
+        "password": "كلمة المرور",
+        "password_placeholder": "············",
+        "forgot_password": "هل نسيت كلمة المرور؟",
+        "login": "تسجيل الدخول",
+        "log_in": "تسجيل الدخول",
+        "create_account": "إنشاء حساب",
+        "new_on_platform": "جديد على منصتنا؟",
+        "already_have_account": "لديك حساب بالفعل؟",
+        "send_code": "إرسال الرمز",
+        "verify_code": "تحقق من الرمز",
+        "reset_password": "إعادة تعيين كلمة المرور",
+        "back_to_login": "العودة لتسجيل الدخول",
+        "verification_code": "رمز التحقق",
+        "verification_code_placeholder": "- - - - - -",
+        "new_password": "كلمة مرور جديدة",
+        "confirm_password": "تأكيد كلمة المرور",
+        "first_name": "الاسم",
+        "first_name_placeholder": "محمد",
+        "last_name": "اللقب",
+        "last_name_placeholder": "بن صالح",
+        "wilaya": "الولاية",
+        "select_wilaya": "اختر الولاية",
+        "city": "المدينة",
+        "select_city": "اختر المدينة",
+        "address": "العنوان",
+        "address_placeholder": "عنوان الشارع",
+        "signup": {
+            "steps": {
+                "personal": {
+                    "title": "شخصي",
+                    "subtitle": "أدخل المعلومات"
+                },
+                "phone": {
+                    "title": "التحقق من الهاتف",
+                    "subtitle": "تحقق من هاتفك"
+                }
+            },
+            "personal_info_title": "المعلومات الشخصية",
+            "personal_info_subtitle": "أدخل معلوماتك الشخصية",
+            "phone_verification_title": "التحقق من الهاتف",
+            "phone_step_description": "أدخل رقم هاتفك لاستلام رمز التحقق",
+            "code_step_description": "أدخل الرمز المكوّن من 6 أرقام الذي تم إرساله إلى هاتفك",
+            "sent_code_to": "لقد أرسلنا رمزًا إلى",
+            "didnt_receive_code": "لم تستلم الرمز؟",
+            "resend_in": "إعادة الإرسال خلال {seconds}ث",
+            "resend_code": "إعادة إرسال الرمز",
+            "verify_create_account": "تحقق وأنشئ الحساب",
+            "code_sent_to": "تم إرسال رمز التحقق إلى {phone}",
+            "phone_verified_creating": "تم التحقق من الهاتف! جارٍ إنشاء حسابك...",
+            "registration_successful": "تم إنشاء الحساب بنجاح"
+        },
+        "forgot": {
+            "title": "نسيت كلمة المرور؟",
+            "step_phone_description": "أدخل رقم هاتفك وسنرسل لك رمز تحقق",
+            "step_code_description": "أدخل رمز التحقق المرسل إلى هاتفك",
+            "step_password_description": "أنشئ كلمة مرور جديدة لحسابك"
+        },
+        "editor": {
+            "title_create": "إنشاء مقال",
+            "title_edit": "تعديل المقال",
+            "subtitle": "أضف عناوين ونصوصًا وصورًا لبناء مقالك",
+            "actions": {
+                "back_to_list": "العودة إلى القائمة",
+                "create": "إنشاء",
+                "update": "تحديث",
+                "replace": "استبدال"
+            },
+            "sections": {
+                "article_information": "معلومات المقال",
+                "preview": "معاينة"
+            },
+            "fields": {
+                "article_title": "عنوان المقال",
+                "article_title_placeholder": "أدخل عنوان المقال...",
+                "article_type": "نوع المقال",
+                "cover_image": "صورة الغلاف *",
+                "upload_cover": "رفع الغلاف",
+                "cover_required": "صورة الغلاف مطلوبة"
+            },
+            "empty": {
+                "title": "لا يوجد محتوى بعد",
+                "subtitle": "اضغط على الأزرار أعلاه للبدء في بناء الصفحة"
+            },
+            "block": {
+                "type": {
+                    "title": "عنوان",
+                    "text": "نص",
+                    "image": "صورة"
+                },
+                "title": {
+                    "label": "عنوان",
+                    "placeholder": "أدخل نص العنوان..."
+                },
+                "text": {
+                    "label": "محتوى النص",
+                    "placeholder": "أدخل محتوى النص..."
+                },
+                "image": {
+                    "upload_prompt": "انقر لرفع صورة",
+                    "replace": "استبدال الصورة"
+                }
+            },
+            "add_block": {
+                "add_title": "إضافة عنوان",
+                "add_text": "إضافة نص",
+                "add_image": "إضافة صورة"
+            },
+            "snackbar": {
+                "image_upload_failed": "فشل رفع الصورة",
+                "cover_uploaded": "تم رفع صورة الغلاف بنجاح",
+                "cover_upload_failed": "فشل رفع صورة الغلاف",
+                "fix_errors": "يرجى تصحيح الأخطاء المميزة",
+                "cover_required": "صورة الغلاف مطلوبة",
+                "updated": "تم تحديث المقال بنجاح",
+                "created": "تم إنشاء المقال بنجاح",
+                "save_failed": "فشل حفظ المقال",
+                "load_failed": "فشل تحميل المقال"
+            },
+            "code_sent": "تم إرسال رمز التحقق",
+            "phone_verified_set_password": "تم التحقق من الهاتف! قم الآن بتعيين كلمة مرور جديدة",
+            "password_reset_success": "تمت إعادة تعيين كلمة المرور بنجاح! جارٍ الانتقال لتسجيل الدخول..."
+        },
+        "errors": {
+            "phone_password_required": "رقم الهاتف وكلمة المرور مطلوبان",
+            "login_failed": "فشل تسجيل الدخول",
+            "invalid_credentials": "بيانات الدخول غير صحيحة",
+            "valid_phone_required": "يرجى إدخال رقم هاتف صحيح مكوّن من 9 أرقام",
+            "failed_to_send_sms": "فشل إرسال رسالة SMS",
+            "enter_6_digit_code": "يرجى إدخال الرمز المكوّن من 6 أرقام",
+            "invalid_code_or_verification_failed": "رمز غير صحيح أو فشل التحقق",
+            "fix_highlighted_errors": "يرجى تصحيح الأخطاء المظللة",
+            "password_min_length": "يجب ألا تقل كلمة المرور عن 6 أحرف",
+            "passwords_do_not_match": "كلمتا المرور غير متطابقتين",
+            "failed_to_reset_password": "فشل إعادة تعيين كلمة المرور",
+            "failed_to_register": "فشل إنشاء الحساب",
+            "registration_failed": "فشل إنشاء الحساب"
+        }
+    },
+    "contact": {
+        "title": "تواصل معنا",
+        "hero_description": "اعثر على أقرب فرع لـ Opera Peinture. لدينا {total} موقعًا عبر الجزائر جاهزًا لخدمتك.",
+        "branches_count": "{total}+ فروع",
+        "nationwide_coverage": "تغطية وطنية عبر الجزائر",
+        "working_hours": "ساعات العمل",
+        "working_hours_details": "السبت - الخميس: 8: 00 صباحًا - 6: 00 مساءً",
+        "support": "الدعم",
+        "support_details": "اتصل بأي فرع للحصول على المساعدة",
+        "our_branches": "فروعنا",
+        "search_by_city": "ابحث حسب المدينة...",
+        "no_branches_found": "لم يتم العثور على فروع",
+        "try_different_search": "جرّب مصطلح بحث آخر",
+        "country": "الجزائر",
+        "phone_numbers": "أرقام الهاتف",
+        "call": "اتصال",
+        "copy": "نسخ",
+        "view_on_map": "عرض على الخريطة",
+        "showing_branches": "عرض {shown} من أصل {total} فروع"
+    },
+    "home": {
+        "hero": {
+            "title_prefix": "اعمل مع منتج",
+            "title_highlight": "ممتاز",
+            "title_suffix": "",
+            "description": "تقدم Opera Peinture دهانات عالية الجودة تجمع بين الابتكار والمتانة والاهتمام بالبيئة لجميع مشاريع الطلاء الخاصة بك.",
+            "explore_products": "استكشف المنتجات",
+            "view_colors": "عرض الألوان"
+        },
+        "stats": {
+            "sales_points": "نقاط البيع",
+            "products_manufactured": "المنتجات المصنّعة",
+            "years_experience": "سنوات الخبرة"
+        },
+        "about": {
+            "overline": "من نحن",
+            "title": "من نحن؟",
+            "p1": "تأسست Opera Paints سنة 2014 في باتنة، وتختص في تصنيع وإنتاج وتصدير دهانات عالية الجودة تلبي معايير المتانة والسلامة البيئية.",
+            "p2": "منذ انطلاقها، أصبحت الشركة من الروّاد في المجال بالجزائر وشمال إفريقيا. تقدم Opera Paints أكثر من 60 منتجًا مختلفًا، بما في ذلك الدهانات المعمارية والديكورية، لتلبية احتياجات الزبائن.",
+            "p3": "حاليًا، تتوفر منتجاتها في أكثر من 80 نقطة بيع في الجزائر، بالإضافة إلى كوت ديفوار وبوركينا فاسو.",
+            "learn_more": "اعرف المزيد"
+        },
+        "why": {
+            "overline": "لماذا تختارنا",
+            "title": "التزامنا بالتميز"
+        },
+        "features": {
+            "quality_title": "جودة لا مثيل لها",
+            "quality_description": "تصنع منتجاتنا بمواد ممتازة لضمان لمسة نهائية متقنة ومتينة.",
+            "innovation_title": "ابتكار مستمر",
+            "innovation_description": "نُدمج أحدث التقنيات واتجاهات السوق لنقدم حلول طلاء تلبي متطلبات العصر.",
+            "resistance_title": "مقاومة استثنائية",
+            "resistance_description": "سواء ضد العوامل الجوية أو الأشعة فوق البنفسجية أو البقع، دهاناتنا مصممة لتدوم وتحمي جدرانك.",
+            "satisfaction_title": "رضا العملاء",
+            "satisfaction_description": "رضاك هو أولويتنا. ندعمك في كل خطوة لضمان نتيجة نهائية تتجاوز توقعاتك."
+        },
+        "cta": {
+            "title": "هل أنت مستعد لتحويل مساحتك؟",
+            "description": "استكشف مجموعتنا الواسعة من الدهانات الممتازة واعثر على اللون المثالي لمشروعك القادم.",
+            "shop_now": "تسوّق الآن",
+            "get_inspired": "استلهم الأفكار"
+        }
+    },
+    "products": {
+        "empty": {
+            "title": "لم يتم العثور على منتجات",
+            "subtitle": "جرّب تعديل عوامل التصفية أو عد لاحقًا"
+        },
+        "filters": {
+            "button": "تصفية",
+            "title": "تصفية المنتجات",
+            "search_label": "بحث (العنوان/النوع)",
+            "destination": {
+                "title": "وجهة الاستخدام",
+                "habitations": "سكن",
+                "offices": "مكاتب",
+                "hotel": "فندق",
+                "restaurants": "مطاعم",
+                "showroom": "قاعة عرض",
+                "stores": "محلات"
+            },
+            "support": {
+                "title": "الأسطح",
+                "plaster": "جبس",
+                "cement": "إسمنت",
+                "render": "لياسة",
+                "brick": "طوب"
+            },
+            "reset": "إعادة ضبط"
+        }
+    },
+    "management": {
+        "articles": {
+            "title": "إدارة المقالات",
+            "actions": {
+                "create": "إنشاء مقال"
+            },
+            "search_placeholder": "البحث في المقالات...",
+            "filters": {
+                "all_types": "كل الأنواع"
+            },
+            "type": {
+                "tip": "نصائح",
+                "inspiration": "إلهام"
+            },
+            "table": {
+                "title": "العنوان",
+                "type": "النوع",
+                "date": "التاريخ"
+            },
+            "empty": {
+                "title": "لا توجد مقالات",
+                "none": "أنشئ أول مقال للبدء",
+                "filtered": "لا توجد مقالات من نوع {type}"
+            },
+            "deleteDialog": {
+                "title": "حذف المقال؟",
+                "confirm": "هل أنت متأكد أنك تريد حذف هذا المقال؟",
+                "warning": "لا يمكن التراجع عن هذا الإجراء."
+            },
+            "editor": {
+                "title_create": "إنشاء مقال",
+                "title_edit": "تعديل المقال",
+                "subtitle": "أضف عناوينًا ونصوصًا وصورًا لبناء مقالك",
+                "actions": {
+                    "back_to_list": "العودة إلى القائمة",
+                    "create": "إنشاء",
+                    "update": "تحديث",
+                    "replace": "استبدال"
+                },
+                "sections": {
+                    "article_information": "معلومات المقال",
+                    "preview": "معاينة"
+                },
+                "fields": {
+                    "article_title": "عنوان المقال",
+                    "article_title_placeholder": "أدخل عنوان المقال...",
+                    "article_type": "نوع المقال",
+                    "cover_image": "صورة الغلاف *",
+                    "upload_cover": "رفع الغلاف",
+                    "cover_required": "صورة الغلاف مطلوبة"
+                },
+                "empty": {
+                    "title": "لا يوجد محتوى بعد",
+                    "subtitle": "انقر على الأزرار أعلاه لبدء إنشاء الصفحة"
+                },
+                "block": {
+                    "type": {
+                        "title": "عنوان",
+                        "text": "نص",
+                        "image": "صورة"
+                    },
+                    "title": {
+                        "label": "عنوان",
+                        "placeholder": "أدخل نص العنوان..."
+                    },
+                    "text": {
+                        "label": "محتوى النص",
+                        "placeholder": "أدخل محتوى النص..."
+                    },
+                    "image": {
+                        "upload_prompt": "انقر لرفع صورة",
+                        "replace": "استبدال الصورة"
+                    }
+                },
+                "add_block": {
+                    "add_title": "إضافة عنوان",
+                    "add_text": "إضافة نص",
+                    "add_image": "إضافة صورة"
+                },
+                "snackbar": {
+                    "image_upload_failed": "فشل رفع الصورة",
+                    "cover_uploaded": "تم رفع صورة الغلاف بنجاح",
+                    "cover_upload_failed": "فشل رفع صورة الغلاف",
+                    "fix_errors": "يرجى تصحيح الأخطاء المميزة",
+                    "cover_required": "صورة الغلاف مطلوبة",
+                    "updated": "تم تحديث المقال بنجاح",
+                    "created": "تم إنشاء المقال بنجاح",
+                    "save_failed": "فشل حفظ المقال",
+                    "load_failed": "فشل تحميل المقال"
+                }
+            }
+        },
+        "dashboard": {
+            "title": "لوحة التحكم",
+            "welcome": "مرحبًا بعودتك، {name}! إليك آخر المستجدات.",
+            "actions": {
+                "view_orders": "عرض الطلبات",
+                "add_product": "إضافة منتج",
+                "retry": "إعادة المحاولة",
+                "view_all": "عرض الكل"
+            },
+            "stats": {
+                "total_revenue": "إجمالي الإيرادات",
+                "total_orders": "إجمالي الطلبات",
+                "pending_orders": "{count} قيد الانتظار",
+                "total_users": "إجمالي المستخدمين",
+                "new_users_this_month": "+{count} هذا الشهر",
+                "products": "المنتجات"
+            },
+            "sections": {
+                "revenue_overview": "نظرة عامة على الإيرادات",
+                "this_month": "هذا الشهر",
+                "last_month": "الشهر الماضي",
+                "orders_this_month": "طلبات هذا الشهر",
+                "orders_by_status": "الطلبات حسب الحالة",
+                "total_orders": "إجمالي الطلبات",
+                "recent_orders": "أحدث الطلبات",
+                "top_products": "أفضل المنتجات"
+            },
+            "table": {
+                "order": "الطلب",
+                "customer": "الزبون",
+                "total": "الإجمالي",
+                "status": "الحالة",
+                "date": "التاريخ"
+            },
+            "sales": "{count} مبيعات",
+            "errors": {
+                "load_failed": "فشل تحميل بيانات لوحة التحكم"
+            }
+        },
+        "products": {
+            "title": "إدارة المنتجات",
+            "filters": {
+                "search": "بحث",
+                "type": "النوع",
+                "select_type": "اختر نوعًا"
+            },
+            "types": {
+                "decor": "ديكور",
+                "buildings": "مبانٍ",
+                "coating": "طلاء"
+            },
+            "table": {
+                "title": "العنوان",
+                "type": "النوع",
+                "variances": "الخيارات",
+                "colors": "الألوان"
+            },
+            "editor": {
+                "title_create": "إضافة منتج جديد",
+                "title_edit": "تعديل المنتج",
+                "subtitle_create": "أدخل تفاصيل المنتج أدناه",
+                "subtitle_edit": "قم بتحديث تفاصيل المنتج أدناه",
+                "actions": {
+                    "discard": "إلغاء",
+                    "publish": "نشر المنتج",
+                    "save_changes": "حفظ"
+                },
+                "sections": {
+                    "preview": "معاينة المنتج",
+                    "product_information": "معلومات المنتج",
+                    "technical_characteristics": "الخصائص التقنية",
+                    "application": "طريقة التطبيق",
+                    "colors": "الألوان",
+                    "variances": "الخيارات"
+                },
+                "preview": {
+                    "click_to_add_cover": "انقر لإضافة صورة الغلاف",
+                    "cover_required": "صورة الغلاف مطلوبة",
+                    "avatar_required": "الصورة المصغرة مطلوبة"
+                },
+                "fields": {
+                    "title": "العنوان",
+                    "title_placeholder": "عنوان المنتج",
+                    "definition": "الوصف",
+                    "definition_placeholder": "وصف المنتج",
+                    "type": "النوع",
+                    "properties": "الخصائص",
+                    "properties_placeholder": "أضف خصائص"
+                },
+                "technical": {
+                    "density": "الكثافة",
+                    "coverage": "المردود",
+                    "drying_time": "وقت الجفاف",
+                    "viscosity_optional": "اللزوجة (اختياري)",
+                    "aspect": {
+                        "title": "مظهر الطبقة بعد الجفاف",
+                        "metallized": "معدني",
+                        "glossy": "لامع",
+                        "silky": "حريري",
+                        "luminous": "مضيء",
+                        "ultra_gloss_marble": "رخام فائق اللمعان"
+                    }
+                },
+                "application": {
+                    "dilution": "التخفيف",
+                    "material": {
+                        "title": "أدوات التطبيق",
+                        "sponge_nature": "إسفنجة طبيعية",
+                        "decorative_stamp": "ختم زخرفي",
+                        "trowel": "ملساء",
+                        "knife": "سكين",
+                        "brush": "فرشاة",
+                        "paintbrush": "فرشاة طلاء",
+                        "stainless_trowel": "ملساء ستانلس",
+                        "flat_brush_spalter": "فرشاة مسطحة (سبالتر)",
+                        "plastic_spatula": "ملعقة/سباتولا بلاستيكية"
+                    },
+                    "cleaning_optional": "تنظيف الأدوات (اختياري)",
+                    "surface_preparation_optional": "تحضير السطح (اختياري)"
+                },
+                "colors": {
+                    "name": "الاسم",
+                    "name_placeholder": "اسم اللون",
+                    "code": "الرمز",
+                    "add": "إضافة لون"
+                },
+                "variances": {
+                    "quantity": "الكمية",
+                    "quantity_placeholder": "مثال: 1L، 5kg",
+                    "price_dzd": "السعر (دج)",
+                    "add": "إضافة خيار"
+                },
+                "technical_file": {
+                    "title": "الورقة التقنية (PDF)",
+                    "upload": "رفع PDF",
+                    "replace": "استبدال PDF",
+                    "download": "تنزيل",
+                    "detach": "إزالة الارتباط",
+                    "attached": "مرفق:",
+                    "file_fallback": "ملف PDF",
+                    "optional_help": "اختياري. ارفع ملف PDF وسيتم ربطه بهذا المنتج."
+                },
+                "placeholders": {
+                    "example": "مثال: {example}",
+                    "water": "ماء"
+                },
+                "validation": {
+                    "at_least_one_item": "مطلوب عنصر واحد على الأقل"
+                },
+                "snackbar": {
+                    "load_failed": "فشل تحميل المنتج",
+                    "image_upload_failed": "فشل رفع الصورة",
+                    "pdf_select_required": "يرجى اختيار ملف PDF",
+                    "pdf_upload_failed": "فشل رفع ملف PDF",
+                    "pdf_read_failed": "تعذرت قراءة ملف PDF",
+                    "fix_errors": "يرجى تصحيح الأخطاء المميزة",
+                    "cover_required": "صورة الغلاف مطلوبة",
+                    "avatar_required": "الصورة المصغرة مطلوبة",
+                    "color_required": "مطلوب لون واحد على الأقل",
+                    "color_invalid": "يجب أن يحتوي كل لون على اسم ورمز",
+                    "variance_required": "مطلوب خيار واحد على الأقل",
+                    "variance_invalid": "كل خيار يحتاج كمية وسعرًا إيجابيًا",
+                    "created": "تم إنشاء المنتج",
+                    "updated": "تم تحديث المنتج",
+                    "save_failed": "فشل حفظ المنتج"
+                }
+            },
+            "empty": {
+                "title": "لم يتم العثور على منتجات",
+                "subtitle": "أنشئ منتجًا جديدًا للبدء"
+            },
+            "actions": {
+                "add_product": "إضافة منتج"
+            },
+            "deleteDialog": {
+                "title": "حذف المنتج",
+                "confirm_prefix": "هل أنت متأكد أنك تريد حذف ",
+                "confirm_suffix": "؟",
+                "item_fallback": "هذا المنتج"
+            },
+            "snackbar": {
+                "load_failed": "فشل تحميل المنتجات",
+                "deleted": "تم حذف المنتج"
+            }
+        },
+        "common": {
+            "status": "الحالة",
+            "cancel": "إلغاء",
+            "delete": "حذف",
+            "action_failed": "فشل الإجراء",
+            "delete_failed": "فشل الحذف",
+            "value": {
+                "na": "-"
+            },
+            "table": {
+                "actions": "إجراءات"
+            }
+        },
+        "users": {
+            "title": "إدارة المستخدمين",
+            "search_placeholder": "ابحث عن المستخدمين...",
+            "filters": {
+                "banned": {
+                    "all": "جميع المستخدمين"
+                }
+            },
+            "table": {
+                "user": "المستخدم",
+                "phone": "الهاتف",
+                "role": "الدور",
+                "status": "الحالة",
+                "joined": "تاريخ الانضمام"
+            },
+            "role": {
+                "admin": "مشرف",
+                "user": "مستخدم"
+            },
+            "status": {
+                "active": "نشط",
+                "banned": "محظور"
+            },
+            "actions": {
+                "ban": "حظر",
+                "unban": "رفع الحظر"
+            },
+            "empty": {
+                "title": "لم يتم العثور على مستخدمين",
+                "none": "لا يوجد مستخدمون مسجلون بعد",
+                "filtered": "جرّب تعديل البحث"
+            },
+            "banDialog": {
+                "ban_title": "حظر المستخدم؟",
+                "unban_title": "رفع الحظر عن المستخدم؟",
+                "ban_confirm": "هل أنت متأكد أنك تريد حظر هذا المستخدم؟",
+                "unban_confirm": "هل أنت متأكد أنك تريد رفع الحظر عن هذا المستخدم؟",
+                "warning": "لن يتمكن المستخدم من تسجيل الدخول أثناء الحظر."
+            },
+            "deleteDialog": {
+                "title": "حذف حساب المستخدم؟",
+                "confirm": "هل أنت متأكد أنك تريد حذف حساب هذا المستخدم نهائيًا؟",
+                "warning": "لا يمكن التراجع عن هذا الإجراء. سيتم فقدان جميع بيانات المستخدم."
+            },
+            "snackbar": {
+                "banned": "تم حظر المستخدم بنجاح",
+                "unbanned": "تم رفع الحظر عن المستخدم بنجاح",
+                "deleted": "تم حذف المستخدم بنجاح"
+            },
+            "details": {
+                "back_to_users": "العودة إلى المستخدمين",
+                "not_found_title": "المستخدم غير موجود",
+                "not_found_subtitle": "المستخدم الذي تبحث عنه غير موجود.",
+                "location": "الموقع",
+                "address": "العنوان",
+                "orders_history": "سجل الطلبات",
+                "orders_count": "{count} طلبات",
+                "no_orders_yet": "لا توجد طلبات بعد",
+                "snackbar": {
+                    "load_failed": "فشل تحميل تفاصيل المستخدم"
+                }
+            }
+        },
+        "orders": {
+            "title": "إدارة الطلبات",
+            "filters": {
+                "all_statuses": "كل الحالات"
+            },
+            "table": {
+                "order_id": "رقم الطلب",
+                "customer": "الزبون",
+                "items": "العناصر",
+                "items_count": "{count} عنصر",
+                "total": "الإجمالي",
+                "status": "الحالة",
+                "date": "التاريخ"
+            },
+            "status": {
+                "pending": "قيد الانتظار",
+                "confirmed": "مؤكد",
+                "shipped": "تم الشحن",
+                "delivered": "تم التسليم",
+                "cancelled": "ملغى"
+            },
+            "details": {
+                "back_to_orders": "العودة إلى الطلبات",
+                "not_found_title": "الطلب غير موجود",
+                "not_found_subtitle": "الطلب الذي تبحث عنه غير موجود.",
+                "order_number": "طلب رقم #{id}",
+                "placed_on": "تم الطلب بتاريخ {date}",
+                "order_items": "عناصر الطلب",
+                "unknown_product": "منتج غير معروف",
+                "table": {
+                    "product": "المنتج",
+                    "variance": "النوع",
+                    "color": "اللون",
+                    "qty": "الكمية",
+                    "price": "السعر",
+                    "total": "الإجمالي"
+                },
+                "update_status": "تحديث الحالة",
+                "order_status": "حالة الطلب",
+                "update_status_action": "تحديث الحالة",
+                "customer_information": "معلومات الزبون",
+                "name": "الاسم",
+                "phone": "الهاتف",
+                "location": "الموقع",
+                "address": "العنوان",
+                "view_customer": "عرض الزبون",
+                "customer_not_available": "معلومات الزبون غير متاحة",
+                "order_timeline": "خط سير الطلب",
+                "timeline": {
+                    "order_placed": "تم إنشاء الطلب"
+                },
+                "snackbar": {
+                    "load_failed": "فشل تحميل تفاصيل الطلب",
+                    "status_updated": "تم تحديث حالة الطلب بنجاح",
+                    "status_update_failed": "فشل تحديث حالة الطلب"
+                }
+            },
+            "empty": {
+                "title": "لم يتم العثور على طلبات",
+                "none": "لم يتم تقديم أي طلبات بعد",
+                "filtered": "لا توجد طلبات بالحالة: {status}"
+            }
+        }
+    },
+    "orders": {
+        "title": "إدارة الطلبات",
+        "filters": {
+            "all_statuses": "كل الحالات"
+        },
+        "table": {
+            "order_id": "رقم الطلب",
+            "customer": "الزبون",
+            "items": "العناصر",
+            "items_count": "{count} عنصر",
+            "total": "الإجمالي",
+            "status": "الحالة",
+            "date": "التاريخ"
+        },
+        "status": {
+            "pending": "قيد الانتظار",
+            "confirmed": "مؤكد",
+            "shipped": "تم الشحن",
+            "delivered": "تم التسليم",
+            "cancelled": "ملغى"
+        },
+        "details": {
+            "back_to_orders": "العودة إلى الطلبات",
+            "not_found_title": "الطلب غير موجود",
+            "not_found_subtitle": "الطلب الذي تبحث عنه غير موجود.",
+            "order_number": "طلب رقم #{id}",
+            "placed_on": "تم الطلب بتاريخ {date}",
+            "order_items": "عناصر الطلب",
+            "unknown_product": "منتج غير معروف",
+            "table": {
+                "product": "المنتج",
+                "variance": "النوع",
+                "color": "اللون",
+                "qty": "الكمية",
+                "price": "السعر",
+                "total": "الإجمالي"
+            },
+            "update_status": "تحديث الحالة",
+            "order_status": "حالة الطلب",
+            "update_status_action": "تحديث الحالة",
+            "customer_information": "معلومات الزبون",
+            "name": "الاسم",
+            "phone": "الهاتف",
+            "location": "الموقع",
+            "address": "العنوان",
+            "view_customer": "عرض الزبون",
+            "customer_not_available": "معلومات الزبون غير متاحة",
+            "order_timeline": "خط سير الطلب",
+            "timeline": {
+                "order_placed": "تم إنشاء الطلب"
+            },
+            "snackbar": {
+                "load_failed": "فشل تحميل تفاصيل الطلب",
+                "status_updated": "تم تحديث حالة الطلب بنجاح",
+                "status_update_failed": "فشل تحديث حالة الطلب"
+            }
+        },
+        "empty": {
+            "title": "لم يتم العثور على طلبات",
+            "none": "لم يتم تقديم أي طلبات بعد",
+            "filtered": "لا توجد طلبات بالحالة: {status}"
+        }
+    }
+}

@@ -1,6 +1,7 @@
 <script setup>
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
@@ -16,18 +17,27 @@ const loading = ref(true)
 const updating = ref(false)
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
+const { t, d } = useI18n()
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
 
 // Status options for update
-const statusOptions = [
-  { title: 'Pending', value: 'pending' },
-  { title: 'Confirmed', value: 'confirmed' },
-  { title: 'Shipped', value: 'shipped' },
-  { title: 'Delivered', value: 'delivered' },
-  { title: 'Cancelled', value: 'cancelled' },
-]
+const statusOptions = computed(() => ([
+  { title: t('management.orders.status.pending'), value: 'pending' },
+  { title: t('management.orders.status.confirmed'), value: 'confirmed' },
+  { title: t('management.orders.status.shipped'), value: 'shipped' },
+  { title: t('management.orders.status.delivered'), value: 'delivered' },
+  { title: t('management.orders.status.cancelled'), value: 'cancelled' },
+]))
+
+const statusLabel = status => {
+  if (!status)
+    return ''
+
+  return t(`management.orders.status.${status}`, status)
+}
 
 // Get status color
 const getStatusColor = status => {
@@ -109,7 +119,7 @@ const fetchOrder = async () => {
   }
   catch (error) {
     console.error('Failed to fetch order:', error)
-    showSnackbar('Failed to load order details', 'error')
+    showSnackbar(t('management.orders.details.snackbar.load_failed'), 'error')
   }
   finally {
     loading.value = false
@@ -133,7 +143,7 @@ const updateStatus = async newStatus => {
       const data = await res.json()
 
       order.value = { ...order.value, ...data.data }
-      showSnackbar('Order status updated successfully', 'success')
+      showSnackbar(t('management.orders.details.snackbar.status_updated'), 'success')
     }
     else {
       throw new Error('Update failed')
@@ -141,7 +151,7 @@ const updateStatus = async newStatus => {
   }
   catch (error) {
     console.error('Failed to update status:', error)
-    showSnackbar('Failed to update order status', 'error')
+    showSnackbar(t('management.orders.details.snackbar.status_update_failed'), 'error')
   }
   finally {
     updating.value = false
@@ -151,16 +161,9 @@ const updateStatus = async newStatus => {
 // Format date
 const formatDate = date => {
   if (!date)
-    return '-'
-  const d = new Date(date)
+    return t('management.common.value.na')
 
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return d(new Date(date), 'long')
 }
 
 onMounted(() => {
@@ -181,7 +184,7 @@ onMounted(() => {
         icon="tabler-arrow-left"
         class="me-2"
       />
-      Back to Orders
+      {{ t('management.orders.details.back_to_orders') }}
     </VBtn>
 
     <!-- Loading State -->
@@ -207,10 +210,10 @@ onMounted(() => {
         class="text-disabled mb-4"
       />
       <h3 class="text-h6 text-disabled mb-2">
-        Order not found
+        {{ t('management.orders.details.not_found_title') }}
       </h3>
       <p class="text-body-2 text-disabled mb-4">
-        The order you're looking for doesn't exist.
+        {{ t('management.orders.details.not_found_subtitle') }}
       </p>
       <VBtn
         color="primary"
@@ -220,7 +223,7 @@ onMounted(() => {
           icon="tabler-arrow-left"
           class="me-2"
         />
-        Back to Orders
+        {{ t('management.orders.details.back_to_orders') }}
       </VBtn>
     </VCard>
 
@@ -234,36 +237,36 @@ onMounted(() => {
         >
           <VCard class="mb-6">
             <VCardTitle class="d-flex align-center justify-space-between">
-              <span>Order #{{ order._id?.slice(-8).toUpperCase() }}</span>
+              <span>{{ t('management.orders.details.order_number', { id: order._id?.slice(-8).toUpperCase() }) }}</span>
               <VChip
                 label
                 :color="getStatusColor(order.status)"
                 variant="tonal"
               >
-                {{ order.status }}
+                {{ statusLabel(order.status) }}
               </VChip>
             </VCardTitle>
             <VDivider />
             <VCardText>
               <div class="text-caption text-disabled mb-4">
-                Placed on {{ formatDate(order.createdAt) }}
+                {{ t('management.orders.details.placed_on', { date: formatDate(order.createdAt) }) }}
               </div>
 
               <!-- Order Items -->
               <h4 class="text-h6 mb-4">
-                Order Items
+                {{ t('management.orders.details.order_items') }}
               </h4>
               <VTable>
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Variance</th>
-                    <th>Color</th>
+                    <th>{{ t('management.orders.details.table.product') }}</th>
+                    <th>{{ t('management.orders.details.table.variance') }}</th>
+                    <th>{{ t('management.orders.details.table.color') }}</th>
                     <th class="text-center">
-                      Qty
+                      {{ t('management.orders.details.table.qty') }}
                     </th>
                     <th class="text-end">
-                      Price
+                      {{ t('management.orders.details.table.price') }}
                     </th>
                   </tr>
                 </thead>
@@ -274,11 +277,11 @@ onMounted(() => {
                   >
                     <td>
                       <div class="font-weight-medium">
-                        {{ item.title || 'Unknown Product' }}
+                        {{ item.title || t('management.orders.details.unknown_product') }}
                       </div>
                     </td>
-                    <td>{{ item.quantity || '-' }}</td>
-                    <td>{{ item.color || '-' }}</td>
+                    <td>{{ item.quantity || t('management.common.value.na') }}</td>
+                    <td>{{ item.color || t('management.common.value.na') }}</td>
                     <td class="text-center">
                       {{ item.qty }}
                     </td>
@@ -293,7 +296,7 @@ onMounted(() => {
                       colspan="4"
                       class="text-end font-weight-bold"
                     >
-                      Total:
+                      {{ t('management.orders.details.table.total') }}:
                     </td>
                     <td class="text-end font-weight-bold text-primary">
                       {{ order.total?.toLocaleString() }} DZD
@@ -312,13 +315,13 @@ onMounted(() => {
         >
           <!-- Update Status -->
           <VCard class="mb-6">
-            <VCardTitle>Update Status</VCardTitle>
+            <VCardTitle>{{ t('management.orders.details.update_status') }}</VCardTitle>
             <VDivider />
             <VCardText>
               <VSelect
                 v-model="order.status"
                 :items="statusOptions"
-                label="Order Status"
+                :label="t('management.orders.details.order_status')"
                 variant="outlined"
                 :disabled="updating"
               />
@@ -333,14 +336,14 @@ onMounted(() => {
                   icon="tabler-check"
                   class="me-2"
                 />
-                Update Status
+                {{ t('management.orders.details.update_status_action') }}
               </VBtn>
             </VCardText>
           </VCard>
 
           <!-- Customer Info -->
           <VCard class="mb-6">
-            <VCardTitle>Customer Information</VCardTitle>
+            <VCardTitle>{{ t('management.orders.details.customer_information') }}</VCardTitle>
             <VDivider />
             <VCardText>
               <div
@@ -349,7 +352,7 @@ onMounted(() => {
               >
                 <div>
                   <div class="text-caption text-disabled">
-                    Name
+                    {{ t('management.orders.details.name') }}
                   </div>
                   <div class="font-weight-medium">
                     {{ order.user.firstName }} {{ order.user.lastName }}
@@ -357,7 +360,7 @@ onMounted(() => {
                 </div>
                 <div>
                   <div class="text-caption text-disabled">
-                    Phone
+                    {{ t('management.orders.details.phone') }}
                   </div>
                   <div class="font-weight-medium">
                     {{ order.user.phone }}
@@ -365,15 +368,15 @@ onMounted(() => {
                 </div>
                 <div v-if="order.user.state || order.user.city">
                   <div class="text-caption text-disabled">
-                    Location
+                    {{ t('management.orders.details.location') }}
                   </div>
                   <div class="font-weight-medium">
-                    {{ displayOrderLocation || '-' }}
+                    {{ displayOrderLocation || t('management.common.value.na') }}
                   </div>
                 </div>
                 <div v-if="order.user.address">
                   <div class="text-caption text-disabled">
-                    Address
+                    {{ t('management.orders.details.address') }}
                   </div>
                   <div class="font-weight-medium">
                     {{ order.user.address }}
@@ -390,21 +393,21 @@ onMounted(() => {
                     icon="tabler-user"
                     class="me-2"
                   />
-                  View Customer
+                  {{ t('management.orders.details.view_customer') }}
                 </VBtn>
               </div>
               <div
                 v-else
                 class="text-disabled"
               >
-                Customer information not available
+                {{ t('management.orders.details.customer_not_available') }}
               </div>
             </VCardText>
           </VCard>
 
           <!-- Order Timeline -->
           <VCard>
-            <VCardTitle>Order Timeline</VCardTitle>
+            <VCardTitle>{{ t('management.orders.details.order_timeline') }}</VCardTitle>
             <VDivider />
             <VCardText>
               <VTimeline
@@ -416,7 +419,7 @@ onMounted(() => {
                   size="x-small"
                 >
                   <div class="text-caption">
-                    Order Placed
+                    {{ t('management.orders.details.timeline.order_placed') }}
                   </div>
                   <div class="text-body-2">
                     {{ formatDate(order.createdAt) }}
@@ -428,7 +431,7 @@ onMounted(() => {
                   size="x-small"
                 >
                   <div class="text-caption">
-                    Confirmed
+                    {{ t('management.orders.status.confirmed') }}
                   </div>
                 </VTimelineItem>
                 <VTimelineItem
@@ -437,7 +440,7 @@ onMounted(() => {
                   size="x-small"
                 >
                   <div class="text-caption">
-                    Shipped
+                    {{ t('management.orders.status.shipped') }}
                   </div>
                 </VTimelineItem>
                 <VTimelineItem
@@ -446,7 +449,7 @@ onMounted(() => {
                   size="x-small"
                 >
                   <div class="text-caption">
-                    Delivered
+                    {{ t('management.orders.status.delivered') }}
                   </div>
                 </VTimelineItem>
                 <VTimelineItem
@@ -455,7 +458,7 @@ onMounted(() => {
                   size="x-small"
                 >
                   <div class="text-caption">
-                    Cancelled
+                    {{ t('management.orders.status.cancelled') }}
                   </div>
                 </VTimelineItem>
               </VTimeline>

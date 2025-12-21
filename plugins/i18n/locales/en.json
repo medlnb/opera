@@ -1,0 +1,718 @@
+{
+    "lang": {
+        "english": "English",
+        "french": "French",
+        "arabic": "Arabic"
+    },
+    "common": {
+        "back_to_home": "Back to Home",
+        "back": "Back",
+        "next": "Next",
+        "unnamed": "Unnamed",
+        "pagination": {
+            "showing": "Showing {start} to {end} of {total} entries"
+        }
+    },
+    "colors_page": {
+        "hero_title": "Welcome to the Spectrum of Colors",
+        "hero_subtitle": "Explore Shades That Bring Your Vision to Life",
+        "empty": {
+            "title": "No colors available",
+            "subtitle": "Check back later for new colors"
+        },
+        "errors": {
+            "load_failed": "Failed to load colors"
+        }
+    },
+    "tips_page": {
+        "hero_title": "Tips & Advice",
+        "hero_subtitle": "Discover helpful tips and tricks for your painting projects",
+        "empty": {
+            "title": "No tips available yet",
+            "subtitle": "Check back soon for helpful tips!"
+        }
+    },
+    "inspirations_page": {
+        "hero_title": "Inspiration Gallery",
+        "hero_subtitle": "Discover ideas to spark your next painting project",
+        "empty": {
+            "title": "No inspirations available yet",
+            "subtitle": "Check back soon for inspiring ideas!"
+        }
+    },
+    "room_painter": {
+        "title": "Room Wall Painter",
+        "painting_enabled": "Painting enabled",
+        "description": "Upload a photo of your room and paint the walls with different colors to visualize your ideas!",
+        "upload": {
+            "title": "Upload Room Image",
+            "subtitle": "Choose a photo of your room to start painting the walls",
+            "select_image": "Select Image"
+        },
+        "controls": {
+            "title": "Paint Controls",
+            "paint": "Paint",
+            "depaint": "Depaint",
+            "depaint_help": "Depaint = click a painted wall area to restore the original photo there.",
+            "tip_undo": "Tip: use Ctrl+Z to undo.",
+            "selected_color": "Selected Color",
+            "quick_colors": "Quick Colors",
+            "detection_sensitivity": "Detection Sensitivity: {value}",
+            "detection_help": "Higher values select larger areas with similar colors",
+            "undo": "Undo",
+            "redo": "Redo",
+            "reset_image": "Reset Image",
+            "download_result": "Download Result",
+            "upload_new_image": "Upload New Image"
+        },
+        "how_to_use": {
+            "title": "How to Use",
+            "step_1": "Choose Paint or Depaint",
+            "step_2": "Choose a color from the palette or picker",
+            "step_3": "Click on any wall to paint it",
+            "step_4": "Adjust sensitivity for better edge detection",
+            "step_5": "Download your design when done!"
+        },
+        "mobile": {
+            "reset": "Reset",
+            "download": "Download",
+            "new": "New"
+        },
+        "aria": {
+            "selected_color": "Selected color"
+        }
+    },
+    "nav": {
+        "home": "Home",
+        "colors": "Colors",
+        "products": {
+            "root": "Products",
+            "decor": "Decor",
+            "buildings": "Buildings",
+            "coating": "Coating"
+        },
+        "tips": "Tips",
+        "inspirations": "Inspirations",
+        "virtual_painter": "Virtual Painter",
+        "management": {
+            "root": "Management",
+            "dashboard": "Dashboard",
+            "products": "Products",
+            "new_product": "New Product",
+            "articles": "Articles",
+            "new_article": "New Article",
+            "orders": "Orders",
+            "users": "Users"
+        }
+    },
+    "user": {
+        "my_orders": "My Orders",
+        "my_cart": "My Cart",
+        "my_favorites": "My Favorites",
+        "account": "Account",
+        "logout": "Logout"
+    },
+    "footer": {
+        "made_with": "Made With",
+        "by": "By",
+        "license": "License",
+        "more_themes": "More Themes",
+        "documentation": "Documentation"
+    },
+    "errors": {
+        "page_not_found_title": "Page Not Found",
+        "page_not_found_description": "We couldn't find the page you are looking for.",
+        "generic_title": "Oops! Something went wrong.",
+        "generic_description": "We are working on it and we'll get it fixed as soon as we can.",
+        "coming_soon_alt": "Coming Soon"
+    },
+    "auth": {
+        "welcome_to": "Welcome to",
+        "sign_in_prompt": "Please sign-in to your account and start the adventure",
+        "phone_number": "Phone Number",
+        "phone_placeholder": "X XX XX XX XX",
+        "password": "Password",
+        "password_placeholder": "············",
+        "forgot_password": "Forgot Password?",
+        "login": "Login",
+        "log_in": "Log in",
+        "create_account": "Create an account",
+        "new_on_platform": "New on our platform?",
+        "already_have_account": "Already have an account?",
+        "send_code": "Send Code",
+        "verify_code": "Verify Code",
+        "reset_password": "Reset Password",
+        "back_to_login": "Back to login",
+        "verification_code": "Verification Code",
+        "verification_code_placeholder": "- - - - - -",
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password",
+        "first_name": "First Name",
+        "first_name_placeholder": "John",
+        "last_name": "Last Name",
+        "last_name_placeholder": "Doe",
+        "wilaya": "Wilaya",
+        "select_wilaya": "Select Wilaya",
+        "city": "City",
+        "select_city": "Select City",
+        "address": "Address",
+        "address_placeholder": "Street address",
+        "signup": {
+            "steps": {
+                "personal": {
+                    "title": "Personal",
+                    "subtitle": "Enter Information"
+                },
+                "phone": {
+                    "title": "Phone Verification",
+                    "subtitle": "Verify Your Phone"
+                }
+            },
+            "personal_info_title": "Personal Information",
+            "personal_info_subtitle": "Enter Your Personal Information",
+            "phone_verification_title": "Phone Verification",
+            "phone_step_description": "Enter your phone number to receive a verification code",
+            "code_step_description": "Enter the 6-digit code sent to your phone",
+            "sent_code_to": "We sent a code to",
+            "didnt_receive_code": "Didn't receive the code?",
+            "resend_in": "Resend in {seconds}s",
+            "resend_code": "Resend Code",
+            "verify_create_account": "Verify & Create Account",
+            "code_sent_to": "Verification code sent to {phone}",
+            "phone_verified_creating": "Phone verified! Creating your account...",
+            "registration_successful": "Registration successful"
+        },
+        "forgot": {
+            "title": "Forgot Password?",
+            "step_phone_description": "Enter your phone number and we'll send you a verification code",
+            "step_code_description": "Enter the verification code sent to your phone",
+            "step_password_description": "Create a new password for your account",
+            "code_sent": "Verification code sent",
+            "phone_verified_set_password": "Phone verified! Now set your new password",
+            "password_reset_success": "Password reset successfully! Redirecting to login..."
+        },
+        "errors": {
+            "phone_password_required": "Phone and password are required",
+            "login_failed": "Login failed",
+            "invalid_credentials": "Invalid credentials",
+            "valid_phone_required": "Please enter a valid 9-digit phone number",
+            "failed_to_send_sms": "Failed to send SMS",
+            "enter_6_digit_code": "Please enter the 6-digit code",
+            "invalid_code_or_verification_failed": "Invalid code or verification failed",
+            "fix_highlighted_errors": "Please fix the highlighted errors",
+            "password_min_length": "Password must be at least 6 characters",
+            "passwords_do_not_match": "Passwords do not match",
+            "failed_to_reset_password": "Failed to reset password",
+            "failed_to_register": "Failed to register",
+            "registration_failed": "Registration failed"
+        }
+    },
+    "contact": {
+        "title": "Contact Us",
+        "hero_description": "Find your nearest Opera Peinture branch. We have {total} locations across Algeria ready to serve you.",
+        "branches_count": "{total}+ Branches",
+        "nationwide_coverage": "Nationwide coverage across Algeria",
+        "working_hours": "Working Hours",
+        "working_hours_details": "Saturday - Thursday: 8:00 AM - 6:00 PM",
+        "support": "Support",
+        "support_details": "Call any branch for assistance",
+        "our_branches": "Our Branches",
+        "search_by_city": "Search by city...",
+        "no_branches_found": "No branches found",
+        "try_different_search": "Try a different search term",
+        "country": "Algeria",
+        "phone_numbers": "Phone Numbers",
+        "call": "Call",
+        "copy": "Copy",
+        "view_on_map": "View on Map",
+        "showing_branches": "Showing {shown} of {total} branches"
+    },
+    "home": {
+        "hero": {
+            "title_prefix": "Work with an",
+            "title_highlight": "Excellent",
+            "title_suffix": "Product",
+            "description": "Opera Peinture offers high-quality paints, combining innovation, durability, and eco-friendliness for all your painting projects.",
+            "explore_products": "Explore Products",
+            "view_colors": "View Colors"
+        },
+        "stats": {
+            "sales_points": "Sales Points",
+            "products_manufactured": "Products Manufactured",
+            "years_experience": "Years Experience"
+        },
+        "about": {
+            "overline": "About Us",
+            "title": "Who are we?",
+            "p1": "Founded in 2014 in Batna, Opera Paints specializes in the manufacturing, production, and export of high-quality paints that meet durability and environmental safety standards.",
+            "p2": "Since its inception, the company has established itself as one of the leaders in the industry in Algeria and North Africa. Opera Paints offers more than 60 different products, including architectural and decorative paints, to meet the needs of its customers.",
+            "p3": "Currently, its products are available in over 80 points of sale in Algeria, as well as in Côte d'Ivoire and Burkina Faso.",
+            "learn_more": "Learn More"
+        },
+        "why": {
+            "overline": "Why Choose Us",
+            "title": "Our Commitment to Excellence"
+        },
+        "features": {
+            "quality_title": "Unmatched Quality",
+            "quality_description": "Our products are made with premium materials to ensure a flawless and durable finish.",
+            "innovation_title": "Continuous Innovation",
+            "innovation_description": "We integrate the latest technologies and market trends to offer paint solutions that meet modern demands.",
+            "resistance_title": "Exceptional Resistance",
+            "resistance_description": "Whether against weather, UV rays, or stains, our paints are designed to last and protect your walls.",
+            "satisfaction_title": "Customer Satisfaction",
+            "satisfaction_description": "Your satisfaction is our priority. We support you at every step to ensure the final result exceeds your expectations."
+        },
+        "cta": {
+            "title": "Ready to Transform Your Space?",
+            "description": "Explore our wide range of premium paints and find the perfect color for your next project.",
+            "shop_now": "Shop Now",
+            "get_inspired": "Get Inspired"
+        }
+    },
+    "products": {
+        "empty": {
+            "title": "No products found",
+            "subtitle": "Try adjusting your filters or check back later"
+        },
+        "filters": {
+            "button": "Filters",
+            "title": "Filter Products",
+            "search_label": "Search (title/type)",
+            "destination": {
+                "title": "Destination",
+                "habitations": "Habitations",
+                "offices": "Offices",
+                "hotel": "Hotel",
+                "restaurants": "Restaurants",
+                "showroom": "Showroom",
+                "stores": "Stores"
+            },
+            "support": {
+                "title": "Supports",
+                "plaster": "Plaster",
+                "cement": "Cement",
+                "render": "Render",
+                "brick": "Brick"
+            },
+            "reset": "Reset"
+        }
+    },
+    "management": {
+        "common": {
+            "status": "Status",
+            "cancel": "Cancel",
+            "delete": "Delete",
+            "action_failed": "Action failed",
+            "delete_failed": "Delete failed",
+            "value": {
+                "na": "-"
+            },
+            "table": {
+                "actions": "Actions"
+            }
+        },
+        "articles": {
+            "title": "Articles Management",
+            "actions": {
+                "create": "Create Article"
+            },
+            "search_placeholder": "Search articles...",
+            "filters": {
+                "all_types": "All Types"
+            },
+            "type": {
+                "tip": "Tips",
+                "inspiration": "Inspiration"
+            },
+            "table": {
+                "title": "Title",
+                "type": "Type",
+                "date": "Date"
+            },
+            "empty": {
+                "title": "No articles found",
+                "none": "Create your first article to get started",
+                "filtered": "No {type} articles found"
+            },
+            "deleteDialog": {
+                "title": "Delete Article?",
+                "confirm": "Are you sure you want to delete this article?",
+                "warning": "This action cannot be undone."
+            },
+            "editor": {
+                "title_create": "Create Article",
+                "title_edit": "Edit Article",
+                "subtitle": "Add titles, text, and images to build your article",
+                "actions": {
+                    "back_to_list": "Back to List",
+                    "create": "Create",
+                    "update": "Update",
+                    "replace": "Replace"
+                },
+                "sections": {
+                    "article_information": "Article Information",
+                    "preview": "Preview"
+                },
+                "fields": {
+                    "article_title": "Article Title",
+                    "article_title_placeholder": "Enter article title...",
+                    "article_type": "Article Type",
+                    "cover_image": "Cover Image *",
+                    "upload_cover": "Upload cover",
+                    "cover_required": "Cover image is required"
+                },
+                "empty": {
+                    "title": "No content yet",
+                    "subtitle": "Click the buttons above to start building your page"
+                },
+                "block": {
+                    "type": {
+                        "title": "Title",
+                        "text": "Text",
+                        "image": "Image"
+                    },
+                    "title": {
+                        "label": "Title",
+                        "placeholder": "Enter title text..."
+                    },
+                    "text": {
+                        "label": "Text Content",
+                        "placeholder": "Enter your text content..."
+                    },
+                    "image": {
+                        "upload_prompt": "Click to upload image",
+                        "replace": "Replace Image"
+                    }
+                },
+                "add_block": {
+                    "add_title": "Add Title",
+                    "add_text": "Add Text",
+                    "add_image": "Add Image"
+                },
+                "snackbar": {
+                    "image_upload_failed": "Image upload failed",
+                    "cover_uploaded": "Cover image uploaded successfully",
+                    "cover_upload_failed": "Cover image upload failed",
+                    "fix_errors": "Please fix the highlighted errors",
+                    "cover_required": "Cover image is required",
+                    "updated": "Article updated successfully",
+                    "created": "Article created successfully",
+                    "save_failed": "Failed to save article",
+                    "load_failed": "Failed to load article"
+                }
+            }
+        },
+        "dashboard": {
+            "title": "Dashboard",
+            "welcome": "Welcome back, {name}! Here's what's happening.",
+            "actions": {
+                "view_orders": "View Orders",
+                "add_product": "Add Product",
+                "retry": "Retry",
+                "view_all": "View All"
+            },
+            "stats": {
+                "total_revenue": "Total Revenue",
+                "total_orders": "Total Orders",
+                "pending_orders": "{count} pending",
+                "total_users": "Total Users",
+                "new_users_this_month": "+{count} this month",
+                "products": "Products"
+            },
+            "sections": {
+                "revenue_overview": "Revenue Overview",
+                "this_month": "This Month",
+                "last_month": "Last Month",
+                "orders_this_month": "Orders This Month",
+                "orders_by_status": "Orders by Status",
+                "total_orders": "Total Orders",
+                "recent_orders": "Recent Orders",
+                "top_products": "Top Products"
+            },
+            "table": {
+                "order": "Order",
+                "customer": "Customer",
+                "total": "Total",
+                "status": "Status",
+                "date": "Date"
+            },
+            "sales": "{count} sales",
+            "errors": {
+                "load_failed": "Failed to load dashboard data"
+            }
+        },
+        "products": {
+            "title": "Products Management",
+            "filters": {
+                "search": "Search",
+                "type": "Type",
+                "select_type": "Select a type"
+            },
+            "types": {
+                "decor": "Decor",
+                "buildings": "Buildings",
+                "coating": "Coating"
+            },
+            "table": {
+                "title": "Title",
+                "type": "Type",
+                "variances": "Variances",
+                "colors": "Colors"
+            },
+            "editor": {
+                "title_create": "Add a new product",
+                "title_edit": "Edit product",
+                "subtitle_create": "Fill in the product details below",
+                "subtitle_edit": "Update the product details below",
+                "actions": {
+                    "discard": "Discard",
+                    "publish": "Publish Product",
+                    "save_changes": "Save Changes"
+                },
+                "sections": {
+                    "preview": "Product Preview",
+                    "product_information": "Product Information",
+                    "technical_characteristics": "Technical Characteristics",
+                    "application": "Application",
+                    "colors": "Colors",
+                    "variances": "Variances"
+                },
+                "preview": {
+                    "click_to_add_cover": "Click to add cover",
+                    "cover_required": "Cover image is required",
+                    "avatar_required": "Avatar is required"
+                },
+                "fields": {
+                    "title": "Title",
+                    "title_placeholder": "Product title",
+                    "definition": "Definition",
+                    "definition_placeholder": "Product definition",
+                    "type": "Type",
+                    "properties": "Properties",
+                    "properties_placeholder": "Add properties"
+                },
+                "technical": {
+                    "density": "Density",
+                    "coverage": "Coverage",
+                    "drying_time": "Drying Time",
+                    "viscosity_optional": "Viscosity (optional)",
+                    "aspect": {
+                        "title": "Dry Film Aspect",
+                        "metallized": "Metallized",
+                        "glossy": "Glossy",
+                        "silky": "Silky",
+                        "luminous": "Luminous",
+                        "ultra_gloss_marble": "Ultra Gloss Marble"
+                    }
+                },
+                "application": {
+                    "dilution": "Dilution",
+                    "material": {
+                        "title": "Application Material",
+                        "sponge_nature": "Natural sponge",
+                        "decorative_stamp": "Decorative stamp",
+                        "trowel": "Trowel",
+                        "knife": "Knife",
+                        "brush": "Brush",
+                        "paintbrush": "Paintbrush",
+                        "stainless_trowel": "Stainless trowel",
+                        "flat_brush_spalter": "Flat brush (spalter)",
+                        "plastic_spatula": "Plastic spatula"
+                    },
+                    "cleaning_optional": "Tool cleaning (optional)",
+                    "surface_preparation_optional": "Surface preparation (optional)"
+                },
+                "colors": {
+                    "name": "Name",
+                    "name_placeholder": "Color name",
+                    "code": "Code",
+                    "add": "Add Color"
+                },
+                "variances": {
+                    "quantity": "Quantity",
+                    "quantity_placeholder": "e.g. 1L, 5kg",
+                    "price_dzd": "Price (DZD)",
+                    "add": "Add Variance"
+                },
+                "technical_file": {
+                    "title": "Technical File (PDF)",
+                    "upload": "Upload PDF",
+                    "replace": "Replace PDF",
+                    "download": "Download",
+                    "detach": "Detach",
+                    "attached": "Attached:",
+                    "file_fallback": "PDF file",
+                    "optional_help": "Optional. Upload a PDF technical file and it will be linked to this product."
+                },
+                "placeholders": {
+                    "example": "e.g. {example}",
+                    "water": "Water"
+                },
+                "validation": {
+                    "at_least_one_item": "At least one item is required"
+                },
+                "snackbar": {
+                    "load_failed": "Failed to load product",
+                    "image_upload_failed": "Image upload failed",
+                    "pdf_select_required": "Please select a PDF file",
+                    "pdf_upload_failed": "PDF upload failed",
+                    "pdf_read_failed": "Failed to read PDF file",
+                    "fix_errors": "Please fix the highlighted errors",
+                    "cover_required": "Cover image is required",
+                    "avatar_required": "Avatar is required",
+                    "color_required": "At least one color is required",
+                    "color_invalid": "Each color must have name and code",
+                    "variance_required": "At least one variance is required",
+                    "variance_invalid": "Each variance requires quantity and positive price",
+                    "created": "Product created",
+                    "updated": "Product updated",
+                    "save_failed": "Failed to save product"
+                }
+            },
+            "empty": {
+                "title": "No products found",
+                "subtitle": "Create a new product to get started"
+            },
+            "actions": {
+                "add_product": "Add Product"
+            },
+            "deleteDialog": {
+                "title": "Delete Product",
+                "confirm_prefix": "Are you sure you want to delete ",
+                "confirm_suffix": "?",
+                "item_fallback": "this product"
+            },
+            "snackbar": {
+                "load_failed": "Failed to load products",
+                "deleted": "Product deleted"
+            }
+        },
+        "users": {
+            "title": "Users Management",
+            "search_placeholder": "Search users...",
+            "filters": {
+                "banned": {
+                    "all": "All Users"
+                }
+            },
+            "table": {
+                "user": "User",
+                "phone": "Phone",
+                "role": "Role",
+                "status": "Status",
+                "joined": "Joined"
+            },
+            "role": {
+                "admin": "Admin",
+                "user": "User"
+            },
+            "status": {
+                "active": "Active",
+                "banned": "Banned"
+            },
+            "actions": {
+                "ban": "Ban",
+                "unban": "Unban"
+            },
+            "empty": {
+                "title": "No users found",
+                "none": "No users registered yet",
+                "filtered": "Try adjusting your search"
+            },
+            "banDialog": {
+                "ban_title": "Ban User?",
+                "unban_title": "Unban User?",
+                "ban_confirm": "Are you sure you want to ban this user?",
+                "unban_confirm": "Are you sure you want to unban this user?",
+                "warning": "The user will not be able to log in while banned."
+            },
+            "deleteDialog": {
+                "title": "Delete User Account?",
+                "confirm": "Are you sure you want to permanently delete this user's account?",
+                "warning": "This action cannot be undone. All user data will be lost."
+            },
+            "snackbar": {
+                "banned": "User banned successfully",
+                "unbanned": "User unbanned successfully",
+                "deleted": "User deleted successfully"
+            },
+            "details": {
+                "back_to_users": "Back to Users",
+                "not_found_title": "User not found",
+                "not_found_subtitle": "The user you're looking for doesn't exist.",
+                "location": "Location",
+                "address": "Address",
+                "orders_history": "Orders History",
+                "orders_count": "{count} orders",
+                "no_orders_yet": "No orders yet",
+                "snackbar": {
+                    "load_failed": "Failed to load user details"
+                }
+            }
+        },
+        "orders": {
+            "title": "Orders Management",
+            "filters": {
+                "all_statuses": "All Statuses"
+            },
+            "table": {
+                "order_id": "Order ID",
+                "customer": "Customer",
+                "items": "Items",
+                "items_count": "{count} items",
+                "total": "Total",
+                "status": "Status",
+                "date": "Date"
+            },
+            "status": {
+                "pending": "Pending",
+                "confirmed": "Confirmed",
+                "shipped": "Shipped",
+                "delivered": "Delivered",
+                "cancelled": "Cancelled"
+            },
+            "details": {
+                "back_to_orders": "Back to Orders",
+                "not_found_title": "Order not found",
+                "not_found_subtitle": "The order you're looking for doesn't exist.",
+                "order_number": "Order #{id}",
+                "placed_on": "Placed on {date}",
+                "order_items": "Order Items",
+                "unknown_product": "Unknown Product",
+                "table": {
+                    "product": "Product",
+                    "variance": "Variance",
+                    "color": "Color",
+                    "qty": "Qty",
+                    "price": "Price",
+                    "total": "Total"
+                },
+                "update_status": "Update Status",
+                "order_status": "Order Status",
+                "update_status_action": "Update Status",
+                "customer_information": "Customer Information",
+                "name": "Name",
+                "phone": "Phone",
+                "location": "Location",
+                "address": "Address",
+                "view_customer": "View Customer",
+                "customer_not_available": "Customer information not available",
+                "order_timeline": "Order Timeline",
+                "timeline": {
+                    "order_placed": "Order Placed"
+                },
+                "snackbar": {
+                    "load_failed": "Failed to load order details",
+                    "status_updated": "Order status updated successfully",
+                    "status_update_failed": "Failed to update order status"
+                }
+            },
+            "empty": {
+                "title": "No orders found",
+                "none": "No orders have been placed yet",
+                "filtered": "No {status} orders found"
+            }
+        }
+    }
+}

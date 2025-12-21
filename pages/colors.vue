@@ -1,9 +1,12 @@
 <script setup>
 import { useApi } from '@/composables/useApi'
+import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const colors = ref([])
 const snackbar = ref({ show: false, color: 'error', text: '' })
+
+const { t } = useI18n()
 
 async function fetchColors() {
   try {
@@ -17,7 +20,7 @@ async function fetchColors() {
     colors.value = Array.isArray(list) ? list : []
   }
   catch (e) {
-    snackbar.value = { show: true, color: 'error', text: 'Failed to load colors' }
+    snackbar.value = { show: true, color: 'error', text: t('colors_page.errors.load_failed') }
   }
   finally {
     loading.value = false
@@ -58,10 +61,10 @@ onMounted(() => {
       >
         <div class="text-center px-4">
           <p class="mb-1 hero-title">
-            Welcome to the Spectrum of Colors
+            {{ t('colors_page.hero_title') }}
           </p>
           <p class="mb-0 hero-subtitle">
-            Explore Shades That Bring Your Vision to Life
+            {{ t('colors_page.hero_subtitle') }}
           </p>
         </div>
       </div>
@@ -69,7 +72,7 @@ onMounted(() => {
     <VCard>
       <VCardText class="px-3 pt-2">
         <VCardTitle class="px-2">
-          Colors
+          {{ t('nav.colors') }}
         </VCardTitle>
         <VRow v-if="loading">
           <VCol
@@ -93,10 +96,10 @@ onMounted(() => {
             class="text-disabled mb-4"
           />
           <p class="text-h6 text-disabled">
-            No colors available
+            {{ t('colors_page.empty.title') }}
           </p>
           <p class="text-body-2 text-disabled">
-            Check back later for new colors
+            {{ t('colors_page.empty.subtitle') }}
           </p>
         </div>
 
@@ -118,7 +121,7 @@ onMounted(() => {
             >
               <div :style="{ backgroundColor: c.code, height: $vuetify.display.xs ? '60px' : '100px', borderRadius: '8px' }" />
               <div class="d-flex flex-column pa-2 pt-1">
-                <span class="text-subtitle-1">{{ c.name || 'Unnamed' }}</span>
+                <span class="text-subtitle-1">{{ c.name || t('common.unnamed') }}</span>
                 <span class="text-caption">{{ c.code || '—' }}</span>
               </div>
             </VCard>

@@ -1,8 +1,9 @@
 <script setup>
-import { debounce } from 'lodash'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { debounce } from 'lodash'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -12,6 +13,7 @@ definePageMeta({
 const router = useRouter()
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
+const { t, d } = useI18n({ useScope: 'global' })
 
 // Reactive state
 const users = ref([])
@@ -37,21 +39,21 @@ const search = ref('')
 const bannedFilter = ref('all')
 
 // Filter options
-const bannedOptions = [
-  { title: 'All Users', value: 'all' },
-  { title: 'Active', value: 'false' },
-  { title: 'Banned', value: 'true' },
-]
+const bannedOptions = computed(() => [
+  { title: t('management.users.filters.banned.all'), value: 'all' },
+  { title: t('management.users.status.active'), value: 'false' },
+  { title: t('management.users.status.banned'), value: 'true' },
+])
 
 // Table headers
-const headers = [
-  { title: 'User', key: 'user', sortable: false },
-  { title: 'Phone', key: 'phone', sortable: false },
-  { title: 'Role', key: 'role', sortable: false },
-  { title: 'Status', key: 'banned', sortable: false },
-  { title: 'Joined', key: 'createdAt', sortable: false },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
-]
+const headers = computed(() => [
+  { title: t('management.users.table.user'), key: 'user', sortable: false },
+  { title: t('management.users.table.phone'), key: 'phone', sortable: false },
+  { title: t('management.users.table.role'), key: 'role', sortable: false },
+  { title: t('management.users.table.status'), key: 'banned', sortable: false },
+  { title: t('management.users.table.joined'), key: 'createdAt', sortable: false },
+  { title: t('management.common.table.actions'), key: 'actions', sortable: false, align: 'end' },
+])
 
 // Fetch users
 const fetchUsers = async () => {
@@ -91,15 +93,29 @@ const fetchUsers = async () => {
 // Format date
 const formatDate = date => {
   if (!date)
-    return '-'
-  const d = new Date(date)
+    return t('management.common.value.na')
 
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+  return d(new Date(date), 'short')
 }
+
+const getRoleLabel = role => {
+  if (role === 'admin')
+    return t('management.users.role.admin')
+  if (!role || role === 'user')
+    return t('management.users.role.user')
+
+  return String(role)
+}
+
+const getUserStatusLabel = banned => (banned ? t('management.users.status.banned') : t('management.users.status.active'))
+
+const noUsersSubtitle = computed(() => (search.value ? t('management.users.empty.filtered') : t('management.users.empty.none')))
+
+const banDialogTitle = computed(() => (userToAction.value?.banned ? t('management.users.banDialog.unban_title') : t('management.users.banDialog.ban_title')))
+const banConfirmText = computed(() => (userToAction.value?.banned ? t('management.users.banDialog.unban_confirm') : t('management.users.banDialog.ban_confirm')))
+const banActionLabel = computed(() => (userToAction.value?.banned ? t('management.users.actions.unban') : t('management.users.actions.ban')))
+
+const deleteDialogTitle = computed(() => t('management.users.deleteDialog.title'))
 
 // View user details
 const viewUser = user => {
@@ -133,7 +149,9 @@ const confirmBan = async () => {
 
     if (res.ok) {
       showSnackbar(
-        userToAction.value.banned ? 'User unbanned successfully' : 'User banned successfully',
+        userToAction.value.banned
+          ? t('management.users.snackbar.unbanned')
+          : t('management.users.snackbar.banned'),
         'success',
       )
       banDialog.value = false
@@ -143,12 +161,12 @@ const confirmBan = async () => {
     else {
       const data = await res.json()
 
-      showSnackbar(data.message || 'Action failed', 'error')
+      showSnackbar(data.message || t('management.common.action_failed'), 'error')
     }
   }
   catch (error) {
     console.error('Failed to ban/unban user:', error)
-    showSnackbar('Action failed', 'error')
+    showSnackbar(t('management.common.action_failed'), 'error')
   }
   finally {
     actionLoading.value = false
@@ -177,7 +195,7 @@ const confirmDelete = async () => {
     })
 
     if (res.ok || res.status === 204) {
-      showSnackbar('User deleted successfully', 'success')
+      showSnackbar(t('management.users.snackbar.deleted'), 'success')
       deleteDialog.value = false
       userToAction.value = null
       await fetchUsers()
@@ -185,12 +203,12 @@ const confirmDelete = async () => {
     else {
       const data = await res.json()
 
-      showSnackbar(data.message || 'Delete failed', 'error')
+      showSnackbar(data.message || t('management.common.delete_failed'), 'error')
     }
   }
   catch (error) {
     console.error('Failed to delete user:', error)
-    showSnackbar('Delete failed', 'error')
+    showSnackbar(t('management.common.delete_failed'), 'error')
   }
   finally {
     actionLoading.value = false
@@ -236,7 +254,7 @@ onMounted(() => {
 <template>
   <div>
     <VCard
-      title="Users Management"
+      :title="t('management.users.title')"
       class="mb-6"
     >
       <VDivider class="my-4" />
@@ -245,7 +263,7 @@ onMounted(() => {
         <div class="d-flex gap-4 flex-wrap align-center">
           <VTextField
             v-model="search"
-            placeholder="Search users..."
+            :placeholder="t('management.users.search_placeholder')"
             density="compact"
             style="min-inline-size: 250px;"
             clearable
@@ -258,7 +276,7 @@ onMounted(() => {
           <VSelect
             v-model="bannedFilter"
             :items="bannedOptions"
-            label="Status"
+            :label="t('management.common.status')"
             density="compact"
             style="min-inline-size: 150px;"
           />
@@ -312,7 +330,7 @@ onMounted(() => {
         </template>
 
         <template #item.phone="{ item }">
-          {{ item.phone || '-' }}
+          {{ item.phone || t('management.common.value.na') }}
         </template>
 
         <template #item.role="{ item }">
@@ -322,7 +340,7 @@ onMounted(() => {
             :color="item.role === 'admin' ? 'error' : 'secondary'"
             variant="tonal"
           >
-            {{ item.role || 'user' }}
+            {{ getRoleLabel(item.role) }}
           </VChip>
         </template>
 
@@ -333,7 +351,7 @@ onMounted(() => {
             :color="item.banned ? 'error' : 'success'"
             variant="tonal"
           >
-            {{ item.banned ? 'Banned' : 'Active' }}
+            {{ getUserStatusLabel(item.banned) }}
           </VChip>
         </template>
 
@@ -376,10 +394,10 @@ onMounted(() => {
               class="text-disabled mb-4"
             />
             <p class="text-h6 text-disabled">
-              No users found
+              {{ t('management.users.empty.title') }}
             </p>
             <p class="text-body-2 text-disabled">
-              {{ search ? 'Try adjusting your search' : 'No users registered yet' }}
+              {{ noUsersSubtitle }}
             </p>
           </div>
         </template>
@@ -389,7 +407,7 @@ onMounted(() => {
 
           <div class="d-flex align-center justify-space-between flex-wrap gap-3 pa-5 pt-3">
             <p class="text-sm text-medium-emphasis mb-0">
-              {{ paginationMeta({ page, itemsPerPage }, totalUsers) }}
+              {{ paginationMeta({ page, itemsPerPage }, totalUsers, t) }}
             </p>
 
             <VPagination
@@ -409,11 +427,11 @@ onMounted(() => {
     >
       <VCard>
         <VCardTitle class="text-h5">
-          {{ userToAction?.banned ? 'Unban User?' : 'Ban User?' }}
+          {{ banDialogTitle }}
         </VCardTitle>
         <VCardText>
           <div class="mb-2">
-            Are you sure you want to {{ userToAction?.banned ? 'unban' : 'ban' }} this user?
+            {{ banConfirmText }}
           </div>
           <div
             v-if="userToAction"
@@ -425,7 +443,7 @@ onMounted(() => {
             v-if="!userToAction?.banned"
             class="text-body-2 text-warning mt-3"
           >
-            The user will not be able to log in while banned.
+            {{ t('management.users.banDialog.warning') }}
           </div>
         </VCardText>
         <VCardActions>
@@ -434,7 +452,7 @@ onMounted(() => {
             variant="text"
             @click="banDialog = false"
           >
-            Cancel
+            {{ t('management.common.cancel') }}
           </VBtn>
           <VBtn
             :color="userToAction?.banned ? 'success' : 'warning'"
@@ -442,7 +460,7 @@ onMounted(() => {
             :loading="actionLoading"
             @click="confirmBan"
           >
-            {{ userToAction?.banned ? 'Unban' : 'Ban' }}
+            {{ banActionLabel }}
           </VBtn>
         </VCardActions>
       </VCard>
@@ -455,11 +473,11 @@ onMounted(() => {
     >
       <VCard>
         <VCardTitle class="text-h5">
-          Delete User Account?
+          {{ deleteDialogTitle }}
         </VCardTitle>
         <VCardText>
           <div class="mb-2">
-            Are you sure you want to permanently delete this user's account?
+            {{ t('management.users.deleteDialog.confirm') }}
           </div>
           <div
             v-if="userToAction"
@@ -468,7 +486,7 @@ onMounted(() => {
             {{ userToAction.firstName }} {{ userToAction.lastName }}
           </div>
           <div class="text-body-2 text-error mt-3">
-            This action cannot be undone. All user data will be lost.
+            {{ t('management.users.deleteDialog.warning') }}
           </div>
         </VCardText>
         <VCardActions>
@@ -477,7 +495,7 @@ onMounted(() => {
             variant="text"
             @click="deleteDialog = false"
           >
-            Cancel
+            {{ t('management.common.cancel') }}
           </VBtn>
           <VBtn
             color="error"
@@ -485,7 +503,7 @@ onMounted(() => {
             :loading="actionLoading"
             @click="confirmDelete"
           >
-            Delete
+            {{ t('management.common.delete') }}
           </VBtn>
         </VCardActions>
       </VCard>

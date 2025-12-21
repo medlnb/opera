@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
-import logo from '@images/logo-v2.svg'
+import { useI18n } from 'vue-i18n'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
+import logo from '@images/logo-v2.svg'
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 
@@ -25,6 +26,8 @@ const confirmationResult = ref<any>(null)
 const phoneVerified = ref(false)
 const loading = ref(false)
 
+const { t } = useI18n({ useScope: 'global' })
+
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
 const showSnackbar = (message: string, color = 'success') => {
@@ -46,7 +49,7 @@ onMounted(() => {
 
 async function sendCode() {
   if (!phone.value || phone.value.length !== 9)
-    return showSnackbar('Please enter a valid 9-digit phone number', 'error')
+    return showSnackbar(t('auth.errors.valid_phone_required'), 'error')
 
   try {
     loading.value = true
@@ -56,10 +59,10 @@ async function sendCode() {
 
     confirmationResult.value = result
     currentStep.value = 1
-    showSnackbar('Verification code sent', 'success')
+    showSnackbar(t('auth.forgot.code_sent'), 'success')
   }
   catch (err: any) {
-    showSnackbar(err.message || 'Failed to send SMS', 'error')
+    showSnackbar(err.message || t('auth.errors.failed_to_send_sms'), 'error')
   }
   finally {
     loading.value = false
@@ -68,7 +71,7 @@ async function sendCode() {
 
 async function verifyCode() {
   if (!code.value || code.value.length !== 6)
-    return showSnackbar('Please enter the 6-digit code', 'error')
+    return showSnackbar(t('auth.errors.enter_6_digit_code'), 'error')
 
   try {
     loading.value = true
@@ -77,11 +80,11 @@ async function verifyCode() {
     if (userCredential.user) {
       phoneVerified.value = true
       currentStep.value = 2
-      showSnackbar('Phone verified! Now set your new password', 'success')
+      showSnackbar(t('auth.forgot.phone_verified_set_password'), 'success')
     }
   }
   catch (err: any) {
-    showSnackbar('Invalid code or verification failed', 'error')
+    showSnackbar(t('auth.errors.invalid_code_or_verification_failed'), 'error')
   }
   finally {
     loading.value = false
@@ -90,10 +93,10 @@ async function verifyCode() {
 
 async function resetPassword() {
   if (!newPassword.value || newPassword.value.length < 6)
-    return showSnackbar('Password must be at least 6 characters', 'error')
+    return showSnackbar(t('auth.errors.password_min_length'), 'error')
 
   if (newPassword.value !== confirmPassword.value)
-    return showSnackbar('Passwords do not match', 'error')
+    return showSnackbar(t('auth.errors.passwords_do_not_match'), 'error')
 
   try {
     loading.value = true
@@ -108,12 +111,12 @@ async function resetPassword() {
 
     const data = await res.json()
     if (!res.ok)
-      throw new Error(data.message || 'Failed to reset password')
-    showSnackbar('Password reset successfully! Redirecting to login...', 'success')
+      throw new Error(data.message || t('auth.errors.failed_to_reset_password'))
+    showSnackbar(t('auth.forgot.password_reset_success'), 'success')
     setTimeout(() => router.push('/login'), 2000)
   }
   catch (err: any) {
-    showSnackbar(err.message || 'Failed to reset password', 'error')
+    showSnackbar(err.message || t('auth.errors.failed_to_reset_password'), 'error')
   }
   finally {
     loading.value = false
@@ -121,6 +124,15 @@ async function resetPassword() {
 }
 
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
+
+const stepDescription = computed(() => {
+  if (currentStep.value === 0)
+    return t('auth.forgot.step_phone_description')
+  if (currentStep.value === 1)
+    return t('auth.forgot.step_code_description')
+
+  return t('auth.forgot.step_password_description')
+})
 </script>
 
 <template>
@@ -161,10 +173,10 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
       >
         <VCardText>
           <h4 class="text-h4 mb-1">
-            Forgot Password? 🔒
+            {{ t('auth.forgot.title') }} 🔒
           </h4>
           <p class="mb-0">
-            {{ currentStep === 0 ? 'Enter your phone number and we\'ll send you a verification code' : currentStep === 1 ? 'Enter the verification code sent to your phone' : 'Create a new password for your account' }}
+            {{ stepDescription }}
           </p>
         </VCardText>
 
@@ -179,14 +191,14 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
                 <AppTextField
                   v-model="phone"
                   autofocus
-                  label="Phone Number"
-                  placeholder="X XX XX XX XX"
+                  :label="t('auth.phone_number')"
+                  :placeholder="t('auth.phone_placeholder')"
                   maxlength="9"
                 >
                   <template #prepend-inner>
                     <p
                       class="mb-0"
-                      style="margin-top: 1px;"
+                      style="margin-block-start: 1px;"
                     >
                       0
                     </p>
@@ -203,8 +215,8 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
                   <VOtpInput
                     v-model="code"
                     :length="6"
-                    label="Verification Code"
-                    placeholder="- - - - - -"
+                    :label="t('auth.verification_code')"
+                    :placeholder="t('auth.verification_code_placeholder')"
                     variant="underlined"
                   />
                 </div>
@@ -215,8 +227,8 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
                 <VCol cols="12">
                   <AppTextField
                     v-model="newPassword"
-                    label="New Password"
-                    placeholder="············"
+                    :label="t('auth.new_password')"
+                    :placeholder="t('auth.password_placeholder')"
                     :type="isPasswordVisible ? 'text' : 'password'"
                     :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
                     @click:append-inner="isPasswordVisible = !isPasswordVisible"
@@ -225,8 +237,8 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
                 <VCol cols="12">
                   <AppTextField
                     v-model="confirmPassword"
-                    label="Confirm Password"
-                    placeholder="············"
+                    :label="t('auth.confirm_password')"
+                    :placeholder="t('auth.password_placeholder')"
                     :type="isConfirmPasswordVisible ? 'text' : 'password'"
                     :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
                     @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
@@ -242,7 +254,7 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
                   :loading="loading"
                   :disabled="loading"
                 >
-                  {{ currentStep === 0 ? 'Send Code' : currentStep === 1 ? 'Verify Code' : 'Reset Password' }}
+                  {{ currentStep === 0 ? t('auth.send_code') : currentStep === 1 ? t('auth.verify_code') : t('auth.reset_password') }}
                 </VBtn>
               </VCol>
 
@@ -256,7 +268,7 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
                     icon="tabler-chevron-left"
                     class="flip-in-rtl"
                   />
-                  <span>Back to login</span>
+                  <span>{{ t('auth.back_to_login') }}</span>
                 </NuxtLink>
               </VCol>
             </VRow>
