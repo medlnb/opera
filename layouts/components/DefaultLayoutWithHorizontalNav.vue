@@ -31,7 +31,7 @@ const navItems = useNavItems()
         :languages="themeConfig.app.i18n.langConfig"
       />
 
-      <NavbarThemeSwitcher class="me-2" />
+      <NavbarThemeSwitcher class="mx-2" />
       <UserProfile />
     </template>
 
