@@ -112,6 +112,134 @@
         "account": "Account",
         "logout": "Logout"
     },
+    "account": {
+        "cart": {
+            "title": "Shopping Cart",
+            "currency_dzd": "DZD",
+            "empty": {
+                "title": "Your cart is empty"
+            },
+            "item": {
+                "size": "Size",
+                "color": "Color"
+            },
+            "shipping": {
+                "title": "Shipping Details (Optional)",
+                "fields": {
+                    "address": {
+                        "label": "Address",
+                        "placeholder": "Street address"
+                    },
+                    "state": {
+                        "label": "State",
+                        "placeholder": "State/Province"
+                    },
+                    "city": {
+                        "label": "City",
+                        "placeholder": "City"
+                    }
+                }
+            },
+            "summary": {
+                "title": "Order Summary",
+                "subtotal": "Subtotal",
+                "total": "Total"
+            },
+            "actions": {
+                "browse_products": "Browse Products",
+                "checkout": "Checkout"
+            },
+            "snackbar": {
+                "order_success": "Order placed successfully",
+                "checkout_failed": "Checkout failed"
+            }
+        },
+        "orders": {
+            "table": {
+                "items": "Items",
+                "status": "Status",
+                "total": "Total",
+                "date": "Date"
+            },
+            "empty": {
+                "title": "No orders yet",
+                "subtitle": "Your order history will appear here"
+            },
+            "actions": {
+                "start_shopping": "Start Shopping"
+            }
+        },
+        "favorites": {
+            "currency_dzd": "DZD",
+            "table": {
+                "product": "Product",
+                "type": "Type",
+                "price": "Price",
+                "actions": "Actions"
+            },
+            "empty": {
+                "title": "No favorites yet",
+                "subtitle": "Browse products and add some to your favorites"
+            },
+            "actions": {
+                "browse_products": "Browse Products"
+            }
+        }
+    },
+    "settings": {
+        "tabs": {
+            "account": "Account",
+            "security": "Security"
+        },
+        "actions": {
+            "save_changes": "Save changes",
+            "reset": "Reset"
+        },
+        "validation": {
+            "fix_errors": "Please fix the highlighted errors"
+        },
+        "account": {
+            "profile": {
+                "title": "Profile Details"
+            },
+            "avatar": {
+                "actions": {
+                    "upload_new_photo": "Upload new photo"
+                },
+                "help": {
+                    "allowed_types_3mb": "Allowed JPG, GIF or PNG. Max size of 3MB"
+                },
+                "errors": {
+                    "size_3mb": "Image size must be less than 3MB"
+                }
+            },
+            "snackbar": {
+                "update_success": "Profile updated successfully",
+                "update_failed": "Failed to update profile",
+                "avatar_upload_failed": "Failed to upload avatar",
+                "avatar_update_success": "Avatar updated successfully",
+                "avatar_change_failed": "Failed to change avatar"
+            }
+        },
+        "security": {
+            "title": "Change Password",
+            "fields": {
+                "current_password": "Current Password",
+                "new_password": "New Password",
+                "confirm_new_password": "Confirm New Password"
+            },
+            "password_requirements": {
+                "title": "Password Requirements:",
+                "min_length": "Minimum 8 characters long - the more, the better",
+                "lowercase": "At least one lowercase character",
+                "number_symbol_space": "At least one number, symbol, or whitespace character"
+            },
+            "snackbar": {
+                "change_password_success": "Password updated successfully",
+                "change_password_failed": "Failed to change password"
+            }
+        }
+    },
     "footer": {
         "made_with": "Made With",
         "by": "By",
@@ -296,6 +424,50 @@
                 "brick": "Brick"
             },
             "reset": "Reset"
+        },
+        "details": {
+            "page_title": "Product",
+            "currency_dzd": "DZD",
+            "panels": {
+                "colors": "Colors",
+                "size": "Size",
+                "quantity": "Quantity"
+            },
+            "actions": {
+                "add_to_cart": "Add to cart",
+                "download_pdf": "Download PDF"
+            },
+            "sections": {
+                "about": "About this product",
+                "destinations": "Destinations",
+                "properties": "Properties",
+                "technical_characteristics": "Technical characteristics",
+                "application": "Application",
+                "technical_file": "Technical file"
+            },
+            "fields": {
+                "density": "Density",
+                "coverage": "Coverage",
+                "drying_time": "Drying time",
+                "tint": "Tint",
+                "viscosity": "Viscosity",
+                "appearance_of_paint_film": "Appearance of the paint film",
+                "dilution": "Dilution",
+                "tool_cleaning": "Tool cleaning",
+                "surface_prep": "Surface preparation",
+                "supported_surfaces": "Supported surfaces",
+                "application_tools": "Application tools"
+            },
+            "snackbar": {
+                "load_failed": "Failed to load product",
+                "select_color": "Please select a color",
+                "added_to_cart": "Added to cart!",
+                "add_to_cart_failed": "Failed to add to cart",
+                "added_to_favorites": "Added to favorites!",
+                "add_to_favorites_failed": "Failed to add to favorites",
+                "removed_from_favorites": "Removed from favorites",
+                "remove_from_favorites_failed": "Failed to remove from favorites"
+            }
         }
     },
     "management": {

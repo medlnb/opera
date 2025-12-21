@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useValidators } from '@/utils/validators'
+import { useI18n } from 'vue-i18n'
 
 const isCurrentPasswordVisible = ref(false)
 const isNewPasswordVisible = ref(false)
@@ -9,6 +10,8 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const isSaving = ref(false)
 const formRef = ref()
+
+const { t } = useI18n({ useScope: 'global' })
 
 const { requiredValidator, passwordValidator, confirmPasswordValidator } = useValidators()
 
@@ -25,7 +28,7 @@ const onSave = async () => {
     if (result && typeof result.then === 'function') {
       const r = await result
       if (!r.valid) {
-        showSnackbar('Please fix the highlighted errors', 'error')
+        showSnackbar(t('settings.validation.fix_errors'), 'error')
 
         return
       }
@@ -43,9 +46,9 @@ const onSave = async () => {
     })
 
     if (error.value)
-      return showSnackbar(error.value?.data?.message || 'Failed to change password', 'error')
+      return showSnackbar(error.value?.data?.message || t('settings.security.snackbar.change_password_failed'), 'error')
 
-    showSnackbar('Password updated successfully', 'success')
+    showSnackbar(t('settings.security.snackbar.change_password_success'), 'success')
 
     // reset fields after success
     currentPassword.value = ''
@@ -53,24 +56,24 @@ const onSave = async () => {
     confirmPassword.value = ''
   }
   catch (err) {
-    showSnackbar('Failed to change password', 'error')
+    showSnackbar(t('settings.security.snackbar.change_password_failed'), 'error')
   }
   finally {
     isSaving.value = false
   }
 }
 
-const passwordRequirements = [
-  'Minimum 8 characters long - the more, the better',
-  'At least one lowercase character',
-  'At least one number, symbol, or whitespace character',
-]
+const passwordRequirements = computed(() => ([
+  t('settings.security.password_requirements.min_length'),
+  t('settings.security.password_requirements.lowercase'),
+  t('settings.security.password_requirements.number_symbol_space'),
+]))
 </script>
 
 <template>
   <VRow>
     <VCol cols="12">
-      <VCard title="Change Password">
+      <VCard :title="t('settings.security.title')">
         <VForm ref="formRef">
           <VCardText class="pt-0">
             <VRow>
@@ -82,7 +85,7 @@ const passwordRequirements = [
                   v-model="currentPassword"
                   :type="isCurrentPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isCurrentPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  label="Current Password"
+                  :label="t('settings.security.fields.current_password')"
                   autocomplete="on"
                   placeholder="············"
                   :rules="[requiredValidator]"
@@ -100,7 +103,7 @@ const passwordRequirements = [
                   v-model="newPassword"
                   :type="isNewPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isNewPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  label="New Password"
+                  :label="t('settings.security.fields.new_password')"
                   autocomplete="on"
                   placeholder="············"
                   :rules="[requiredValidator, passwordValidator]"
@@ -116,7 +119,7 @@ const passwordRequirements = [
                   v-model="confirmPassword"
                   :type="isConfirmPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  label="Confirm New Password"
+                  :label="t('settings.security.fields.confirm_new_password')"
                   autocomplete="on"
                   placeholder="············"
                   :rules="[(val:any) => confirmPasswordValidator(val, newPassword)]"
@@ -128,13 +131,13 @@ const passwordRequirements = [
 
           <VCardText>
             <h6 class="text-base font-weight-medium mb-3">
-              Password Requirements:
+              {{ t('settings.security.password_requirements.title') }}
             </h6>
 
             <VList class="card-list">
               <VListItem
-                v-for="item in passwordRequirements"
-                :key="item"
+                v-for="(item, i) in passwordRequirements"
+                :key="i"
                 :title="item"
                 class="text-medium-emphasis"
               >
@@ -155,7 +158,7 @@ const passwordRequirements = [
               :disabled="isSaving"
               @click="onSave"
             >
-              Save changes
+              {{ t('settings.actions.save_changes') }}
             </VBtn>
 
             <VBtn
@@ -163,7 +166,7 @@ const passwordRequirements = [
               color="secondary"
               variant="tonal"
             >
-              Reset
+              {{ t('settings.actions.reset') }}
             </VBtn>
           </VCardText>
         </VForm>

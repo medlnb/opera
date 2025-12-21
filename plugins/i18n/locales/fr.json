@@ -174,6 +174,134 @@
         "account": "Compte",
         "logout": "Déconnexion"
     },
+    "account": {
+        "cart": {
+            "title": "Panier",
+            "currency_dzd": "DZD",
+            "empty": {
+                "title": "Votre panier est vide"
+            },
+            "item": {
+                "size": "Taille",
+                "color": "Couleur"
+            },
+            "shipping": {
+                "title": "Informations de livraison (Optionnel)",
+                "fields": {
+                    "address": {
+                        "label": "Adresse",
+                        "placeholder": "Adresse"
+                    },
+                    "state": {
+                        "label": "Wilaya",
+                        "placeholder": "Wilaya/Province"
+                    },
+                    "city": {
+                        "label": "Ville",
+                        "placeholder": "Ville"
+                    }
+                }
+            },
+            "summary": {
+                "title": "Récapitulatif de la commande",
+                "subtotal": "Sous-total",
+                "total": "Total"
+            },
+            "actions": {
+                "browse_products": "Voir les produits",
+                "checkout": "Passer la commande"
+            },
+            "snackbar": {
+                "order_success": "Commande passée avec succès",
+                "checkout_failed": "Échec du paiement"
+            }
+        },
+        "orders": {
+            "table": {
+                "items": "Articles",
+                "status": "Statut",
+                "total": "Total",
+                "date": "Date"
+            },
+            "empty": {
+                "title": "Aucune commande",
+                "subtitle": "Votre historique de commandes s'affichera ici"
+            },
+            "actions": {
+                "start_shopping": "Commencer vos achats"
+            }
+        },
+        "favorites": {
+            "currency_dzd": "DZD",
+            "table": {
+                "product": "Produit",
+                "type": "Type",
+                "price": "Prix",
+                "actions": "Actions"
+            },
+            "empty": {
+                "title": "Aucun favori",
+                "subtitle": "Parcourez les produits et ajoutez-en à vos favoris"
+            },
+            "actions": {
+                "browse_products": "Voir les produits"
+            }
+        }
+    },
+    "settings": {
+        "tabs": {
+            "account": "Compte",
+            "security": "Sécurité"
+        },
+        "actions": {
+            "save_changes": "Enregistrer les modifications",
+            "reset": "Réinitialiser"
+        },
+        "validation": {
+            "fix_errors": "Veuillez corriger les erreurs indiquées"
+        },
+        "account": {
+            "profile": {
+                "title": "Détails du profil"
+            },
+            "avatar": {
+                "actions": {
+                    "upload_new_photo": "Téléverser une nouvelle photo"
+                },
+                "help": {
+                    "allowed_types_3mb": "JPG, GIF ou PNG autorisés. Taille maximale : 3 Mo"
+                },
+                "errors": {
+                    "size_3mb": "La taille de l'image doit être inférieure à 3 Mo"
+                }
+            },
+            "snackbar": {
+                "update_success": "Profil mis à jour avec succès",
+                "update_failed": "Échec de la mise à jour du profil",
+                "avatar_upload_failed": "Échec du téléversement de l'avatar",
+                "avatar_update_success": "Avatar mis à jour avec succès",
+                "avatar_change_failed": "Échec de la modification de l'avatar"
+            }
+        },
+        "security": {
+            "title": "Changer le mot de passe",
+            "fields": {
+                "current_password": "Mot de passe actuel",
+                "new_password": "Nouveau mot de passe",
+                "confirm_new_password": "Confirmer le nouveau mot de passe"
+            },
+            "password_requirements": {
+                "title": "Exigences du mot de passe :",
+                "min_length": "Au moins 8 caractères — plus c'est long, mieux c'est",
+                "lowercase": "Au moins une lettre minuscule",
+                "number_symbol_space": "Au moins un chiffre, un symbole ou un espace"
+            },
+            "snackbar": {
+                "change_password_success": "Mot de passe mis à jour avec succès",
+                "change_password_failed": "Échec du changement de mot de passe"
+            }
+        }
+    },
     "footer": {
         "made_with": "Fait avec",
         "by": "par",
@@ -358,6 +486,50 @@
                 "brick": "Brique"
             },
             "reset": "Réinitialiser"
+        },
+        "details": {
+            "page_title": "Produit",
+            "currency_dzd": "DZD",
+            "panels": {
+                "colors": "Couleurs",
+                "size": "Taille",
+                "quantity": "Quantité"
+            },
+            "actions": {
+                "add_to_cart": "Ajouter au panier",
+                "download_pdf": "Télécharger le PDF"
+            },
+            "sections": {
+                "about": "À propos de ce produit",
+                "destinations": "Destinations",
+                "properties": "Propriétés",
+                "technical_characteristics": "Caractéristiques techniques",
+                "application": "Application",
+                "technical_file": "Fiche technique"
+            },
+            "fields": {
+                "density": "Densité",
+                "coverage": "Rendement",
+                "drying_time": "Temps de séchage",
+                "tint": "Teinte",
+                "viscosity": "Viscosité",
+                "appearance_of_paint_film": "Aspect du film de peinture",
+                "dilution": "Dilution",
+                "tool_cleaning": "Nettoyage des outils",
+                "surface_prep": "Préparation du support",
+                "supported_surfaces": "Supports",
+                "application_tools": "Outils d'application"
+            },
+            "snackbar": {
+                "load_failed": "Échec du chargement du produit",
+                "select_color": "Veuillez sélectionner une couleur",
+                "added_to_cart": "Ajouté au panier !",
+                "add_to_cart_failed": "Échec de l'ajout au panier",
+                "added_to_favorites": "Ajouté aux favoris !",
+                "add_to_favorites_failed": "Échec de l'ajout aux favoris",
+                "removed_from_favorites": "Retiré des favoris",
+                "remove_from_favorites_failed": "Échec de la suppression des favoris"
+            }
         }
     },
     "management": {

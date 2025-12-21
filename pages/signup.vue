@@ -1,7 +1,4 @@
 <script setup>
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth.js'
 import { useValidators } from '@/utils/validators'
@@ -9,6 +6,9 @@ import { useGenerateImageVariant } from '@core/composable/useGenerateImageVarian
 import logo from '@images/logo-v2.svg'
 import registerMultistepBgDark from '@images/pages/register-multistep-bg-dark.png'
 import registerMultistepBgLight from '@images/pages/register-multistep-bg-light.png'
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 definePageMeta({
   layout: 'blank',
@@ -22,7 +22,7 @@ const recaptchaVerifier = ref()
 const confirmationResult = ref()
 const loading = ref(false)
 
-const { t } = useI18n({ useScope: 'global' })
+const { t, locale } = useI18n({ useScope: 'global' })
 
 const registerMultistepBg = useGenerateImageVariant(registerMultistepBgLight, registerMultistepBgDark)
 const isPasswordVisible = ref(false)
@@ -397,8 +397,9 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     :disabled="!!confirmationResult"
                     :rules="[requiredValidator, phoneValidator]"
                     @input="form.phone = form.phone.replace(/\D/g, '')"
+                    dir="ltr"
                   >
-                    <template #prepend-inner>
+                    <template v-if="locale ==='ar'" #append-inner>
                       <p
                         class="mb-0"
                         style="margin-block-start: 1px;"
@@ -406,6 +407,14 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                         0
                       </p>
                     </template>
+                    <template v-else #prepend-inner>
+                      <p
+                        class="mb-0"
+                        style="margin-block-start: 1px;"
+                      >
+                        0
+                      </p>
+                    </template>  
                   </AppTextField>
                 </VCol>
 

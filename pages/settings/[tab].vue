@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import AccountSettingsAccount from '@/views/pages/account-settings/AccountSettingsAccount.vue'
 import AccountSettingsSecurity from '@/views/pages/account-settings/AccountSettingsSecurity.vue'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute('settings-tab')
+
+const { t } = useI18n({ useScope: 'global' })
 
 const activeTab = computed({
   get: () => route.params.tab,
@@ -11,9 +14,13 @@ const activeTab = computed({
 
 // tabs
 const tabs = [
-  { title: 'Account', icon: 'tabler-users', tab: 'account' },
-  { title: 'Security', icon: 'tabler-lock', tab: 'security' },
+  { titleKey: 'settings.tabs.account', icon: 'tabler-users', tab: 'account' },
+  { titleKey: 'settings.tabs.security', icon: 'tabler-lock', tab: 'security' },
 ]
+
+useHead(() => ({
+  title: activeTab.value === 'security' ? t('settings.tabs.security') : t('settings.tabs.account'),
+}))
 
 definePageMeta({
   navActiveLink: 'pages-account-settings-tab',
@@ -38,7 +45,7 @@ definePageMeta({
           start
           :icon="item.icon"
         />
-        {{ item.title }}
+        {{ t(item.titleKey) }}
       </VTab>
     </VTabs>
 

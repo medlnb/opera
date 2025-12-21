@@ -222,6 +222,134 @@
         "account": "الحساب",
         "logout": "تسجيل الخروج"
     },
+    "account": {
+        "cart": {
+            "title": "سلة التسوق",
+            "currency_dzd": "دج",
+            "empty": {
+                "title": "سلتك فارغة"
+            },
+            "item": {
+                "size": "الحجم",
+                "color": "اللون"
+            },
+            "shipping": {
+                "title": "معلومات الشحن (اختياري)",
+                "fields": {
+                    "address": {
+                        "label": "العنوان",
+                        "placeholder": "عنوان الشارع"
+                    },
+                    "state": {
+                        "label": "الولاية",
+                        "placeholder": "الولاية/المقاطعة"
+                    },
+                    "city": {
+                        "label": "المدينة",
+                        "placeholder": "المدينة"
+                    }
+                }
+            },
+            "summary": {
+                "title": "ملخص الطلب",
+                "subtotal": "المجموع الفرعي",
+                "total": "الإجمالي"
+            },
+            "actions": {
+                "browse_products": "تصفح المنتجات",
+                "checkout": "إتمام الطلب"
+            },
+            "snackbar": {
+                "order_success": "تم إنشاء الطلب بنجاح",
+                "checkout_failed": "فشلت عملية الدفع"
+            }
+        },
+        "orders": {
+            "table": {
+                "items": "العناصر",
+                "status": "الحالة",
+                "total": "الإجمالي",
+                "date": "التاريخ"
+            },
+            "empty": {
+                "title": "لا توجد طلبات بعد",
+                "subtitle": "سيظهر سجل طلباتك هنا"
+            },
+            "actions": {
+                "start_shopping": "ابدأ التسوق"
+            }
+        },
+        "favorites": {
+            "currency_dzd": "دج",
+            "table": {
+                "product": "المنتج",
+                "type": "النوع",
+                "price": "السعر",
+                "actions": "إجراءات"
+            },
+            "empty": {
+                "title": "لا توجد مفضلات بعد",
+                "subtitle": "تصفح المنتجات وأضف بعضًا منها إلى المفضلة"
+            },
+            "actions": {
+                "browse_products": "تصفح المنتجات"
+            }
+        }
+    },
+    "settings": {
+        "tabs": {
+            "account": "الحساب",
+            "security": "الأمان"
+        },
+        "actions": {
+            "save_changes": "حفظ التغييرات",
+            "reset": "إعادة ضبط"
+        },
+        "validation": {
+            "fix_errors": "يرجى تصحيح الأخطاء المميزة"
+        },
+        "account": {
+            "profile": {
+                "title": "تفاصيل الملف الشخصي"
+            },
+            "avatar": {
+                "actions": {
+                    "upload_new_photo": "رفع صورة جديدة"
+                },
+                "help": {
+                    "allowed_types_3mb": "الأنواع المسموحة: JPG وGIF وPNG. الحد الأقصى للحجم: 3MB"
+                },
+                "errors": {
+                    "size_3mb": "يجب أن يكون حجم الصورة أقل من 3MB"
+                }
+            },
+            "snackbar": {
+                "update_success": "تم تحديث الملف الشخصي بنجاح",
+                "update_failed": "فشل تحديث الملف الشخصي",
+                "avatar_upload_failed": "فشل رفع الصورة الرمزية",
+                "avatar_update_success": "تم تحديث الصورة الرمزية بنجاح",
+                "avatar_change_failed": "فشل تغيير الصورة الرمزية"
+            }
+        },
+        "security": {
+            "title": "تغيير كلمة المرور",
+            "fields": {
+                "current_password": "كلمة المرور الحالية",
+                "new_password": "كلمة مرور جديدة",
+                "confirm_new_password": "تأكيد كلمة المرور الجديدة"
+            },
+            "password_requirements": {
+                "title": "متطلبات كلمة المرور:",
+                "min_length": "الحد الأدنى 8 أحرف — كلما زاد كان أفضل",
+                "lowercase": "على الأقل حرف صغير واحد",
+                "number_symbol_space": "على الأقل رقم أو رمز أو مسافة"
+            },
+            "snackbar": {
+                "change_password_success": "تم تحديث كلمة المرور بنجاح",
+                "change_password_failed": "فشل تغيير كلمة المرور"
+            }
+        }
+    },
     "footer": {
         "made_with": "صُنع بـ",
         "by": "بواسطة",
@@ -468,6 +596,50 @@
                 "brick": "طوب"
             },
             "reset": "إعادة ضبط"
+        },
+        "details": {
+            "page_title": "المنتج",
+            "currency_dzd": "دج",
+            "panels": {
+                "colors": "الألوان",
+                "size": "الحجم",
+                "quantity": "الكمية"
+            },
+            "actions": {
+                "add_to_cart": "أضف إلى السلة",
+                "download_pdf": "تحميل PDF"
+            },
+            "sections": {
+                "about": "حول هذا المنتج",
+                "destinations": "وجهات الاستخدام",
+                "properties": "الخصائص",
+                "technical_characteristics": "الخصائص التقنية",
+                "application": "طريقة التطبيق",
+                "technical_file": "الملف التقني"
+            },
+            "fields": {
+                "density": "الكثافة",
+                "coverage": "المردود",
+                "drying_time": "وقت التجفيف",
+                "tint": "اللون",
+                "viscosity": "اللزوجة",
+                "appearance_of_paint_film": "مظهر طبقة الطلاء",
+                "dilution": "التخفيف",
+                "tool_cleaning": "تنظيف الأدوات",
+                "surface_prep": "تحضير السطح",
+                "supported_surfaces": "الأسطح المناسبة",
+                "application_tools": "أدوات التطبيق"
+            },
+            "snackbar": {
+                "load_failed": "فشل تحميل المنتج",
+                "select_color": "يرجى اختيار لون",
+                "added_to_cart": "تمت الإضافة إلى السلة!",
+                "add_to_cart_failed": "فشلت الإضافة إلى السلة",
+                "added_to_favorites": "تمت الإضافة إلى المفضلة!",
+                "add_to_favorites_failed": "فشلت الإضافة إلى المفضلة",
+                "removed_from_favorites": "تمت الإزالة من المفضلة",
+                "remove_from_favorites_failed": "فشلت الإزالة من المفضلة"
+            }
         }
     },
     "management": {

@@ -1,7 +1,8 @@
 <script setup>
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -10,11 +11,17 @@ definePageMeta({
 const authStore = useAuthStore()
 const config = useRuntimeConfig()
 
+const { t } = useI18n({ useScope: 'global' })
+
+useHead(() => ({
+  title: t('user.my_orders'),
+}))
+
 const headers = [
-  { title: 'Items', key: 'itemsCount', sortable: false },
-  { title: 'Status', key: 'status' },
-  { title: 'Total', key: 'total' },
-  { title: 'Date', key: 'createdAt' },
+  { title: t('account.orders.table.items'), key: 'itemsCount', sortable: false },
+  { title: t('account.orders.table.status'), key: 'status' },
+  { title: t('account.orders.table.total'), key: 'total' },
+  { title: t('account.orders.table.date'), key: 'createdAt' },
 ]
 
 const items = ref([])
@@ -85,7 +92,7 @@ function formatDate(d) {
 <template>
   <div>
     <VCard
-      title="My Orders"
+      :title="t('user.my_orders')"
       class="mb-6"
     >
       <VCardText>
@@ -159,17 +166,17 @@ function formatDate(d) {
                 class="text-disabled mb-4"
               />
               <p class="text-h6 text-disabled">
-                No orders yet
+                {{ t('account.orders.empty.title') }}
               </p>
               <p class="text-body-2 text-disabled">
-                Your order history will appear here
+                {{ t('account.orders.empty.subtitle') }}
               </p>
               <VBtn
                 color="primary"
                 to="/products/decor"
                 class="mt-4"
               >
-                Start Shopping
+                {{ t('account.orders.actions.start_shopping') }}
               </VBtn>
             </div>
           </template>

@@ -2,8 +2,11 @@
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth.js'
 import { useValidators } from '@/utils/validators'
+import { useI18n } from 'vue-i18n'
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const showSnackbar = (message, color = 'snackbar') => {
   snackbar.value = { show: true, message, color }
@@ -32,7 +35,7 @@ const updateProfile = async () => {
     if (result && typeof result.then === 'function') {
       const r = await result
       if (!r.valid) {
-        showSnackbar('Please fix the highlighted errors', 'error')
+        showSnackbar(t('settings.validation.fix_errors'), 'error')
 
         return
       }
@@ -54,19 +57,19 @@ const updateProfile = async () => {
     })
 
     if (error.value) {
-      showSnackbar('Failed to update profile', 'error')
+      showSnackbar(t('settings.account.snackbar.update_failed'), 'error')
 
       return console.error('Failed to update profile:', error.value)
     }
 
     if (data.value?.user) {
       authStore.patchUser(data.value.user)
-      showSnackbar('Profile updated successfully', 'success')
+      showSnackbar(t('settings.account.snackbar.update_success'), 'success')
     }
   }
   catch (err) {
     console.error('Failed to update profile:', err)
-    showSnackbar('Failed to update profile', 'error')
+    showSnackbar(t('settings.account.snackbar.update_failed'), 'error')
   }
   finally {
     isLoading.value = false
@@ -109,8 +112,8 @@ const changeAvatar = async file => {
   // Check file size (3MB = 3 * 1024 * 1024 bytes)
   const maxSize = 3 * 1024 * 1024
   if (files[0].size > maxSize) {
-    avatarError.value = 'Image size must be less than 3MB'
-    showSnackbar('Image size must be less than 3MB', 'error')
+    avatarError.value = t('settings.account.avatar.errors.size_3mb')
+    showSnackbar(t('settings.account.avatar.errors.size_3mb'), 'error')
 
     return
   }
@@ -155,7 +158,7 @@ const changeAvatar = async file => {
       })
 
       if (error.value) {
-        showSnackbar('Failed to upload avatar', 'error')
+        showSnackbar(t('settings.account.snackbar.avatar_upload_failed'), 'error')
 
         return console.error('Failed to upload avatar:', error.value)
       }
@@ -172,20 +175,20 @@ const changeAvatar = async file => {
         })
 
         if (updateError.value) {
-          showSnackbar('Failed to update profile', 'error')
+          showSnackbar(t('settings.account.snackbar.update_failed'), 'error')
 
           return console.error('Failed to update profile with avatar:', updateError.value)
         }
 
         authStore.patchUser({ avatar: avatarUrl })
-        showSnackbar('Avatar updated successfully', 'success')
+        showSnackbar(t('settings.account.snackbar.avatar_update_success'), 'success')
       }
 
       // }
     }
     catch (err) {
       console.error('Failed to change avatar:', err)
-      showSnackbar('Failed to change avatar', 'error')
+      showSnackbar(t('settings.account.snackbar.avatar_change_failed'), 'error')
     }
     finally {
       isUploadingAvatar.value = false
@@ -197,7 +200,7 @@ const changeAvatar = async file => {
 <template>
   <VRow>
     <VCol cols="12">
-      <VCard title="Profile Details">
+      <VCard :title="t('settings.account.profile.title')">
         <VCardText class="d-flex">
           <VAvatar
             rounded
@@ -218,7 +221,7 @@ const changeAvatar = async file => {
                   icon="tabler-cloud-upload"
                   class="d-sm-none"
                 />
-                <span class="d-none d-sm-block">Upload new photo</span>
+                <span class="d-none d-sm-block">{{ t('settings.account.avatar.actions.upload_new_photo') }}</span>
               </VBtn>
 
               <input
@@ -232,7 +235,7 @@ const changeAvatar = async file => {
             </div>
 
             <p class="text-body-1 mb-0">
-              Allowed JPG, GIF or PNG. Max size of 3MB
+              {{ t('settings.account.avatar.help.allowed_types_3mb') }}
             </p>
             <p
               v-if="avatarError"
@@ -257,8 +260,8 @@ const changeAvatar = async file => {
               >
                 <AppTextField
                   v-model="accountDataLocal.firstName"
-                  placeholder="John"
-                  label="First Name"
+                  :placeholder="t('auth.first_name_placeholder')"
+                  :label="t('auth.first_name')"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -269,8 +272,8 @@ const changeAvatar = async file => {
               >
                 <AppTextField
                   v-model="accountDataLocal.lastName"
-                  placeholder="Doe"
-                  label="Last Name"
+                  :placeholder="t('auth.last_name_placeholder')"
+                  :label="t('auth.last_name')"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -283,8 +286,8 @@ const changeAvatar = async file => {
                   v-model="accountDataLocal.state"
                   item-value="id"
                   item-title="label"
-                  label="Wilaya"
-                  placeholder="Select Wilaya"
+                  :label="t('auth.wilaya')"
+                  :placeholder="t('auth.select_wilaya')"
                   :items="stateOptions"
                   :rules="[requiredValidator]"
                 />
@@ -296,10 +299,10 @@ const changeAvatar = async file => {
               >
                 <AppSelect
                   v-model="accountDataLocal.city"
-                  label="City"
+                  :label="t('auth.city')"
                   item-value="id"
                   item-title="label"
-                  placeholder="Select City"
+                  :placeholder="t('auth.select_city')"
                   :items="cityOptions"
                   :rules="[requiredValidator]"
                 />
@@ -311,8 +314,8 @@ const changeAvatar = async file => {
               >
                 <AppTextField
                   v-model="accountDataLocal.address"
-                  label="Address"
-                  placeholder="1234 Main St, New York, NY 10001, USA"
+                  :label="t('auth.address')"
+                  :placeholder="t('auth.address_placeholder')"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -323,7 +326,7 @@ const changeAvatar = async file => {
               >
                 <AppTextField
                   v-model="accountDataLocal.phone"
-                  label="Phone Number"
+                  :label="t('auth.phone_number')"
                   maxlength="9"
                   disabled
                 >
@@ -347,7 +350,7 @@ const changeAvatar = async file => {
                   :disabled="isLoading"
                   @click="updateProfile"
                 >
-                  Save changes
+                  {{ t('settings.actions.save_changes') }}
                 </VBtn>
 
                 <VBtn
@@ -356,7 +359,7 @@ const changeAvatar = async file => {
                   type="reset"
                   @click.prevent="resetForm"
                 >
-                  Reset
+                  {{ t('settings.actions.reset') }}
                 </VBtn>
               </VCol>
             </VRow>

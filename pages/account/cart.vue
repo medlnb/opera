@@ -1,6 +1,7 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
@@ -9,6 +10,12 @@ definePageMeta({
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const config = useRuntimeConfig()
+
+const { t } = useI18n({ useScope: 'global' })
+
+useHead(() => ({
+  title: t('user.my_cart'),
+}))
 
 const checkout = ref({
   shippingCost: 0,
@@ -89,13 +96,13 @@ async function handleCheckout() {
     })
 
     if (order)
-      showSnackbar('Order placed successfully', 'success')
+      showSnackbar(t('account.cart.snackbar.order_success'), 'success')
     else
-      showSnackbar('Checkout failed', 'error')
+      showSnackbar(t('account.cart.snackbar.checkout_failed'), 'error')
   }
   catch (err) {
     console.log(err)
-    showSnackbar('Checkout failed', 'error')
+    showSnackbar(t('account.cart.snackbar.checkout_failed'), 'error')
   }
   finally {
     checkoutLoading.value = false
@@ -116,7 +123,7 @@ const total = computed(() => {
 <template>
   <div>
     <VCard
-      title="Shopping Cart"
+      :title="t('account.cart.title')"
       class="mb-6"
     >
       <VCardText>
@@ -140,14 +147,14 @@ const total = computed(() => {
             class="text-disabled mb-4"
           />
           <p class="text-h6 text-disabled">
-            Your cart is empty
+            {{ t('account.cart.empty.title') }}
           </p>
           <VBtn
             color="primary"
             to="/products/decor"
             class="mt-4"
           >
-            Browse Products
+            {{ t('account.cart.actions.browse_products') }}
           </VBtn>
         </div>
 
@@ -179,13 +186,13 @@ const total = computed(() => {
                 {{ item.title }}
               </VListItemTitle>
               <VListItemSubtitle>
-                <span v-if="item.variance">Size: {{ item.quantity }}</span>
-                <span v-if="item.color"> · Color: {{ item.color }}</span>
+                <span v-if="item.variance">{{ t('account.cart.item.size') }}: {{ item.quantity }}</span>
+                <span v-if="item.color"> · {{ t('account.cart.item.color') }}: {{ item.color }}</span>
               </VListItemSubtitle>
               <VListItemSubtitle class="mt-1">
-                <span class="text-primary font-weight-medium">{{ item.price }} DZD</span>
+                <span class="text-primary font-weight-medium">{{ item.price }} {{ t('account.cart.currency_dzd') }}</span>
                 <span class="text-disabled"> × {{ item.qty }}</span>
-                <span class="font-weight-bold"> = {{ (item.price || 0) * (item.qty || 1) }} DZD</span>
+                <span class="font-weight-bold"> = {{ (item.price || 0) * (item.qty || 1) }} {{ t('account.cart.currency_dzd') }}</span>
               </VListItemSubtitle>
 
               <template #append>
@@ -231,28 +238,28 @@ const total = computed(() => {
               md="6"
             >
               <h6 class="text-h6 mb-3">
-                Shipping Details (Optional)
+                {{ t('account.cart.shipping.title') }}
               </h6>
               <VRow>
                 <VCol cols="12">
                   <AppTextField
                     v-model="checkout.address"
-                    label="Address"
-                    placeholder="Street address"
+                    :label="t('account.cart.shipping.fields.address.label')"
+                    :placeholder="t('account.cart.shipping.fields.address.placeholder')"
                   />
                 </VCol>
                 <VCol cols="6">
                   <AppTextField
                     v-model="checkout.state"
-                    label="State"
-                    placeholder="State/Province"
+                    :label="t('account.cart.shipping.fields.state.label')"
+                    :placeholder="t('account.cart.shipping.fields.state.placeholder')"
                   />
                 </VCol>
                 <VCol cols="6">
                   <AppTextField
                     v-model="checkout.city"
-                    label="City"
-                    placeholder="City"
+                    :label="t('account.cart.shipping.fields.city.label')"
+                    :placeholder="t('account.cart.shipping.fields.city.placeholder')"
                   />
                 </VCol>
               </VRow>
@@ -267,16 +274,16 @@ const total = computed(() => {
                 class="pa-4"
               >
                 <h6 class="text-h6 mb-4">
-                  Order Summary
+                  {{ t('account.cart.summary.title') }}
                 </h6>
                 <div class="d-flex justify-space-between mb-2">
-                  <span class="text-body-1">Subtotal</span>
-                  <span class="text-body-1 font-weight-medium">{{ subtotal }} DZD</span>
+                  <span class="text-body-1">{{ t('account.cart.summary.subtotal') }}</span>
+                  <span class="text-body-1 font-weight-medium">{{ subtotal }} {{ t('account.cart.currency_dzd') }}</span>
                 </div>
                 <VDivider class="my-3" />
                 <div class="d-flex justify-space-between mb-4">
-                  <span class="text-h6">Total</span>
-                  <span class="text-h6 text-primary">{{ total }} DZD</span>
+                  <span class="text-h6">{{ t('account.cart.summary.total') }}</span>
+                  <span class="text-h6 text-primary">{{ total }} {{ t('account.cart.currency_dzd') }}</span>
                 </div>
                 <VBtn
                   color="primary"
@@ -286,7 +293,7 @@ const total = computed(() => {
                   :disabled="cartStore.isEmpty"
                   @click="handleCheckout"
                 >
-                  Checkout
+                  {{ t('account.cart.actions.checkout') }}
                 </VBtn>
               </VCard>
             </VCol>

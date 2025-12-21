@@ -1,17 +1,111 @@
 <script setup>
-import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const config = useRuntimeConfig()
 const { query } = useRoute()
+
+const { t, te } = useI18n({ useScope: 'global' })
+
 const productDetails = ref()
 const productLoading = ref(true)
 const panelStatus = ref()
 const favoriteLoading = ref(false)
 const addingToCart = ref(false)
+
+const productTypeLabel = computed(() => {
+  const type = productDetails.value?.type
+  if (!type)
+    return ''
+
+  const key = `management.products.types.${type}`
+
+  return te(key) ? t(key) : String(type)
+})
+
+function translateDestination(value) {
+  const map = {
+    Habitations: 'habitations',
+    Bureaux: 'offices',
+    Hotel: 'hotel',
+    Restaurants: 'restaurants',
+    Showroom: 'showroom',
+    Magasins: 'stores',
+  }
+
+  const suffix = map[String(value)]
+  if (!suffix)
+    return String(value ?? '')
+
+  const key = `products.filters.destination.${suffix}`
+
+  return te(key) ? t(key) : String(value ?? '')
+}
+
+function translateSupport(value) {
+  const map = {
+    Platre: 'plaster',
+    Ciment: 'cement',
+    Enduit: 'render',
+    Brique: 'brick',
+  }
+
+  const suffix = map[String(value)]
+  if (!suffix)
+    return String(value ?? '')
+
+  const key = `products.filters.support.${suffix}`
+
+  return te(key) ? t(key) : String(value ?? '')
+}
+
+function translateMaterial(value) {
+  const map = {
+    'Eponge nature': 'sponge_nature',
+    'tampon décore': 'decorative_stamp',
+    Lisseuse: 'trowel',
+    couteau: 'knife',
+    brosse: 'brush',
+    Pinceau: 'paintbrush',
+    'Lisseuse inox': 'stainless_trowel',
+    'Pinceau plat spalter': 'flat_brush_spalter',
+    'spatule plasque': 'plastic_spatula',
+  }
+
+  const suffix = map[String(value)]
+  if (!suffix)
+    return String(value ?? '')
+
+  const key = `management.products.editor.application.material.${suffix}`
+
+  return te(key) ? t(key) : String(value ?? '')
+}
+
+function translateAspect(value) {
+  const map = {
+    Mitallise: 'metallized',
+    Brillant: 'glossy',
+    Soyeux: 'silky',
+    Lumineux: 'luminous',
+    'Marbre Ultra Brillant': 'ultra_gloss_marble',
+  }
+
+  const suffix = map[String(value)]
+  if (!suffix)
+    return String(value ?? '')
+
+  const key = `management.products.editor.technical.aspect.${suffix}`
+
+  return te(key) ? t(key) : String(value ?? '')
+}
+
+useHead(() => ({
+  title: productDetails.value?.title || t('products.details.page_title'),
+}))
 
 const technicalFileId = computed(() => {
   const tf = productDetails.value?.technicalFile
@@ -67,7 +161,7 @@ onMounted(async () => {
   }
   catch (err) {
     console.error(err)
-    showSnackbar('Failed to load product', 'error')
+    showSnackbar(t('products.details.snackbar.load_failed'), 'error')
   }
   finally {
     productLoading.value = false
@@ -92,7 +186,7 @@ async function addToCart() {
 
   if (isColorRequired.value && order.value.color === null) {
     panelStatus.value = 0
-    showSnackbar('Please select a color', 'error')
+    showSnackbar(t('products.details.snackbar.select_color'), 'error')
 
     return
   }
@@ -124,15 +218,15 @@ async function addToCart() {
     if (success) {
       panelStatus.value = undefined
       order.value.qty = 1
-      showSnackbar('Added to cart!', 'success')
+      showSnackbar(t('products.details.snackbar.added_to_cart'), 'success')
     }
     else {
-      showSnackbar('Failed to add to cart', 'error')
+      showSnackbar(t('products.details.snackbar.add_to_cart_failed'), 'error')
     }
   }
   catch (err) {
     console.error(err)
-    showSnackbar('Failed to add to cart', 'error')
+    showSnackbar(t('products.details.snackbar.add_to_cart_failed'), 'error')
   }
   finally {
     addingToCart.value = false
@@ -159,11 +253,11 @@ async function addToFavorites() {
     if (!res.ok)
       throw new Error('Failed to add favorite')
     productDetails.value.isFavorite = true
-    showSnackbar('Added to favorites', 'success')
+    showSnackbar(t('products.details.snackbar.added_to_favorites'), 'success')
   }
   catch (err) {
     console.error(err)
-    showSnackbar('Failed to add to favorites', 'error')
+    showSnackbar(t('products.details.snackbar.add_to_favorites_failed'), 'error')
   }
   finally {
     favoriteLoading.value = false
@@ -190,11 +284,11 @@ async function removeFromFavorites() {
     if (!res.ok)
       throw new Error('Failed to remove favorite')
     productDetails.value.isFavorite = false
-    showSnackbar('Removed from favorites', 'success')
+    showSnackbar(t('products.details.snackbar.removed_from_favorites'), 'success')
   }
   catch (err) {
     console.error(err)
-    showSnackbar('Failed to remove from favorites', 'error')
+    showSnackbar(t('products.details.snackbar.remove_from_favorites_failed'), 'error')
   }
   finally {
     favoriteLoading.value = false
@@ -233,7 +327,7 @@ function toggleFavorite() {
                 color="info"
                 label
               >
-                {{ productDetails?.type }}
+                {{ productTypeLabel }}
               </VChip>
               <IconBtn
                 :loading="favoriteLoading"
@@ -317,7 +411,7 @@ function toggleFavorite() {
                       <template #title>
                         <div>
                           <h5 class="text-h5 mb-1">
-                            Colors
+                            {{ t('products.details.panels.colors') }}
                           </h5>
                           <div
                             v-if="productDetails && order.color != null"
@@ -361,7 +455,7 @@ function toggleFavorite() {
                       <template #title>
                         <div>
                           <h5 class="text-h5 mb-1">
-                            Size
+                            {{ t('products.details.panels.size') }}
                           </h5>
                           <div
                             v-if="productDetails && order.variance != null"
@@ -391,7 +485,7 @@ function toggleFavorite() {
                               {{ variance.quantity }}
                             </VListItemTitle>
                             <VListItemSubtitle>
-                              <span class="text-disabled text-base">{{ variance.price }} Dzd</span>
+                              <span class="text-disabled text-base">{{ variance.price }} {{ t('products.details.currency_dzd') }}</span>
                             </VListItemSubtitle>
                           </VListItem>
                         </VList>
@@ -406,7 +500,7 @@ function toggleFavorite() {
                         <div class="d-flex align-center justify-space-between w-100">
                           <div>
                             <h5 class="text-h5 mb-1">
-                              Quantity
+                              {{ t('products.details.panels.quantity') }}
                             </h5>
                             <div
                               v-if="order.qty != null"
@@ -454,7 +548,7 @@ function toggleFavorite() {
                       :disabled="!canAddToCart"
                       @click="addToCart"
                     >
-                      Add to Cart
+                      {{ t('products.details.actions.add_to_cart') }}
                     </VBtn>
                   </div>
                 </div>
@@ -463,7 +557,7 @@ function toggleFavorite() {
           </div>
           <VCardText class="px-0">
             <h5 class="text-h5 mb-3 pt-2">
-              About this product
+              {{ t('products.details.sections.about') }}
             </h5>
             <p class="text-body-1">
               {{ productDetails?.definition }}
@@ -472,7 +566,7 @@ function toggleFavorite() {
             <template v-if="productDetails?.destination?.length">
               <VDivider class="my-6" />
               <h5 class="text-h5 mb-3">
-                Destinations
+                {{ t('products.details.sections.destinations') }}
               </h5>
               <div class="d-flex flex-wrap gap-2">
                 <VChip
@@ -481,7 +575,7 @@ function toggleFavorite() {
                   label
                   variant="tonal"
                 >
-                  {{ dest }}
+                  {{ translateDestination(dest) }}
                 </VChip>
               </div>
             </template>
@@ -489,7 +583,7 @@ function toggleFavorite() {
             <template v-if="productDetails?.properties?.length">
               <VDivider class="my-6" />
               <h5 class="text-h5 mb-3">
-                Properties
+                {{ t('products.details.sections.properties') }}
               </h5>
               <VList class="card-list">
                 <VListItem
@@ -508,7 +602,7 @@ function toggleFavorite() {
 
             <VDivider class="my-6" />
             <h5 class="text-h5 mb-3">
-              Technical Characteristics
+              {{ t('products.details.sections.technical_characteristics') }}
             </h5>
             <VList class="card-list">
               <VListItem>
@@ -516,7 +610,7 @@ function toggleFavorite() {
                   <VIcon icon="tabler-scale" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Density: {{ productDetails?.densite }}
+                  {{ t('products.details.fields.density') }}: {{ productDetails?.densite }}
                 </VListItemTitle>
               </VListItem>
               <VListItem>
@@ -524,7 +618,7 @@ function toggleFavorite() {
                   <VIcon icon="tabler-gauge" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Coverage: {{ productDetails?.rendement }}
+                  {{ t('products.details.fields.coverage') }}: {{ productDetails?.rendement }}
                 </VListItemTitle>
               </VListItem>
               <VListItem>
@@ -532,7 +626,7 @@ function toggleFavorite() {
                   <VIcon icon="tabler-hourglass" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Drying Time: {{ productDetails?.tempsSachage }}
+                  {{ t('products.details.fields.drying_time') }}: {{ productDetails?.tempsSachage }}
                 </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.teinte">
@@ -540,7 +634,7 @@ function toggleFavorite() {
                   <VIcon icon="tabler-palette" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Tint: {{ productDetails.teinte }}
+                  {{ t('products.details.fields.tint') }}: {{ productDetails.teinte }}
                 </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.viscosite">
@@ -548,13 +642,13 @@ function toggleFavorite() {
                   <VIcon icon="tabler-wave-sine" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Viscosity: {{ productDetails.viscosite }}
+                  {{ t('products.details.fields.viscosity') }}: {{ productDetails.viscosite }}
                 </VListItemTitle>
               </VListItem>
             </VList>
             <template v-if="productDetails?.aspectdifilmsec?.length">
               <VLabel class="mb-2 pt-4">
-                Appearance of the paint film
+                {{ t('products.details.fields.appearance_of_paint_film') }}
               </VLabel>
               <div class="d-flex flex-wrap gap-2 ps-4">
                 <VChip
@@ -563,14 +657,14 @@ function toggleFavorite() {
                   label
                   variant="tonal"
                 >
-                  {{ a }}
+                  {{ translateAspect(a) }}
                 </VChip>
               </div>
             </template>
 
             <VDivider class="my-6" />
             <h5 class="text-h5 mb-3">
-              Application
+              {{ t('products.details.sections.application') }}
             </h5>
             <VList class="card-list pb-2">
               <VListItem>
@@ -578,7 +672,7 @@ function toggleFavorite() {
                   <VIcon icon="tabler-droplet" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Dilution: {{ productDetails?.dilution }}
+                  {{ t('products.details.fields.dilution') }}: {{ productDetails?.dilution }}
                 </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.nettoyageMateriel">
@@ -586,7 +680,7 @@ function toggleFavorite() {
                   <VIcon icon="tabler-brush" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Tool Cleaning: {{ productDetails.nettoyageMateriel }}
+                  {{ t('products.details.fields.tool_cleaning') }}: {{ productDetails.nettoyageMateriel }}
                 </VListItemTitle>
               </VListItem>
               <VListItem v-if="productDetails?.preparationSupport">
@@ -594,14 +688,14 @@ function toggleFavorite() {
                   <VIcon icon="tabler-hammer" />
                 </template>
                 <VListItemTitle class="text-body-1">
-                  Surface Prep: {{ productDetails.preparationSupport }}
+                  {{ t('products.details.fields.surface_prep') }}: {{ productDetails.preparationSupport }}
                 </VListItemTitle>
               </VListItem>
             </VList>
 
             <template v-if="productDetails?.supports?.length">
               <h6 class="text-subtitle-1 mt-2 mb-2">
-                Supported Surfaces
+                {{ t('products.details.fields.supported_surfaces') }}
               </h6>
               <div class="d-flex flex-wrap gap-2">
                 <VChip
@@ -610,14 +704,14 @@ function toggleFavorite() {
                   label
                   variant="tonal"
                 >
-                  {{ s }}
+                  {{ translateSupport(s) }}
                 </VChip>
               </div>
             </template>
 
             <template v-if="productDetails?.materielApplication?.length">
               <h6 class="text-subtitle-1 mt-2 mb-2 pt-2">
-                Application Tools
+                {{ t('products.details.fields.application_tools') }}
               </h6>
               <div class="d-flex flex-wrap gap-2">
                 <VChip
@@ -626,14 +720,14 @@ function toggleFavorite() {
                   label
                   variant="tonal"
                 >
-                  {{ m }}
+                  {{ translateMaterial(m) }}
                 </VChip>
               </div>
             </template>
             <template v-if="technicalFileId">
               <VDivider class="my-6" />
               <h5 class="text-h5 mb-3">
-                Technical File
+                {{ t('products.details.sections.technical_file') }}
               </h5>
               <div class="d-flex flex-wrap gap-2 align-center">
                 <VBtn
@@ -644,7 +738,7 @@ function toggleFavorite() {
                   target="_blank"
                   rel="noopener"
                 >
-                  Download PDF
+                  {{ t('products.details.actions.download_pdf') }}
                 </VBtn>
                 <span
                   v-if="technicalFileName"

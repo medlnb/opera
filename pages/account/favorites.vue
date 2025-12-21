@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
 })
 
+const { t } = useI18n({ useScope: 'global' })
+
+useHead(() => ({
+  title: t('user.my_favorites'),
+}))
+
 const headers = [
-  { title: 'Product', key: 'product' },
-  { title: 'Type', key: 'type' },
-  { title: 'Price', key: 'price' },
-  { title: 'Actions', key: 'actions', sortable: false },
+  { title: t('account.favorites.table.product'), key: 'product' },
+  { title: t('account.favorites.table.type'), key: 'type' },
+  { title: t('account.favorites.table.price'), key: 'price' },
+  { title: t('account.favorites.table.actions'), key: 'actions', sortable: false },
 ]
 
 // Data table options
@@ -101,7 +108,7 @@ const deleteProduct = async (id: string) => {
 <template>
   <div>
     <VCard
-      title="My Favorites"
+      :title="t('user.my_favorites')"
       class="mb-6"
     >
       <VDivider class="my-4" />
@@ -145,17 +152,17 @@ const deleteProduct = async (id: string) => {
               class="text-disabled mb-4"
             />
             <p class="text-h6 text-disabled">
-              No favorites yet
+              {{ t('account.favorites.empty.title') }}
             </p>
             <p class="text-body-2 text-disabled">
-              Browse products and add some to your favorites
+              {{ t('account.favorites.empty.subtitle') }}
             </p>
             <VBtn
               color="primary"
               to="/products/decor"
               class="mt-4"
             >
-              Browse Products
+              {{ t('account.favorites.actions.browse_products') }}
             </VBtn>
           </div>
         </template>
@@ -178,7 +185,7 @@ const deleteProduct = async (id: string) => {
         </template>
 
         <template #item.price="{ item }">
-          {{ item.price }} Dzd
+          {{ item.price }} {{ t('account.favorites.currency_dzd') }}
         </template>
 
         <!-- type -->
