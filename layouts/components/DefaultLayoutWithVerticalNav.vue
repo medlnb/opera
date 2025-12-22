@@ -38,7 +38,7 @@ const navItems = useNavItems()
           v-if="themeConfig.app.i18n.enable && themeConfig.app.i18n.langConfig?.length"
           :languages="themeConfig.app.i18n.langConfig"
         />
-        <UserProfile class="mx-2"/>
+        <UserProfile class="mx-2" />
       </div>
     </template>
 

@@ -1,6 +1,6 @@
 <script setup>
-import tips from '@images/tips.webp'
 import { useI18n } from 'vue-i18n'
+import tips from '@images/tips.webp'
 
 const config = useRuntimeConfig()
 const articles = ref([])

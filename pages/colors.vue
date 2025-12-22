@@ -1,6 +1,6 @@
 <script setup>
-import { useApi } from '@/composables/useApi'
 import { useI18n } from 'vue-i18n'
+import { useApi } from '@/composables/useApi'
 
 const loading = ref(false)
 const colors = ref([])

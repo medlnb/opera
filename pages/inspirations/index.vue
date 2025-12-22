@@ -1,6 +1,6 @@
 <script setup>
-import inspiration from '@images/inspiration.webp'
 import { useI18n } from 'vue-i18n'
+import inspiration from '@images/inspiration.webp'
 
 const config = useRuntimeConfig()
 const articles = ref([])

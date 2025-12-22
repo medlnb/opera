@@ -1,8 +1,8 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-import { useValidators } from '@/utils/validators'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useValidators } from '@/utils/validators'
 
 definePageMeta({
   admin: true,
@@ -247,7 +247,7 @@ async function savePage() {
       throw new Error('Failed to save')
     const data = await res.json()
 
-  showSnackbar(isEdit.value ? t('management.articles.editor.snackbar.updated') : t('management.articles.editor.snackbar.created'), 'success')
+    showSnackbar(isEdit.value ? t('management.articles.editor.snackbar.updated') : t('management.articles.editor.snackbar.created'), 'success')
 
     // If creating new, redirect to edit mode
     if (!isEdit.value && data.data?._id)

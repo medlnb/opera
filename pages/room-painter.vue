@@ -21,6 +21,13 @@ const tolerance = ref(30)
 type ToolMode = 'paint' | 'erase'
 const toolMode = ref<ToolMode>('paint')
 
+type SelectionMode = 'point' | 'rect'
+const selectionMode = ref<SelectionMode>('point')
+
+const isSelecting = ref(false)
+const selectionStartClient = ref<{ x: number; y: number } | null>(null)
+const selectionCurrentClient = ref<{ x: number; y: number } | null>(null)
+
 const undoStack = ref<ImageData[]>([])
 const redoStack = ref<ImageData[]>([])
 
@@ -310,7 +317,59 @@ function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: n
 }
 
 // Flood fill algorithm with edge detection (paint) + depaint (restore original pixels)
-const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: number; b: number }, mode: ToolMode) => {
+type RegionMatcher = (or: number, og: number, ob: number, x: number, y: number) => boolean
+
+const isEdgePixelByMatcher = (
+  x: number,
+  y: number,
+  pixels: Uint8ClampedArray,
+  width: number,
+  height: number,
+  matcher: RegionMatcher,
+): boolean => {
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+    [-1, -1],
+    [-1, 1],
+    [1, -1],
+    [1, 1],
+  ]
+
+  for (const [dx, dy] of directions) {
+    const nx = x + dx
+    const ny = y + dy
+
+    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+      const pos = (ny * width + nx) * 4
+      const nr = pixels[pos]
+      const ng = pixels[pos + 1]
+      const nb = pixels[pos + 2]
+
+      if (!matcher(nr, ng, nb, nx, ny))
+        return true
+    }
+  }
+
+  return false
+}
+
+const hueDistance = (a: number, b: number) => {
+  const d = Math.abs(a - b) % 360
+  return d > 180 ? 360 - d : d
+}
+
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v))
+
+const applyRegionWithMatcher = (
+  startX: number,
+  startY: number,
+  fillColor: { r: number; g: number; b: number },
+  mode: ToolMode,
+  matcher?: RegionMatcher,
+) => {
   if (!ctx.value || !displayCtx.value || !canvas.value || !originalImageData.value)
     return
 
@@ -377,13 +436,14 @@ const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: 
   const visited = new Uint8Array(width * height)
   const stack: Array<{ x: number; y: number }> = [{ x: startX, y: startY }]
 
-  const colorMatch = (r: number, g: number, b: number): boolean => {
-    return (
-      Math.abs(r - regionR) <= tolerance.value
-      && Math.abs(g - regionG) <= tolerance.value
-      && Math.abs(b - regionB) <= tolerance.value
-    )
-  }
+  const colorMatch: RegionMatcher = matcher
+    ?? ((or: number, og: number, ob: number) => {
+      return (
+        Math.abs(or - regionR) <= tolerance.value
+        && Math.abs(og - regionG) <= tolerance.value
+        && Math.abs(ob - regionB) <= tolerance.value
+      )
+    })
 
   while (stack.length > 0) {
     const { x, y } = stack.pop()!
@@ -404,12 +464,14 @@ const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: 
     const og = originalPixels[pixelPos + 1]
     const ob = originalPixels[pixelPos + 2]
 
-    if (!colorMatch(or, og, ob))
+    if (!colorMatch(or, og, ob, x, y))
       continue
 
     visited[pos] = 1
 
-    const edge = isEdgePixel(x, y, originalPixels, width, height, regionR, regionG, regionB)
+    const edge = matcher
+      ? isEdgePixelByMatcher(x, y, originalPixels, width, height, colorMatch)
+      : isEdgePixel(x, y, originalPixels, width, height, regionR, regionG, regionB)
     const alpha = edge ? 0.7 : 1.0
 
     if (mode === 'paint') {
@@ -437,8 +499,258 @@ const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: 
   displayCtx.value.putImageData(imageData, 0, 0)
 }
 
+const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: number; b: number }, mode: ToolMode) => {
+  applyRegionWithMatcher(startX, startY, fillColor, mode)
+}
+
+const clampInt = (value: number, min: number, max: number) => Math.max(min, Math.min(max, Math.trunc(value)))
+
+const getCanvasPointFromClient = (clientX: number, clientY: number) => {
+  if (!displayCanvas.value)
+    return null
+
+  const rect = displayCanvas.value.getBoundingClientRect()
+  const scaleX = displayCanvas.value.width / rect.width
+  const scaleY = displayCanvas.value.height / rect.height
+
+  const x = Math.floor((clientX - rect.left) * scaleX)
+  const y = Math.floor((clientY - rect.top) * scaleY)
+
+  return { x, y, rect, scaleX, scaleY }
+}
+
+const pickSeedFromRoi = (x0: number, y0: number, x1: number, y1: number) => {
+  if (!canvas.value || !originalImageData.value)
+    return null
+
+  const width = canvas.value.width
+  const height = canvas.value.height
+
+  const left = clampInt(Math.min(x0, x1), 0, width - 1)
+  const right = clampInt(Math.max(x0, x1), 0, width - 1)
+  const top = clampInt(Math.min(y0, y1), 0, height - 1)
+  const bottom = clampInt(Math.max(y0, y1), 0, height - 1)
+
+  const roiW = right - left + 1
+  const roiH = bottom - top + 1
+  if (roiW <= 0 || roiH <= 0)
+    return null
+
+  const pixels = originalImageData.value.data
+  const roiArea = roiW * roiH
+  const targetSamples = 5000
+  const step = Math.max(1, Math.floor(Math.sqrt(roiArea / targetSamples)))
+
+  let sumR = 0
+  let sumG = 0
+  let sumB = 0
+  let count = 0
+
+  for (let y = top; y <= bottom; y += step) {
+    for (let x = left; x <= right; x += step) {
+      const pos = (y * width + x) * 4
+
+      sumR += pixels[pos]
+      sumG += pixels[pos + 1]
+      sumB += pixels[pos + 2]
+      count++
+    }
+  }
+
+  if (count === 0)
+    return { x: clampInt((left + right) / 2, 0, width - 1), y: clampInt((top + bottom) / 2, 0, height - 1) }
+
+  const avgR = sumR / count
+  const avgG = sumG / count
+  const avgB = sumB / count
+
+  const centerX = clampInt((left + right) / 2, 0, width - 1)
+  const centerY = clampInt((top + bottom) / 2, 0, height - 1)
+
+  let bestX = centerX
+  let bestY = centerY
+  let bestScore = Number.POSITIVE_INFINITY
+
+  for (let y = top; y <= bottom; y += step) {
+    for (let x = left; x <= right; x += step) {
+      const pos = (y * width + x) * 4
+      const r = pixels[pos]
+      const g = pixels[pos + 1]
+      const b = pixels[pos + 2]
+
+      const dist = Math.abs(r - avgR) + Math.abs(g - avgG) + Math.abs(b - avgB)
+
+      // Prefer interior pixels (non-edges) to reduce accidental boundary seeds.
+      const edgePenalty = isEdgePixel(x, y, pixels, width, height, r, g, b) ? 60 : 0
+      const centerPenalty = (Math.abs(x - centerX) + Math.abs(y - centerY)) * 0.05
+
+      const score = dist + edgePenalty + centerPenalty
+      if (score < bestScore) {
+        bestScore = score
+        bestX = x
+        bestY = y
+      }
+    }
+  }
+
+  return { x: bestX, y: bestY }
+}
+
+const buildMatcherFromRoi = (x0: number, y0: number, x1: number, y1: number): RegionMatcher | null => {
+  if (!canvas.value || !originalImageData.value)
+    return null
+
+  const width = canvas.value.width
+  const height = canvas.value.height
+
+  const left = clampInt(Math.min(x0, x1), 0, width - 1)
+  const right = clampInt(Math.max(x0, x1), 0, width - 1)
+  const top = clampInt(Math.min(y0, y1), 0, height - 1)
+  const bottom = clampInt(Math.max(y0, y1), 0, height - 1)
+
+  const roiW = right - left + 1
+  const roiH = bottom - top + 1
+  const roiArea = roiW * roiH
+  if (roiArea <= 1)
+    return null
+
+  const pixels = originalImageData.value.data
+  const targetSamples = 7000
+  const step = Math.max(1, Math.floor(Math.sqrt(roiArea / targetSamples)))
+
+  let sumR = 0
+  let sumG = 0
+  let sumB = 0
+  let minL = 1
+  let maxL = 0
+
+  // Circular mean for hue (weighted by saturation to reduce noise on near-gray pixels)
+  let sumSin = 0
+  let sumCos = 0
+  let sumSat = 0
+  let count = 0
+
+  const samples: Array<{ h: number; s: number; l: number; r: number; g: number; b: number }> = []
+
+  for (let y = top; y <= bottom; y += step) {
+    for (let x = left; x <= right; x += step) {
+      const pos = (y * width + x) * 4
+      const r = pixels[pos]
+      const g = pixels[pos + 1]
+      const b = pixels[pos + 2]
+
+      const { h, s, l } = rgbToHsl(r, g, b)
+
+      sumR += r
+      sumG += g
+      sumB += b
+
+      minL = Math.min(minL, l)
+      maxL = Math.max(maxL, l)
+
+      const w = Math.max(0.001, s)
+      sumSin += Math.sin((h * Math.PI) / 180) * w
+      sumCos += Math.cos((h * Math.PI) / 180) * w
+      sumSat += s
+
+      count++
+      samples.push({ h, s, l, r, g, b })
+    }
+  }
+
+  if (count === 0)
+    return null
+
+  const avgR = sumR / count
+  const avgG = sumG / count
+  const avgB = sumB / count
+
+  const meanSat = sumSat / count
+  const meanHue = (Math.atan2(sumSin, sumCos) * 180) / Math.PI
+  const hue0 = (meanHue + 360) % 360
+
+  let hueDev = 0
+  let satDev = 0
+  let maxDevR = 0
+  let maxDevG = 0
+  let maxDevB = 0
+
+  for (const s of samples) {
+    hueDev += hueDistance(s.h, hue0)
+    satDev += Math.abs(s.s - meanSat)
+    maxDevR = Math.max(maxDevR, Math.abs(s.r - avgR))
+    maxDevG = Math.max(maxDevG, Math.abs(s.g - avgG))
+    maxDevB = Math.max(maxDevB, Math.abs(s.b - avgB))
+  }
+
+  hueDev /= samples.length
+  satDev /= samples.length
+
+  // Map existing tolerance slider (RGB) to HSL thresholds.
+  const t = tolerance.value
+  const hueTol = Math.max(10, Math.min(80, 10 + hueDev * 1.6 + t * 0.35))
+  const satTol = clamp01(0.06 + satDev * 1.8 + t / 900)
+  const lMargin = clamp01(0.03 + t / 650)
+
+  const lMin = clamp01(minL - lMargin)
+  const lMax = clamp01(maxL + lMargin)
+
+  // If it's mostly gray/low-saturation, hue becomes unreliable; fall back to RGB spread.
+  if (meanSat < 0.12) {
+    const rTol = maxDevR + t
+    const gTol = maxDevG + t
+    const bTol = maxDevB + t
+
+    return (or: number, og: number, ob: number) => {
+      return (
+        Math.abs(or - avgR) <= rTol
+        && Math.abs(og - avgG) <= gTol
+        && Math.abs(ob - avgB) <= bTol
+      )
+    }
+  }
+
+  return (or: number, og: number, ob: number) => {
+    const { h, s, l } = rgbToHsl(or, og, ob)
+
+    // Include the full lightness range seen in the rectangle (shadows/highlights).
+    if (l < lMin || l > lMax)
+      return false
+
+    if (hueDistance(h, hue0) > hueTol)
+      return false
+
+    if (Math.abs(s - meanSat) > satTol)
+      return false
+
+    return true
+  }
+}
+
+const applyRegionFromRoi = (x0: number, y0: number, x1: number, y1: number) => {
+  const color = hexToRgb(selectedColor.value)
+  if (!color)
+    return
+
+  const seed = pickSeedFromRoi(x0, y0, x1, y1)
+  if (!seed)
+    return
+
+  const matcher = buildMatcherFromRoi(x0, y0, x1, y1)
+  if (!matcher) {
+    applyRegion(seed.x, seed.y, color, toolMode.value)
+
+    return
+  }
+
+  applyRegionWithMatcher(seed.x, seed.y, color, toolMode.value, matcher)
+}
+
 // Handle canvas click
 const handleCanvasClick = (event: MouseEvent) => {
+  if (selectionMode.value === 'rect')
+    return
+
   if (!displayCanvas.value)
     return
 
@@ -454,6 +766,105 @@ const handleCanvasClick = (event: MouseEvent) => {
     return
 
   applyRegion(x, y, color, toolMode.value)
+}
+
+const selectionOverlayStyle = computed(() => {
+  if (!isSelecting.value || !displayCanvas.value || !selectionStartClient.value || !selectionCurrentClient.value)
+    return null
+
+  const rect = displayCanvas.value.getBoundingClientRect()
+
+  const x0 = selectionStartClient.value.x - rect.left
+  const y0 = selectionStartClient.value.y - rect.top
+  const x1 = selectionCurrentClient.value.x - rect.left
+  const y1 = selectionCurrentClient.value.y - rect.top
+
+  const left = Math.min(x0, x1)
+  const top = Math.min(y0, y1)
+  const width = Math.abs(x1 - x0)
+  const height = Math.abs(y1 - y0)
+
+  return {
+    left: `${left}px`,
+    top: `${top}px`,
+    width: `${width}px`,
+    height: `${height}px`,
+  }
+})
+
+const handleCanvasPointerDown = (event: PointerEvent) => {
+  if (selectionMode.value !== 'rect')
+    return
+
+  if (!displayCanvas.value || isLoading.value)
+    return
+
+  // Only primary button for mouse; allow touch/pen.
+  if (event.pointerType === 'mouse' && event.button !== 0)
+    return
+
+  event.preventDefault()
+  displayCanvas.value.setPointerCapture(event.pointerId)
+
+  isSelecting.value = true
+  selectionStartClient.value = { x: event.clientX, y: event.clientY }
+  selectionCurrentClient.value = { x: event.clientX, y: event.clientY }
+}
+
+const handleCanvasPointerMove = (event: PointerEvent) => {
+  if (!isSelecting.value || selectionMode.value !== 'rect')
+    return
+
+  event.preventDefault()
+  selectionCurrentClient.value = { x: event.clientX, y: event.clientY }
+}
+
+const finishSelection = (event: PointerEvent) => {
+  if (!isSelecting.value || selectionMode.value !== 'rect')
+    return
+
+  event.preventDefault()
+
+  const start = selectionStartClient.value
+  const current = selectionCurrentClient.value
+
+  isSelecting.value = false
+  selectionStartClient.value = null
+  selectionCurrentClient.value = null
+
+  if (!start || !current)
+    return
+
+  const p0 = getCanvasPointFromClient(start.x, start.y)
+  const p1 = getCanvasPointFromClient(current.x, current.y)
+  if (!p0 || !p1)
+    return
+
+  const dx = Math.abs(current.x - start.x)
+  const dy = Math.abs(current.y - start.y)
+
+  // Small drag acts like a normal click.
+  if (dx < 4 && dy < 4) {
+    applyRegionFromRoi(p0.x, p0.y, p0.x, p0.y)
+
+    return
+  }
+
+  applyRegionFromRoi(p0.x, p0.y, p1.x, p1.y)
+}
+
+const handleCanvasPointerUp = (event: PointerEvent) => {
+  finishSelection(event)
+}
+
+const handleCanvasPointerCancel = (event: PointerEvent) => {
+  if (!isSelecting.value)
+    return
+
+  event.preventDefault()
+  isSelecting.value = false
+  selectionStartClient.value = null
+  selectionCurrentClient.value = null
 }
 
 // Reset to original image
@@ -635,6 +1046,27 @@ const colorPalette = [
                 </p>
               </div>
 
+              <!-- Selection Mode -->
+              <div class="mb-6">
+                <label class="text-sm font-weight-medium mb-2 d-block">{{ t('room_painter.controls.selection_mode') }}</label>
+                <VBtnToggle
+                  v-model="selectionMode"
+                  mandatory
+                  divided
+                  class="w-100"
+                >
+                  <VBtn value="point">
+                    {{ t('room_painter.controls.selection_point') }}
+                  </VBtn>
+                  <VBtn value="rect">
+                    {{ t('room_painter.controls.selection_rect') }}
+                  </VBtn>
+                </VBtnToggle>
+                <p class="text-caption text-medium-emphasis mt-2">
+                  {{ t('room_painter.controls.selection_help') }}
+                </p>
+              </div>
+
               <!-- Color Picker -->
               <div class="mb-4">
                 <label class="text-sm font-weight-medium mb-2 d-block">{{ t('room_painter.controls.selected_color') }}</label>
@@ -783,6 +1215,16 @@ const colorPalette = [
                   ref="displayCanvas"
                   class="display-canvas"
                   @click="handleCanvasClick"
+                  @pointerdown="handleCanvasPointerDown"
+                  @pointermove="handleCanvasPointerMove"
+                  @pointerup="handleCanvasPointerUp"
+                  @pointercancel="handleCanvasPointerCancel"
+                />
+
+                <div
+                  v-if="selectionOverlayStyle"
+                  class="selection-rect"
+                  :style="selectionOverlayStyle"
                 />
 
                 <div
@@ -858,6 +1300,29 @@ const colorPalette = [
               class="color-picker color-picker--sm"
               :aria-label="t('room_painter.aria.selected_color')"
             >
+          </div>
+
+          <div class="d-flex align-center gap-2 mt-2">
+            <VBtnToggle
+              v-model="selectionMode"
+              mandatory
+              divided
+              density="compact"
+              class="w-100"
+            >
+              <VBtn
+                value="point"
+                size="small"
+              >
+                {{ t('room_painter.controls.selection_point') }}
+              </VBtn>
+              <VBtn
+                value="rect"
+                size="small"
+              >
+                {{ t('room_painter.controls.selection_rect') }}
+              </VBtn>
+            </VBtnToggle>
           </div>
 
           <div class="mobile-color-row mt-2">
@@ -1017,6 +1482,16 @@ const colorPalette = [
   max-block-size: 800px;
   max-inline-size: 100%;
   object-fit: contain;
+  touch-action: none;
+}
+
+.selection-rect {
+  position: absolute;
+  z-index: 5;
+  border: 2px solid rgb(var(--v-theme-primary));
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.04);
+  pointer-events: none;
 }
 
 .loading-overlay {

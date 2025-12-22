@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
-import { useValidators } from '@/utils/validators'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useValidators } from '@/utils/validators'
 
 definePageMeta({
   admin: true,
@@ -18,6 +18,7 @@ const isEdit = computed(() => !!route.query.id)
 useHead(() => ({
   title: isEdit.value ? t('management.products.editor.title_edit') : t('management.products.editor.title_create'),
 }))
+
 const snackbar = ref({ show: false, text: '', color: 'error' })
 const saving = ref(false)
 const uploadingCover = ref(false)

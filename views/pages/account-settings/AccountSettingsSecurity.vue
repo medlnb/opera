@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { useValidators } from '@/utils/validators'
 import { useI18n } from 'vue-i18n'
+import { useValidators } from '@/utils/validators'
 
 const isCurrentPasswordVisible = ref(false)
 const isNewPasswordVisible = ref(false)

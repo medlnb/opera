@@ -1,8 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth.js'
 import { useValidators } from '@/utils/validators'
-import { useI18n } from 'vue-i18n'
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
 

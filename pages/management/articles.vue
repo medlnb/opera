@@ -1,9 +1,9 @@
 <script setup>
-import { useApi } from '@/composables/useApi'
-import { paginationMeta } from '@api-utils/paginationMeta'
 import { debounce } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { paginationMeta } from '@api-utils/paginationMeta'
+import { useApi } from '@/composables/useApi'
 
 definePageMeta({
   authed: true,

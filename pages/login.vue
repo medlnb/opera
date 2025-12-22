@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
@@ -6,7 +7,6 @@ import logo from '@images/logo-v2.svg'
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { themeConfig } from '@themeConfig'
-import { useI18n } from 'vue-i18n'
 
 const config = useRuntimeConfig()
 
@@ -129,10 +129,13 @@ const { phoneValidator } = useValidators()
                   :placeholder="t('auth.phone_placeholder')"
                   maxlength="9"
                   :rules="[phoneValidator]"
-                  @input="form.phone = form.phone.replace(/\D/g, '')"
                   dir="ltr"
+                  @input="form.phone = form.phone.replace(/\D/g, '')"
                 >
-                  <template v-if="locale ==='ar'" #append-inner>
+                  <template
+                    v-if="locale === 'ar'"
+                    #append-inner
+                  >
                     <p
                       class="mb-0"
                       style="margin-block-start: 1px;"
@@ -140,14 +143,17 @@ const { phoneValidator } = useValidators()
                       0
                     </p>
                   </template>
-                  <template v-else #prepend-inner>
+                  <template
+                    v-else
+                    #prepend-inner
+                  >
                     <p
                       class="mb-0"
                       style="margin-block-start: 1px;"
                     >
                       0
                     </p>
-                  </template>                  
+                  </template>
                 </AppTextField>
               </VCol>
 

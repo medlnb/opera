@@ -1,9 +1,9 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
-import { useI18n } from 'vue-i18n'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,

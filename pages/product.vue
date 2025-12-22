@@ -1,8 +1,8 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-import { useCartStore } from '@/stores/cart'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useCartStore } from '@/stores/cart'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
@@ -67,10 +67,10 @@ function translateMaterial(value) {
   const map = {
     'Eponge nature': 'sponge_nature',
     'tampon décore': 'decorative_stamp',
-    Lisseuse: 'trowel',
-    couteau: 'knife',
-    brosse: 'brush',
-    Pinceau: 'paintbrush',
+    'Lisseuse': 'trowel',
+    'couteau': 'knife',
+    'brosse': 'brush',
+    'Pinceau': 'paintbrush',
     'Lisseuse inox': 'stainless_trowel',
     'Pinceau plat spalter': 'flat_brush_spalter',
     'spatule plasque': 'plastic_spatula',
@@ -87,10 +87,10 @@ function translateMaterial(value) {
 
 function translateAspect(value) {
   const map = {
-    Mitallise: 'metallized',
-    Brillant: 'glossy',
-    Soyeux: 'silky',
-    Lumineux: 'luminous',
+    'Mitallise': 'metallized',
+    'Brillant': 'glossy',
+    'Soyeux': 'silky',
+    'Lumineux': 'luminous',
     'Marbre Ultra Brillant': 'ultra_gloss_marble',
   }
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { db } from '@/fake-db/pages/profile/index'
 import type { ProfileHeader } from '@db/pages/profile/types'
+import { db } from '@/fake-db/pages/profile/index'
 
 const userData = db.data.profileHeader
 const profileHeaderData = ref<ProfileHeader>()

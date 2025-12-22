@@ -1,9 +1,9 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-import { paginationMeta } from '@api-utils/paginationMeta'
 import { debounce } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { paginationMeta } from '@api-utils/paginationMeta'
+import { useAuthStore } from '@/stores/auth'
 
 definePageMeta({
   authed: true,
