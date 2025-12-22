@@ -358,6 +358,7 @@ const isEdgePixelByMatcher = (
 
 const hueDistance = (a: number, b: number) => {
   const d = Math.abs(a - b) % 360
+
   return d > 180 ? 360 - d : d
 }
 
@@ -472,6 +473,7 @@ const applyRegionWithMatcher = (
     const edge = matcher
       ? isEdgePixelByMatcher(x, y, originalPixels, width, height, colorMatch)
       : isEdgePixel(x, y, originalPixels, width, height, regionR, regionG, regionB)
+
     const alpha = edge ? 0.7 : 1.0
 
     if (mode === 'paint') {
@@ -649,6 +651,7 @@ const buildMatcherFromRoi = (x0: number, y0: number, x1: number, y1: number): Re
       maxL = Math.max(maxL, l)
 
       const w = Math.max(0.001, s)
+
       sumSin += Math.sin((h * Math.PI) / 180) * w
       sumCos += Math.cos((h * Math.PI) / 180) * w
       sumSat += s

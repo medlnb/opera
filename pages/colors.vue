@@ -1,6 +1,6 @@
 <script setup>
-import { useApi } from '@/composables/useApi'
 import { useI18n } from 'vue-i18n'
+import { useApi } from '@/composables/useApi'
 
 const loading = ref(false)
 const colors = ref([])
@@ -34,10 +34,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div
-      class="mb-4"
-      style="position: relative;"
-    >
+    <div class="mb-4 hero-wrap">
       <VImg
         src="https://jazeerapaints.com/media/blockbuilder_blocktype/1/1/1172x210_3_1__2.png"
         class="rounded w-100 hero-img"
@@ -57,9 +54,9 @@ onMounted(() => {
       </VImg>
       <div
         style="inset: 0;"
-        class="d-flex align-center justify-center position-absolute"
+        class="d-flex align-center justify-center position-absolute hero-overlay"
       >
-        <div class="text-center px-4">
+        <div class="text-center px-4 hero-text">
           <p class="mb-1 hero-title">
             {{ t('colors_page.hero_title') }}
           </p>
@@ -164,11 +161,47 @@ onMounted(() => {
 .hero-title {
   font-size: 1.5rem;
   font-weight: 1200;
+  text-shadow:
+    0 1px 2px rgba(var(--v-theme-surface), 0.9),
+    0 0 1px rgba(var(--v-theme-on-surface), 0.25);
 }
 
 .hero-subtitle {
   font-size: 1rem;
   font-weight: 1200;
+  text-shadow:
+    0 1px 2px rgba(var(--v-theme-surface), 0.9),
+    0 0 1px rgba(var(--v-theme-on-surface), 0.25);
+}
+
+.hero-wrap {
+  position: relative;
+}
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.hero-overlay {
+  position: absolute;
+}
+
+.hero-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Soft halo behind text for readability (no visible box). */
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(var(--v-theme-surface), 0.92) 0%,
+      rgba(var(--v-theme-surface), 0.55) 38%,
+      rgba(var(--v-theme-surface), 0.18) 58%,
+      rgba(var(--v-theme-surface), 0) 82%
+    );
 }
 
 @media (min-width: 600px) {
