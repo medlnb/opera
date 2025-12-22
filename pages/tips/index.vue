@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import tips from '@images/tips.webp'
+import { useI18n } from 'vue-i18n'
 
 const config = useRuntimeConfig()
 const articles = ref([])
@@ -210,18 +210,18 @@ onMounted(() => {
 }
 
 .hero-title {
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: 1.5rem;
+  font-weight: 1200;
 }
 
 .hero-subtitle {
-  font-size: 0.7rem;
+  font-size: 1rem;
+  font-weight: 1200;
 }
 
 @media (min-width: 600px) {
   .hero-title {
     font-size: 2rem;
-    font-weight: 900;
   }
 
   .hero-subtitle {
