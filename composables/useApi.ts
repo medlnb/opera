@@ -1,6 +1,6 @@
+import { useAuthStore } from '@/stores/auth'
 import { defu } from 'defu'
 import type { UseFetchOptions } from 'nuxt/app'
-import { useAuthStore } from '@/stores/auth'
 
 export const useApi: typeof useFetch = <T>(url: MaybeRefOrGetter<string>, options: UseFetchOptions<T> = {}) => {
   const config = useRuntimeConfig()
@@ -26,7 +26,7 @@ export const useApi: typeof useFetch = <T>(url: MaybeRefOrGetter<string>, option
   const queryKey = makeQueryKey((options as any)?.query ?? (options as any)?.params)
 
   const defaults: UseFetchOptions<T> = {
-    baseURL: config.public.apiBaseUrl ?? 'http://localhost:8888',
+    baseURL: config.public.apiBaseUrl ,
 
     // Only cache/dedupe GET requests by default.
     // For POST/PATCH/etc we want a fresh request each time even if the URL is the same.
