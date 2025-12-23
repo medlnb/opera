@@ -220,6 +220,93 @@
             "users": "المستخدمون"
         }
     },
+    "painters_page": {
+        "title": "الرسامين",
+        "filters": {
+            "state": "الولاية",
+            "city": "البلدية",
+            "state_placeholder": "اختر ولاية",
+            "city_placeholder": "اختر بلدية"
+        },
+        "empty": {
+            "title": "لم يتم العثور على رسامين",
+            "subtitle": "جرّب تغيير فلاتر منطقة الخدمة"
+        },
+        "card": {
+            "unnamed": "رسام",
+            "note": "الطلبات محدودة حسب منطقة الخدمة.",
+            "service_area": "منطقة الخدمة: {city}، {state}",
+            "service_areas": "مناطق الخدمة: {areas}"
+        },
+        "actions": {
+            "apply": "قدّم لتصبح رسامًا",
+            "request": "طلب",
+            "cancel": "إلغاء",
+            "submit_request": "إرسال الطلب",
+            "sign_in_to_apply": "سجّل الدخول للتقديم",
+            "sign_in_to_request": "سجّل الدخول لطلب رسام"
+        },
+        "request": {
+            "title": "طلب رسام",
+            "subtitle": "طلب: {name}",
+            "must_match": "يجب أن تتطابق الولاية/البلدية مع إحدى المناطق: {areas}",
+            "fields": {
+                "state": "الولاية",
+                "city": "البلدية",
+                "address": "العنوان (اختياري)",
+                "address_placeholder": "عنوان الشارع",
+                "note": "ملاحظة (اختياري)",
+                "note_placeholder": "أحتاج عرض سعر لغرفتين"
+            }
+        },
+        "validation": {
+            "fix_errors": "يرجى تصحيح الأخطاء المميزة"
+        },
+        "errors": {
+            "load_failed": "فشل تحميل الرسامين",
+            "request_failed": "فشل طلب الرسام",
+            "area_mismatch": "المنطقة المحددة لا تطابق منطقة خدمة هذا الرسام."
+        },
+        "snackbar": {
+            "requested": "تم إرسال طلب الرسام"
+        }
+    },
+    "painters_apply_page": {
+        "title": "كن رسامًا",
+        "current_area": "منطقة خدمتك الحالية: {city}، {state}",
+        "current_areas": "مناطق خدمتك الحالية: {areas}",
+        "service_areas_title": "مناطق الخدمة",
+        "actions": {
+            "add_area": "إضافة منطقة خدمة"
+        },
+        "requests": {
+            "title": "الطلبات الواردة",
+            "empty": "لا توجد طلبات واردة",
+            "table": {
+                "requester": "الطالب",
+                "area": "المنطقة",
+                "address": "العنوان",
+                "note": "ملاحظة",
+                "status": "الحالة",
+                "date": "التاريخ"
+            },
+            "snackbar": {
+                "status_updated": "تم تحديث حالة الطلب",
+                "status_update_failed": "فشل تحديث حالة الطلب"
+            }
+        },
+        "status": {
+            "pending": "قيد الانتظار",
+            "accepted": "مقبول",
+            "rejected": "مرفوض",
+            "cancelled": "ملغي",
+            "completed": "مكتمل"
+        },
+        "state": "الولاية",
+        "requests_load_failed": "فشل تحميل الطلبات الواردة",
+        "state_placeholder": "اختر ولاية",
+        "city_placeholder": "اختر بلدية"
+    },
     "user": {
         "my_orders": "طلباتي",
         "my_cart": "سلّتي",
@@ -310,6 +397,18 @@
         "actions": {
             "save_changes": "حفظ التغييرات",
             "reset": "إعادة ضبط"
+        },
+        "painter": {
+            "title": "إعدادات الرسام",
+            "no_profile": "ليس لديك ملف رسام بعد. حدّد مناطق الخدمة لتصبح رسامًا.",
+            "current_area": "منطقة خدمتك الحالية: {city}، {state}",
+            "errors": {
+                "load_failed": "فشل تحميل ملف الرسام",
+                "save_failed": "فشل حفظ إعدادات الرسام"
+            },
+            "snackbar": {
+                "saved": "تم حفظ إعدادات الرسام"
+            }
         },
         "validation": {
             "fix_errors": "يرجى تصحيح الأخطاء المميزة"

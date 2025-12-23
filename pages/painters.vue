@@ -53,6 +53,7 @@ const fetchPainters = async () => {
 
     if (error.value) {
       showSnackbar(error.value?.data?.message || t('painters_page.errors.load_failed'), 'error')
+
       return painters.value = []
     }
 
@@ -94,17 +95,19 @@ const painterDisplayName = painter => {
 
 const painterAreasLabel = painter => {
   const areas = Array.isArray(painter?.serviceAreas) ? painter.serviceAreas : []
-  if (!areas.length) return ''
+  if (!areas.length)
+    return ''
 
   return areas.map(a => `${a.city}, ${a.state}`).join(' | ')
 }
 
 const painterServiceAreas = painter => {
   const areas = Array.isArray(painter?.serviceAreas) ? painter.serviceAreas : []
-  if (areas.length)
+  if (areas.length) {
     return areas
       .map(a => ({ city: a?.city ?? '', state: a?.state ?? '' }))
       .filter(a => a.city && a.state)
+  }
 
   // legacy fallback
   if (painter?.city && painter?.state)
@@ -155,6 +158,7 @@ const openRequest = painter => {
   if (!authStore.token) {
     showSnackbar(t('painters_page.actions.sign_in_to_request'), 'info')
     navigateTo('/login')
+
     return
   }
 
@@ -174,6 +178,7 @@ const openRequest = painter => {
   else {
     // Keep state only if it's valid for this painter
     const validStates = new Set(areas.map(a => a.state))
+
     requestForm.value.state = validStates.has(filters.value.state) ? filters.value.state : null
     requestForm.value.city = null
   }
@@ -187,12 +192,12 @@ const submitRequest = async () => {
   if (!selectedPainter.value)
     return
 
-  if (!requestForm.value.state || !requestForm.value.city) 
+  if (!requestForm.value.state || !requestForm.value.city)
     return showSnackbar(t('painters_page.validation.fix_errors'), 'error')
 
   const painterUserId = selectedPainter.value?.user?._id || selectedPainter.value?.user?.id || selectedPainter.value?.user
 
-  if (!painterUserId) 
+  if (!painterUserId)
     return showSnackbar(t('painters_page.errors.request_failed'), 'error')
 
   requestLoading.value = true

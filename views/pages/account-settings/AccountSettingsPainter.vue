@@ -9,6 +9,7 @@ const authStore = useAuthStore()
 const { requiredValidator } = useValidators()
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
+
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
@@ -21,19 +22,21 @@ const stateOptions = computed(() =>
 )
 
 const getCityOptionsForState = stateName => {
-  if (!stateName) return []
+  if (!stateName)
+    return []
 
   const group = wilayaGroups.find(g => String(g[0].name) === String(stateName))
+
   return group ? group.map(c => ({ id: String(c.name), label: String(c.name) })) : []
 }
 
-const statusOptions = [
-  { id: 'pending', label: 'pending' },
-  { id: 'accepted', label: 'accepted' },
-  { id: 'rejected', label: 'rejected' },
-  { id: 'cancelled', label: 'cancelled' },
-  { id: 'completed', label: 'completed' },
-]
+const statusOptions = computed(() => [
+  { id: 'pending', label: t('painters_apply_page.status.pending') },
+  { id: 'accepted', label: t('painters_apply_page.status.accepted') },
+  { id: 'rejected', label: t('painters_apply_page.status.rejected') },
+  { id: 'cancelled', label: t('painters_apply_page.status.cancelled') },
+  { id: 'completed', label: t('painters_apply_page.status.completed') },
+])
 
 const formRef = ref()
 
@@ -147,13 +150,14 @@ const savePainterSettings = async () => {
   if (!cleaned.length) {
     // Trigger Vuetify validation so inputs show errors
     await formRef.value?.validate?.()
+
     return showSnackbar(t('settings.validation.fix_errors'), 'error')
   }
 
   saving.value = true
   try {
     const currentRole = (authStore.user || {}).role
-    const isPainter = currentRole === 'painter' 
+    const isPainter = currentRole === 'painter' || currentRole === 'admin'
 
     // If already a painter, update service areas.
     // Otherwise, apply to become a painter.
@@ -165,7 +169,7 @@ const savePainterSettings = async () => {
       body: { serviceAreas: cleaned },
     })
 
-    if (error.value) 
+    if (error.value)
       return showSnackbar(error.value?.data?.message || t('settings.painter.errors.save_failed'), 'error')
 
     const payload = data.value?.data ?? data.value
@@ -173,7 +177,10 @@ const savePainterSettings = async () => {
     // Apply route returns { painter, user }; update route returns painter.
     const updatedPainter = payload?.painter ?? payload
 
-    authStore.patchUser({ role: 'painter' })
+    if (payload?.user)
+      authStore.patchUser(payload.user)
+    else if (currentRole !== 'admin')
+      authStore.patchUser({ role: 'painter' })
 
     painterProfile.value = updatedPainter ?? painterProfile.value
     showSnackbar(t('settings.painter.snackbar.saved'), 'success')
@@ -223,17 +230,17 @@ const updateRequestStatus = async (req, newStatus) => {
     })
 
     if (error.value) {
-      showSnackbar(error.value?.data?.message || 'Failed to update request status', 'error')
+      showSnackbar(error.value?.data?.message || t('painters_apply_page.requests.snackbar.status_update_failed'), 'error')
 
       return
     }
 
     req.status = newStatus
-    showSnackbar('Request status updated', 'success')
+    showSnackbar(t('painters_apply_page.requests.snackbar.status_updated'), 'success')
   }
   catch (e) {
     console.error(e)
-    showSnackbar('Failed to update request status', 'error')
+    showSnackbar(t('painters_apply_page.requests.snackbar.status_update_failed'), 'error')
   }
   finally {
     requestRowBusy.value = { ...requestRowBusy.value, [id]: false }
@@ -241,7 +248,8 @@ const updateRequestStatus = async (req, newStatus) => {
 }
 
 onMounted(async () => {
-  if(authStore.user?.role !== 'painter') return 
+  if (authStore.user?.role !== 'painter' && authStore.user?.role !== 'admin')
+    return
   await loadProfile()
   await loadIncomingRequests()
 })
@@ -330,7 +338,7 @@ onMounted(async () => {
                     {{ t('painters_apply_page.actions.add_area') }}
                   </VBtn>
                 </VCol>
-                
+
                 <VCol
                   cols="12"
                   class="d-flex flex-wrap gap-4"
@@ -358,7 +366,10 @@ onMounted(async () => {
         </VCard>
       </VCol>
 
-      <VCol cols="12" v-if="authStore.user?.role === 'painter'">
+      <VCol
+        v-if="authStore.user?.role === 'painter' || authStore.user?.role === 'admin'"
+        cols="12"
+      >
         <VCard :title="t('painters_apply_page.requests.title')">
           <VCardText>
             <div v-if="requestsLoading">

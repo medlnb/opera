@@ -172,6 +172,93 @@
             "users": "Utilisateurs"
         }
     },
+    "painters_page": {
+        "title": "Peintres",
+        "filters": {
+            "state": "Wilaya",
+            "city": "Commune",
+            "state_placeholder": "Sélectionner une wilaya",
+            "city_placeholder": "Sélectionner une commune"
+        },
+        "empty": {
+            "title": "Aucun peintre trouvé",
+            "subtitle": "Essayez de modifier les filtres de zone de service"
+        },
+        "card": {
+            "unnamed": "Peintre",
+            "note": "Les demandes sont limitées à la zone de service.",
+            "service_area": "Zone de service : {city}, {state}",
+            "service_areas": "Zones de service : {areas}"
+        },
+        "actions": {
+            "apply": "Devenir peintre",
+            "request": "Demander",
+            "cancel": "Annuler",
+            "submit_request": "Envoyer la demande",
+            "sign_in_to_apply": "Connectez-vous pour postuler",
+            "sign_in_to_request": "Connectez-vous pour demander"
+        },
+        "request": {
+            "title": "Demander un peintre",
+            "subtitle": "Demande : {name}",
+            "must_match": "La ville/wilaya doit correspondre à : {areas}",
+            "fields": {
+                "state": "Wilaya",
+                "city": "Commune",
+                "address": "Adresse (optionnel)",
+                "address_placeholder": "Adresse",
+                "note": "Note (optionnel)",
+                "note_placeholder": "Besoin d'un devis pour 2 pièces"
+            }
+        },
+        "validation": {
+            "fix_errors": "Veuillez corriger les erreurs surlignées"
+        },
+        "errors": {
+            "load_failed": "Échec du chargement des peintres",
+            "request_failed": "Échec de la demande de peintre",
+            "area_mismatch": "La zone sélectionnée ne correspond pas à la zone de service de ce peintre."
+        },
+        "snackbar": {
+            "requested": "Demande envoyée"
+        }
+    },
+    "painters_apply_page": {
+        "title": "Devenir peintre",
+        "current_area": "Votre zone de service actuelle : {city}, {state}",
+        "current_areas": "Vos zones de service actuelles : {areas}",
+        "service_areas_title": "Zones de service",
+        "actions": {
+            "add_area": "Ajouter une zone de service"
+        },
+        "requests": {
+            "title": "Demandes reçues",
+            "empty": "Aucune demande reçue",
+            "table": {
+                "requester": "Demandeur",
+                "area": "Zone",
+                "address": "Adresse",
+                "note": "Note",
+                "status": "Statut",
+                "date": "Date"
+            },
+            "snackbar": {
+                "status_updated": "Statut de la demande mis à jour",
+                "status_update_failed": "Échec de la mise à jour du statut"
+            }
+        },
+        "status": {
+            "pending": "En attente",
+            "accepted": "Acceptée",
+            "rejected": "Refusée",
+            "cancelled": "Annulée",
+            "completed": "Terminée"
+        },
+        "state": "Wilaya",
+        "requests_load_failed": "Échec du chargement des demandes reçues",
+        "state_placeholder": "Sélectionner une wilaya",
+        "city_placeholder": "Sélectionner une commune"
+    },
     "user": {
         "my_orders": "Mes commandes",
         "my_cart": "Mon panier",
@@ -262,6 +349,18 @@
         "actions": {
             "save_changes": "Enregistrer les modifications",
             "reset": "Réinitialiser"
+        },
+        "painter": {
+            "title": "Paramètres peintre",
+            "no_profile": "Vous n'avez pas encore de profil peintre. Définissez vos zones de service pour devenir peintre.",
+            "current_area": "Votre zone de service actuelle : {city}, {state}",
+            "errors": {
+                "load_failed": "Échec du chargement de votre profil peintre",
+                "save_failed": "Échec de l'enregistrement des paramètres peintre"
+            },
+            "snackbar": {
+                "saved": "Paramètres peintre enregistrés"
+            }
         },
         "validation": {
             "fix_errors": "Veuillez corriger les erreurs indiquées"

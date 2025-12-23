@@ -179,7 +179,18 @@
                 "note": "Note",
                 "status": "Status",
                 "date": "Date"
+            },
+            "snackbar": {
+                "status_updated": "Request status updated",
+                "status_update_failed": "Failed to update request status"
             }
+        },
+        "status": {
+            "pending": "Pending",
+            "accepted": "Accepted",
+            "rejected": "Rejected",
+            "cancelled": "Cancelled",
+            "completed": "Completed"
         },
         "state": "State",
         "save_failed": "Failed to save painter settings",
