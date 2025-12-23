@@ -53,6 +53,11 @@ export function useNavItems() {
         title: 'nav.painters',
         icon: { icon: 'tabler-users' },
       },
+      {
+        to: { name: 'contact' },
+        title: 'nav.contact',
+        icon: { icon: 'tabler-phone' },
+      },
       (user as any)?.role as string === 'admin' && {
         title: 'nav.management.root',
         icon: { icon: 'tabler-user-shield' },
