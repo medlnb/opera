@@ -160,6 +160,7 @@
         "tips": "Conseils",
         "inspirations": "Inspirations",
         "virtual_painter": "Peintre virtuel",
+        "painters": "Peintres",
         "management": {
             "root": "Administration",
             "dashboard": "Tableau de bord",
@@ -255,7 +256,8 @@
     "settings": {
         "tabs": {
             "account": "Compte",
-            "security": "Sécurité"
+            "security": "Sécurité",
+            "painter": "Peintre"
         },
         "actions": {
             "save_changes": "Enregistrer les modifications",

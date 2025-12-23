@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = user
     },
     patchUser(newProps) {
-      this.user = { ...this.user, ...newProps }
+      this.user = { ...(this.user || {}), ...newProps }
     },
     logout() {
       this.token = null

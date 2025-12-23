@@ -1,11 +1,15 @@
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 import AccountSettingsAccount from '@/views/pages/account-settings/AccountSettingsAccount.vue'
+import AccountSettingsPainter from '@/views/pages/account-settings/AccountSettingsPainter.vue'
 import AccountSettingsSecurity from '@/views/pages/account-settings/AccountSettingsSecurity.vue'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute('settings-tab')
 
 const { t } = useI18n({ useScope: 'global' })
+const { user } = useAuthStore()
+
 
 const activeTab = computed({
   get: () => route.params.tab,
@@ -16,10 +20,16 @@ const activeTab = computed({
 const tabs = [
   { titleKey: 'settings.tabs.account', icon: 'tabler-users', tab: 'account' },
   { titleKey: 'settings.tabs.security', icon: 'tabler-lock', tab: 'security' },
-]
+  user?.role !== "admin" ?  { titleKey: 'settings.tabs.painter', icon: 'tabler-brush', tab: 'painter' } : null,
+].filter(Boolean)
 
 useHead(() => ({
-  title: activeTab.value === 'security' ? t('settings.tabs.security') : t('settings.tabs.account'),
+  title:
+    activeTab.value === 'security'
+      ? t('settings.tabs.security')
+      : activeTab.value === 'painter'
+        ? t('settings.tabs.painter')
+        : t('settings.tabs.account'),
 }))
 
 definePageMeta({
@@ -61,6 +71,10 @@ definePageMeta({
 
         <VWindowItem value="security">
           <AccountSettingsSecurity />
+        </VWindowItem>
+
+        <VWindowItem value="painter">
+          <AccountSettingsPainter />
         </VWindowItem>
         <!--
           <VWindowItem value="billing-plans">

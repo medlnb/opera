@@ -48,6 +48,11 @@ export function useNavItems() {
         title: 'nav.virtual_painter',
         icon: { icon: 'tabler-brush' },
       },
+      {
+        to: { name: 'painters' },
+        title: 'nav.painters',
+        icon: { icon: 'tabler-users' },
+      },
       (user as any)?.role as string === 'admin' && {
         title: 'nav.management.root',
         icon: { icon: 'tabler-user-shield' },

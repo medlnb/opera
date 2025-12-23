@@ -98,6 +98,7 @@
         "tips": "Tips",
         "inspirations": "Inspirations",
         "virtual_painter": "Virtual Painter",
+        "painters": "Painters",
         "management": {
             "root": "Management",
             "dashboard": "Dashboard",
@@ -108,6 +109,98 @@
             "orders": "Orders",
             "users": "Users"
         }
+    },
+    "painters_page": {
+        "title": "Painters",
+        "filters": {
+            "state": "State",
+            "city": "City",
+            "state_placeholder": "Select a state",
+            "city_placeholder": "Select a city"
+        },
+        "empty": {
+            "title": "No painters found",
+            "subtitle": "Try changing the service area filters"
+        },
+        "card": {
+            "unnamed": "Painter",
+            "note": "Requests are limited to the service area.",
+            "service_area": "Service area: {city}, {state}",
+            "service_areas": "Service areas: {areas}"
+        },
+        "actions": {
+            "apply": "Apply to be a painter",
+            "request": "Request",
+            "cancel": "Cancel",
+            "submit_request": "Send request",
+            "sign_in_to_apply": "Sign in to apply",
+            "sign_in_to_request": "Sign in to request"
+        },
+        "request": {
+            "title": "Request a painter",
+            "subtitle": "Requesting: {name}",
+            "must_match": "City/state must match one of: {areas}",
+            "fields": {
+                "state": "State",
+                "city": "City",
+                "address": "Address (optional)",
+                "address_placeholder": "Street address",
+                "note": "Note (optional)",
+                "note_placeholder": "Need a quote for 2 rooms"
+            }
+        },
+        "validation": {
+            "fix_errors": "Please fix the highlighted errors"
+        },
+        "errors": {
+            "load_failed": "Failed to load painters",
+            "request_failed": "Failed to request painter",
+            "area_mismatch": "The selected area does not match this painter's service area."
+        },
+        "snackbar": {
+            "requested": "Painter requested"
+        }
+    },
+    "painters_apply_page": {
+        "title": "Become a painter",
+        "current_area": "Your current service area: {city}, {state}",
+        "current_areas": "Your current service areas: {areas}",
+        "service_areas_title": "Service areas",
+        "actions": {
+            "add_area": "Add service area"
+        },
+        "requests": {
+            "title": "Incoming requests",
+            "empty": "No incoming requests",
+            "table": {
+                "requester": "Requester",
+                "area": "Area",
+                "address": "Address",
+                "note": "Note",
+                "status": "Status",
+                "date": "Date"
+            }
+        },
+        "state": "State",
+        "save_failed": "Failed to save painter settings",
+        "requests_load_failed": "Failed to load incoming requests",
+        "state_placeholder": "Select a state",
+        "city_placeholder": "Select a city"
+    },
+    "actions": {
+        "back_to_list": "Back to painters",
+        "apply": "Apply",
+        "update": "Update"
+    },
+    "validation": {
+        "fix_errors": "Please fix the highlighted errors"
+    },
+    "errors": {
+        "load_failed": "Failed to load your painter profile",
+        "apply_failed": "Failed to apply as painter"
+    },
+    "snackbar": {
+        "applied": "Painter profile saved"
     },
     "user": {
         "my_orders": "My Orders",
@@ -193,11 +286,24 @@
     "settings": {
         "tabs": {
             "account": "Account",
-            "security": "Security"
+            "security": "Security",
+            "painter": "Painter"
         },
         "actions": {
             "save_changes": "Save changes",
             "reset": "Reset"
+        },
+        "painter": {
+            "title": "Painter settings",
+            "no_profile": "You don't have a painter profile yet. Set your service area to become a painter.",
+            "current_area": "Your current service area: {city}, {state}",
+            "errors": {
+                "load_failed": "Failed to load your painter profile",
+                "save_failed": "Failed to save painter settings"
+            },
+            "snackbar": {
+                "saved": "Painter settings saved"
+            }
         },
         "validation": {
             "fix_errors": "Please fix the highlighted errors"

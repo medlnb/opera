@@ -208,6 +208,7 @@
         "tips": "نصائح",
         "inspirations": "إلهام",
         "virtual_painter": "الرسام الافتراضي",
+        "painters": "الرسامين",
         "management": {
             "root": "الإدارة",
             "dashboard": "لوحة التحكم",
@@ -303,7 +304,8 @@
     "settings": {
         "tabs": {
             "account": "الحساب",
-            "security": "الأمان"
+            "security": "الأمان",
+            "painter": "الرسام"
         },
         "actions": {
             "save_changes": "حفظ التغييرات",

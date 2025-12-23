@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
+import { useI18n } from 'vue-i18n'
 
 const authStore = useAuthStore()
 
@@ -83,7 +83,9 @@ const logout = () => {
             <VListItemTitle class="font-weight-semibold">
               {{ `${authStore.user?.firstName || ''} ${authStore.user?.lastName || ''}` }}
             </VListItemTitle>
-            <VListItemSubtitle>{{ authStore.user?.phone ? `${authStore.user.phone.slice(0, 4)} ${authStore.user.phone.slice(4, 20)}` : '' }}</VListItemSubtitle>
+            <VListItemSubtitle v-if="authStore.user?.phone">
+              <bdi dir="ltr">{{ `${authStore.user.phone.slice(0, 4)} ${authStore.user.phone.slice(4, 20)}` }}</bdi>
+            </VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />
