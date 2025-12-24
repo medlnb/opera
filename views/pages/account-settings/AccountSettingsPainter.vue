@@ -43,6 +43,9 @@ const formRef = ref()
 const profileLoading = ref(false)
 const saving = ref(false)
 
+const availabilityLocal = ref(true)
+const availabilitySaving = ref(false)
+
 const painterProfile = ref(null)
 
 const serviceAreasLocal = ref([
@@ -88,6 +91,7 @@ const loadProfile = async () => {
 
     painterProfile.value = profile
     serviceAreasLocal.value = normalizeServiceAreas(profile)
+    availabilityLocal.value = profile?.available !== false
   }
   catch (e) {
     console.error(e)
@@ -95,6 +99,58 @@ const loadProfile = async () => {
   }
   finally {
     profileLoading.value = false
+  }
+}
+
+const saveAvailability = async (nextAvailable) => {
+  const currentRole = (authStore.user || {}).role
+  const isPainter = currentRole === 'painter' || currentRole === 'admin'
+  if (!isPainter)
+    return
+
+  if (!painterProfile.value) {
+    showSnackbar(t('settings.painter.no_profile'), 'info')
+
+    return
+  }
+
+  availabilitySaving.value = true
+  try {
+    const { error } = await useApi('/api/painters/me/availability', {
+      method: 'PATCH',
+      body: { available: !!nextAvailable },
+    })
+
+    if (error.value)
+      return showSnackbar(error.value?.data?.message || t('settings.painter.errors.availability_failed'), 'error')
+
+    showSnackbar(t('settings.painter.snackbar.availability_updated'), 'success')
+
+    // Keep local state in sync without a second network request.
+    painterProfile.value = { ...painterProfile.value, available: !!nextAvailable }
+  }
+  catch (e) {
+    console.error(e)
+    showSnackbar(t('settings.painter.errors.availability_failed'), 'error')
+  }
+  finally {
+    availabilitySaving.value = false
+  }
+}
+
+const onAvailabilityToggle = async nextValue => {
+  if (profileLoading.value || availabilitySaving.value)
+    return
+
+  const previous = availabilityLocal.value
+  availabilityLocal.value = !!nextValue
+
+  try {
+    await saveAvailability(availabilityLocal.value)
+  }
+  catch (e) {
+    availabilityLocal.value = previous
+    throw e
   }
 }
 
@@ -273,6 +329,41 @@ onMounted(async () => {
               class="mt-2"
             >
               <VRow>
+                <VCol cols="12">
+                  <div class="d-flex align-center justify-space-between flex-wrap gap-3">
+                    <div>
+                      <h6 class="text-h6 mb-0">
+                        {{ t('settings.painter.availability.title') }}
+                      </h6>
+                      <p class="text-body-2 text-medium-emphasis mb-0">
+                        {{ t('settings.painter.availability.help') }}
+                      </p>
+                    </div>
+
+                    <div class="d-flex align-center gap-3">
+                      <VSwitch
+                        v-model="availabilityLocal"
+                        :label="availabilityLocal ? t('settings.painter.availability.available') : t('settings.painter.availability.unavailable')"
+                        color="success"
+                        inset
+                        hide-details
+                        :disabled="profileLoading || availabilitySaving"
+                        @update:model-value="onAvailabilityToggle"
+                      />
+
+                      <VProgressCircular
+                        v-if="availabilitySaving"
+                        size="20"
+                        width="2"
+                        indeterminate
+                        color="primary"
+                      />
+                    </div>
+                  </div>
+
+                  <VDivider class="my-4" />
+                </VCol>
+
                 <VCol cols="12">
                   <h6 class="text-h6 mb-0">
                     {{ t('painters_apply_page.service_areas_title') }}

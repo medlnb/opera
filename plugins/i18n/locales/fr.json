@@ -111,6 +111,15 @@
             "subtitle": "Choisissez une photo de votre pièce pour commencer à peindre les murs",
             "select_image": "Sélectionner une image"
         },
+        "samples": {
+            "title": "Ou utiliser une image d'exemple",
+            "subtitle": "Choisissez un exemple pour tester l'outil",
+            "categories": {
+                "room": "Pièce",
+                "livingroom": "Salon",
+                "kitchen": "Cuisine"
+            }
+        },
         "controls": {
             "title": "Commandes de peinture",
             "paint": "Peindre",
@@ -148,6 +157,29 @@
             "selected_color": "Couleur sélectionnée"
         }
     },
+    "room_painter_ai": {
+        "title": "Peintre IA",
+        "generated": "Résultat IA",
+        "description": "Importez une photo, choisissez une couleur et laissez l'IA repeindre les murs.",
+        "upload": {
+            "title": "Importer une image",
+            "subtitle": "Choisissez une photo pour commencer",
+            "select_image": "Sélectionner une image"
+        },
+        "controls": {
+            "title": "Commandes IA",
+            "selected_color": "Couleur sélectionnée",
+            "quick_colors": "Couleurs rapides",
+            "generate": "Générer",
+            "download": "Télécharger le résultat",
+            "upload_new_image": "Importer une nouvelle image"
+        },
+        "errors": {
+            "no_image": "Veuillez d'abord sélectionner une image.",
+            "no_result": "Aucun résultat retourné.",
+            "failed": "Échec de la génération du résultat IA."
+        }
+    },
     "nav": {
         "home": "Accueil",
         "colors": "Couleurs",
@@ -175,9 +207,36 @@
     },
     "painters_page": {
         "title": "Peintres",
+        "my_requests": {
+            "button": "Mes demandes",
+            "title": "Mes demandes de peintre",
+            "subtitle": "Voir et supprimer/annuler vos demandes",
+            "close": "Fermer",
+            "empty": "Vous n'avez pas encore de demandes",
+            "confirm_remove": "Supprimer cette demande ?",
+            "table": {
+                "painter": "Peintre",
+                "area": "Zone",
+                "status": "Statut",
+                "date": "Date",
+                "actions": "Actions"
+            },
+            "errors": {
+                "load_failed": "Échec du chargement de vos demandes",
+                "remove_failed": "Échec de la suppression de la demande"
+            },
+            "snackbar": {
+                "removed": "Demande mise à jour"
+            }
+        },
         "filters": {
             "state": "Wilaya",
             "city": "Commune",
+            "available": "Disponibilité",
+            "available_only": "Disponibles uniquement",
+            "available_placeholder": "Tous",
+            "available_yes": "Disponible",
+            "available_no": "Indisponible",
             "state_placeholder": "Sélectionner une wilaya",
             "city_placeholder": "Sélectionner une commune"
         },
@@ -188,6 +247,8 @@
         "card": {
             "unnamed": "Peintre",
             "note": "Les demandes sont limitées à la zone de service.",
+            "available": "Disponible",
+            "unavailable": "Indisponible",
             "service_area": "Zone de service : {city}, {state}",
             "service_areas": "Zones de service : {areas}"
         },
@@ -355,12 +416,21 @@
             "title": "Paramètres peintre",
             "no_profile": "Vous n'avez pas encore de profil peintre. Définissez vos zones de service pour devenir peintre.",
             "current_area": "Votre zone de service actuelle : {city}, {state}",
+            "availability": {
+                "title": "Disponibilité",
+                "help": "Désactivez ceci lorsque vous n'acceptez pas de nouvelles demandes.",
+                "available": "Disponible",
+                "unavailable": "Indisponible",
+                "save": "Mettre à jour"
+            },
             "errors": {
                 "load_failed": "Échec du chargement de votre profil peintre",
+                "availability_failed": "Échec de la mise à jour de la disponibilité",
                 "save_failed": "Échec de l'enregistrement des paramètres peintre"
             },
             "snackbar": {
-                "saved": "Paramètres peintre enregistrés"
+                "saved": "Paramètres peintre enregistrés",
+                "availability_updated": "Disponibilité mise à jour"
             }
         },
         "validation": {

@@ -159,6 +159,15 @@
             "subtitle": "اختر صورة لغرفتك للبدء في تلوين الجدران",
             "select_image": "اختيار صورة"
         },
+        "samples": {
+            "title": "أو استخدم صورة جاهزة",
+            "subtitle": "اختر مثالاً لتجربة أداة التلوين",
+            "categories": {
+                "room": "غرفة",
+                "livingroom": "غرفة المعيشة",
+                "kitchen": "مطبخ"
+            }
+        },
         "controls": {
             "title": "أدوات الطلاء",
             "paint": "طلاء",
@@ -196,6 +205,29 @@
             "selected_color": "اللون المحدد"
         }
     },
+    "room_painter_ai": {
+        "title": "تلوين الغرفة بالذكاء الاصطناعي",
+        "generated": "نتيجة الذكاء الاصطناعي",
+        "description": "ارفع صورة الغرفة، اختر لونًا، ودع الذكاء الاصطناعي يعيد طلاء الجدران.",
+        "upload": {
+            "title": "رفع صورة الغرفة",
+            "subtitle": "اختر صورة لغرفتك للبدء",
+            "select_image": "اختيار صورة"
+        },
+        "controls": {
+            "title": "إعدادات الذكاء الاصطناعي",
+            "selected_color": "اللون المحدد",
+            "quick_colors": "ألوان سريعة",
+            "generate": "توليد",
+            "download": "تحميل النتيجة",
+            "upload_new_image": "رفع صورة جديدة"
+        },
+        "errors": {
+            "no_image": "يرجى اختيار صورة أولاً.",
+            "no_result": "لم يتم إرجاع نتيجة.",
+            "failed": "فشل توليد النتيجة بالذكاء الاصطناعي."
+        }
+    },
     "nav": {
         "home": "الرئيسية",
         "colors": "الألوان",
@@ -223,9 +255,36 @@
     },
     "painters_page": {
         "title": "الرسامين",
+        "my_requests": {
+            "button": "طلباتي",
+            "title": "طلبات الرسام الخاصة بي",
+            "subtitle": "عرض وحذف/إلغاء طلباتك",
+            "close": "إغلاق",
+            "empty": "ليس لديك طلبات بعد",
+            "confirm_remove": "هل تريد حذف هذا الطلب؟",
+            "table": {
+                "painter": "الرسام",
+                "area": "المنطقة",
+                "status": "الحالة",
+                "date": "التاريخ",
+                "actions": "إجراءات"
+            },
+            "errors": {
+                "load_failed": "فشل تحميل طلباتك",
+                "remove_failed": "فشل حذف الطلب"
+            },
+            "snackbar": {
+                "removed": "تم تحديث الطلب"
+            }
+        },
         "filters": {
             "state": "الولاية",
             "city": "البلدية",
+            "available": "التوفر",
+            "available_only": "المتاح فقط",
+            "available_placeholder": "الكل",
+            "available_yes": "متاح",
+            "available_no": "غير متاح",
             "state_placeholder": "اختر ولاية",
             "city_placeholder": "اختر بلدية"
         },
@@ -236,6 +295,8 @@
         "card": {
             "unnamed": "رسام",
             "note": "الطلبات محدودة حسب منطقة الخدمة.",
+            "available": "متاح",
+            "unavailable": "غير متاح",
             "service_area": "منطقة الخدمة: {city}، {state}",
             "service_areas": "مناطق الخدمة: {areas}"
         },
@@ -403,12 +464,21 @@
             "title": "إعدادات الرسام",
             "no_profile": "ليس لديك ملف رسام بعد. حدّد مناطق الخدمة لتصبح رسامًا.",
             "current_area": "منطقة خدمتك الحالية: {city}، {state}",
+            "availability": {
+                "title": "التوفر",
+                "help": "قم بإيقاف هذا عندما لا تقبل طلبات جديدة.",
+                "available": "متاح",
+                "unavailable": "غير متاح",
+                "save": "تحديث"
+            },
             "errors": {
                 "load_failed": "فشل تحميل ملف الرسام",
+                "availability_failed": "فشل تحديث التوفر",
                 "save_failed": "فشل حفظ إعدادات الرسام"
             },
             "snackbar": {
-                "saved": "تم حفظ إعدادات الرسام"
+                "saved": "تم حفظ إعدادات الرسام",
+                "availability_updated": "تم تحديث التوفر"
             }
         },
         "validation": {

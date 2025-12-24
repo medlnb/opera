@@ -7,6 +7,8 @@
     "common": {
         "back_to_home": "Back to Home",
         "back": "Back",
+        "cancel": "Cancel",
+        "delete": "Delete",
         "next": "Next",
         "unnamed": "Unnamed",
         "pagination": {
@@ -49,6 +51,15 @@
             "subtitle": "Choose a photo of your room to start painting the walls",
             "select_image": "Select Image"
         },
+        "samples": {
+            "title": "Or use a sample image",
+            "subtitle": "Pick one of our examples to try the painter",
+            "categories": {
+                "room": "Room",
+                "livingroom": "Living room",
+                "kitchen": "Kitchen"
+            }
+        },
         "controls": {
             "title": "Paint Controls",
             "paint": "Paint",
@@ -86,6 +97,29 @@
             "selected_color": "Selected color"
         }
     },
+    "room_painter_ai": {
+        "title": "AI Room Painter",
+        "generated": "AI result",
+        "description": "Upload a room photo, pick a color, and let AI repaint the walls.",
+        "upload": {
+            "title": "Upload Room Image",
+            "subtitle": "Choose a photo of your room to start",
+            "select_image": "Select Image"
+        },
+        "controls": {
+            "title": "AI Controls",
+            "selected_color": "Selected Color",
+            "quick_colors": "Quick Colors",
+            "generate": "Generate",
+            "download": "Download Result",
+            "upload_new_image": "Upload New Image"
+        },
+        "errors": {
+            "no_image": "Please select an image first.",
+            "no_result": "No result returned.",
+            "failed": "Failed to generate AI result."
+        }
+    },
     "nav": {
         "home": "Home",
         "colors": "Colors",
@@ -113,9 +147,37 @@
     },
     "painters_page": {
         "title": "Painters",
+        "my_requests": {
+            "button": "My requests",
+            "title": "My painter requests",
+            "subtitle": "View and remove/cancel your requests",
+            "close": "Close",
+            "empty": "You have no requests yet",
+            "confirm_title": "Confirm deletion",
+            "confirm_remove": "Remove this request?",
+            "table": {
+                "painter": "Painter",
+                "area": "Area",
+                "status": "Status",
+                "date": "Date",
+                "actions": "Actions"
+            },
+            "errors": {
+                "load_failed": "Failed to load your requests",
+                "remove_failed": "Failed to remove request"
+            },
+            "snackbar": {
+                "removed": "Request updated"
+            }
+        },
         "filters": {
             "state": "State",
             "city": "City",
+            "available": "Availability",
+            "available_only": "Available only",
+            "available_placeholder": "All",
+            "available_yes": "Available",
+            "available_no": "Unavailable",
             "state_placeholder": "Select a state",
             "city_placeholder": "Select a city"
         },
@@ -126,6 +188,8 @@
         "card": {
             "unnamed": "Painter",
             "note": "Requests are limited to the service area.",
+            "available": "Available",
+            "unavailable": "Unavailable",
             "service_area": "Service area: {city}, {state}",
             "service_areas": "Service areas: {areas}"
         },
@@ -309,12 +373,21 @@
             "title": "Painter settings",
             "no_profile": "You don't have a painter profile yet. Set your service area to become a painter.",
             "current_area": "Your current service area: {city}, {state}",
+            "availability": {
+                "title": "Availability",
+                "help": "Turn this off when you are not accepting new requests.",
+                "available": "Available",
+                "unavailable": "Unavailable",
+                "save": "Update"
+            },
             "errors": {
                 "load_failed": "Failed to load your painter profile",
+                "availability_failed": "Failed to update availability",
                 "save_failed": "Failed to save painter settings"
             },
             "snackbar": {
-                "saved": "Painter settings saved"
+                "saved": "Painter settings saved",
+                "availability_updated": "Availability updated"
             }
         },
         "validation": {

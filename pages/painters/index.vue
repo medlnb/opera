@@ -31,6 +31,7 @@ const getCityOptionsForState = stateName => {
 const filters = ref({
   state: null,
   city: null,
+  available: null,
 })
 
 watch(() => filters.value.state, () => {
@@ -48,6 +49,7 @@ const fetchPainters = async () => {
       query: {
         state: filters.value.state || undefined,
         city: filters.value.city || undefined,
+        available: typeof filters.value.available === 'boolean' ? String(filters.value.available) : undefined,
       },
     })
 
@@ -56,7 +58,6 @@ const fetchPainters = async () => {
 
       return painters.value = []
     }
-
     painters.value = data.value?.data ?? []
   }
   catch (e) {
@@ -69,7 +70,13 @@ const fetchPainters = async () => {
   }
 }
 
-watch([() => filters.value.state, () => filters.value.city], fetchPainters, { immediate: true })
+const isAvailableOnly = computed(() => filters.value.available === true)
+
+const toggleAvailableOnly = () => {
+  filters.value.available = isAvailableOnly.value ? null : true
+}
+
+watch([() => filters.value.state, () => filters.value.city, () => filters.value.available], fetchPainters, { immediate: true })
 
 const requestDialog = ref(false)
 const requestLoading = ref(false)
@@ -82,6 +89,16 @@ const requestForm = ref({
   note: '',
 })
 
+const openMyRequests = async () => {
+  if (!authStore.token) {
+    showSnackbar(t('painters_page.actions.sign_in_to_request'), 'info')
+    navigateTo('/login')
+    return
+  }
+
+  navigateTo('/painters/requests')
+}
+
 const painterDisplayName = painter => {
   const user = painter?.user
   const first = user?.firstName
@@ -90,7 +107,7 @@ const painterDisplayName = painter => {
   if (first || last)
     return `${first ?? ''} ${last ?? ''}`.trim()
 
-  return t('painters_page.card.unnamed')
+  return t('common.unnamed')
 }
 
 const painterAreasLabel = painter => {
@@ -126,6 +143,13 @@ const painterAvatarSrc = painter => {
 
   return `https://dummyimage.com/100x100/000/fff&text=${first}${last}`
 }
+
+const painterIsAvailable = painter => painter?.available !== false
+
+const painterAvailabilityLabel = painter =>
+  painterIsAvailable(painter)
+    ? t('painters_page.card.available')
+    : t('painters_page.card.unavailable')
 
 const requestableAreas = computed(() => painterServiceAreas(selectedPainter.value))
 
@@ -248,12 +272,21 @@ useHead(() => ({
               {{ t('painters_page.card.note') }}
             </p>
           </div>
+
+          <VBtn
+            variant="tonal"
+            color="primary"
+            prepend-icon="tabler-list"
+            @click="openMyRequests"
+          >
+            {{ t('painters_page.my_requests.button') }}
+          </VBtn>
         </div>
 
         <VRow class="mt-4">
           <VCol
             cols="12"
-            md="6"
+            md="4"
           >
             <AppSelect
               v-model="filters.state"
@@ -268,7 +301,7 @@ useHead(() => ({
 
           <VCol
             cols="12"
-            md="6"
+            md="4"
           >
             <AppSelect
               v-model="filters.city"
@@ -280,6 +313,27 @@ useHead(() => ({
               clearable
               :disabled="!filters.state"
             />
+          </VCol>
+
+          <VCol
+            cols="12"
+            md="4"
+          >
+            <div>
+              <label class="text-sm font-weight-medium mb-2 d-block">
+                {{ t('painters_page.filters.available') }}
+              </label>
+
+              <VBtn
+                block
+                :variant="isAvailableOnly ? 'tonal' : 'outlined'"
+                color="primary"
+                :prepend-icon="isAvailableOnly ? 'tabler-check' : undefined"
+                @click="toggleAvailableOnly"
+              >
+                {{ t('painters_page.filters.available_only') }}
+              </VBtn>
+            </div>
           </VCol>
         </VRow>
       </VCardText>
@@ -327,9 +381,19 @@ useHead(() => ({
                 />
               </VAvatar>
 
-              <h6 class="text-h6 mb-0">
-                {{ painterDisplayName(p) }}
-              </h6>
+              <div class="d-flex align-center gap-2 flex-wrap">
+                <h6 class="text-h6 mb-0">
+                  {{ painterDisplayName(p) }}
+                </h6>
+
+                <VChip
+                  size="small"
+                  :color="painterIsAvailable(p) ? 'success' : 'error'"
+                  variant="tonal"
+                >
+                  {{ painterAvailabilityLabel(p) }}
+                </VChip>
+              </div>
             </div>
 
             <div

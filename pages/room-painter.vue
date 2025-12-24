@@ -5,6 +5,33 @@ const router = useRouter()
 
 const { t } = useI18n()
 
+type SampleCategory = 'room' | 'livingroom' | 'kitchen'
+
+const sampleCategory = ref<SampleCategory>('room')
+
+const sampleImagesByCategory: Record<SampleCategory, Array<{ src: string }>> = {
+  room: [
+    { src: new URL('../assets/images/room/room1.png', import.meta.url).href },
+    { src: new URL('../assets/images/room/room2.jpg', import.meta.url).href },
+    { src: new URL('../assets/images/room/room3.png', import.meta.url).href },
+    { src: new URL('../assets/images/room/room4.png', import.meta.url).href },
+  ],
+  livingroom: [
+    { src: new URL('../assets/images/livingroom/livingroom1.jpg', import.meta.url).href },
+    { src: new URL('../assets/images/livingroom/livingroom2.jpg', import.meta.url).href },
+    { src: new URL('../assets/images/livingroom/livingroom3.jpg', import.meta.url).href },
+    { src: new URL('../assets/images/livingroom/livingroom4.jpg', import.meta.url).href },
+    { src: new URL('../assets/images/livingroom/livingroom5.jpg', import.meta.url).href },
+  ],
+  kitchen: [
+    { src: new URL('../assets/images/kitchen/kitchen1.jpg', import.meta.url).href },
+    { src: new URL('../assets/images/kitchen/kitchen2.png', import.meta.url).href },
+    { src: new URL('../assets/images/kitchen/kitchen3.jpg', import.meta.url).href },
+  ],
+}
+
+const sampleImages = computed(() => sampleImagesByCategory[sampleCategory.value] ?? [])
+
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const imageFile = ref<File | null>(null)
@@ -16,7 +43,12 @@ const displayCtx = ref<CanvasRenderingContext2D | null>(null)
 const selectedColor = ref('#FF5733')
 const originalImageData = ref<ImageData | null>(null)
 const isLoading = ref(false)
-const tolerance = ref(30)
+const tolerance = ref(25)
+
+// Paint layer: stores how strongly each pixel is painted (0 = not painted).
+// This enables recoloring all painted areas when `selectedColor` changes.
+const paintLayerAlpha = ref<Uint8Array | null>(null)
+const paintedPixelCount = ref(0)
 
 type ToolMode = 'paint' | 'erase'
 const toolMode = ref<ToolMode>('paint')
@@ -28,8 +60,10 @@ const isSelecting = ref(false)
 const selectionStartClient = ref<{ x: number; y: number } | null>(null)
 const selectionCurrentClient = ref<{ x: number; y: number } | null>(null)
 
-const undoStack = ref<ImageData[]>([])
-const redoStack = ref<ImageData[]>([])
+type LayerSnapshot = { paintLayerAlpha: Uint8Array }
+
+const undoStack = ref<LayerSnapshot[]>([])
+const redoStack = ref<LayerSnapshot[]>([])
 
 const canUndo = computed(() => undoStack.value.length > 0)
 const canRedo = computed(() => redoStack.value.length > 0)
@@ -39,19 +73,88 @@ const clearHistory = () => {
   redoStack.value = []
 }
 
-const getSnapshot = () => {
-  if (!ctx.value || !canvas.value)
-    return null
+const recountPaintedPixels = () => {
+  const alpha = paintLayerAlpha.value
+  if (!alpha) {
+    paintedPixelCount.value = 0
+    return
+  }
 
-  return ctx.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
+  let count = 0
+  for (let i = 0; i < alpha.length; i++) {
+    if (alpha[i] > 0)
+      count++
+  }
+  paintedPixelCount.value = count
 }
 
-const applySnapshot = (snapshot: ImageData) => {
-  if (!ctx.value || !displayCtx.value)
+const renderPaintLayer = () => {
+  if (!ctx.value || !displayCtx.value || !canvas.value || !originalImageData.value)
     return
 
-  ctx.value.putImageData(snapshot, 0, 0)
-  displayCtx.value.putImageData(snapshot, 0, 0)
+  const alpha = paintLayerAlpha.value
+  if (!alpha)
+    return
+
+  const color = hexToRgb(selectedColor.value)
+  if (!color)
+    return
+
+  const width = canvas.value.width
+  const height = canvas.value.height
+
+  const originalPixels = originalImageData.value.data
+  const out = new ImageData(new Uint8ClampedArray(originalPixels), width, height)
+  const outPixels = out.data
+
+  const fillHsl = rgbToHsl(color.r, color.g, color.b)
+
+  // Preserve original lighting/shadows by mixing the original lightness into the chosen paint.
+  // We also apply a minimum lightness derived from the chosen color so light paints don't
+  // disappear on very dark areas.
+  const lightingPreservation = 0.8
+  const minLightnessFromPaint = 0.35
+
+  for (let pos = 0; pos < alpha.length; pos++) {
+    const aByte = alpha[pos]
+    if (aByte === 0)
+      continue
+
+    const i = pos * 4
+    const or = originalPixels[i]
+    const og = originalPixels[i + 1]
+    const ob = originalPixels[i + 2]
+
+    const { l: origL } = rgbToHsl(or, og, ob)
+
+    const mixedL = fillHsl.l * (1 - lightingPreservation) + origL * lightingPreservation
+    const targetL = Math.max(fillHsl.l * minLightnessFromPaint, mixedL)
+
+    const painted = hslToRgb(fillHsl.h, fillHsl.s, targetL)
+
+    const a = aByte / 255
+
+    outPixels[i] = painted.r * a + or * (1 - a)
+    outPixels[i + 1] = painted.g * a + og * (1 - a)
+    outPixels[i + 2] = painted.b * a + ob * (1 - a)
+  }
+
+  ctx.value.putImageData(out, 0, 0)
+  displayCtx.value.putImageData(out, 0, 0)
+}
+
+const getSnapshot = (): LayerSnapshot | null => {
+  const alpha = paintLayerAlpha.value
+  if (!alpha)
+    return null
+
+  return { paintLayerAlpha: alpha.slice() }
+}
+
+const applySnapshot = (snapshot: LayerSnapshot) => {
+  paintLayerAlpha.value = snapshot.paintLayerAlpha.slice()
+  recountPaintedPixels()
+  renderPaintLayer()
 }
 
 const pushUndoSnapshot = () => {
@@ -150,12 +253,20 @@ const loadImageToCanvas = () => {
         ctx.value.drawImage(img, 0, 0)
         displayCtx.value.drawImage(img, 0, 0)
         originalImageData.value = ctx.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
+        paintLayerAlpha.value = new Uint8Array(canvas.value.width * canvas.value.height)
+        paintedPixelCount.value = 0
         clearHistory()
       }
     }
     isLoading.value = false
   }
   img.src = imageUrl.value
+}
+
+const loadSampleImage = (src: string) => {
+  imageFile.value = null
+  imageUrl.value = src
+  loadImageToCanvas()
 }
 
 const triggerFilePicker = () => {
@@ -371,68 +482,38 @@ const applyRegionWithMatcher = (
   mode: ToolMode,
   matcher?: RegionMatcher,
 ) => {
-  if (!ctx.value || !displayCtx.value || !canvas.value || !originalImageData.value)
+  if (!canvas.value || !originalImageData.value)
     return
 
-  const imageData = ctx.value.getImageData(0, 0, canvas.value.width, canvas.value.height)
-  const pixels = imageData.data
+  if (!paintLayerAlpha.value || paintLayerAlpha.value.length !== canvas.value.width * canvas.value.height) {
+    paintLayerAlpha.value = new Uint8Array(canvas.value.width * canvas.value.height)
+    paintedPixelCount.value = 0
+    clearHistory()
+  }
+
   const originalPixels = originalImageData.value.data
   const width = canvas.value.width
   const height = canvas.value.height
 
-  const startPos = (startY * width + startX) * 4
-  const currentStartR = pixels[startPos]
-  const currentStartG = pixels[startPos + 1]
-  const currentStartB = pixels[startPos + 2]
+  const alphaLayer = paintLayerAlpha.value
 
-  const originalStartR = originalPixels[startPos]
-  const originalStartG = originalPixels[startPos + 1]
-  const originalStartB = originalPixels[startPos + 2]
-
-  const fillHsl = rgbToHsl(fillColor.r, fillColor.g, fillColor.b)
-
-  const paintFromOriginal = (or: number, og: number, ob: number): { r: number; g: number; b: number } => {
-    // Preserve photo lighting/shadows: keep original pixel lightness, but apply selected hue/saturation.
-    const { l } = rgbToHsl(or, og, ob)
-
-    return hslToRgb(fillHsl.h, fillHsl.s, l)
-  }
-
-  // No-op checks (must happen BEFORE pushing undo snapshots).
-  // Paint: if the clicked pixel already matches the expected painted value, do nothing.
-  // Erase: if the clicked pixel already matches the original, do nothing.
+  const startIndex = startY * width + startX
   if (mode === 'paint') {
-    const edge = isEdgePixel(startX, startY, originalPixels, width, height, originalStartR, originalStartG, originalStartB)
-    const alpha = edge ? 0.7 : 1.0
-
-    const painted = paintFromOriginal(originalStartR, originalStartG, originalStartB)
-
-    const expectedR = painted.r * alpha + originalStartR * (1 - alpha)
-    const expectedG = painted.g * alpha + originalStartG * (1 - alpha)
-    const expectedB = painted.b * alpha + originalStartB * (1 - alpha)
-
-    if (
-      Math.abs(currentStartR - expectedR) <= 1
-      && Math.abs(currentStartG - expectedG) <= 1
-      && Math.abs(currentStartB - expectedB) <= 1
-    )
+    if (alphaLayer[startIndex] > 0)
       return
   }
   else {
-    if (
-      Math.abs(currentStartR - originalStartR) <= 1
-      && Math.abs(currentStartG - originalStartG) <= 1
-      && Math.abs(currentStartB - originalStartB) <= 1
-    )
+    if (alphaLayer[startIndex] === 0)
       return
   }
 
   pushUndoSnapshot()
 
   // Region selection is based on ORIGINAL pixels (stable across repeated paints/erases).
-  const regionR = originalStartR
-  const regionG = originalStartG
-  const regionB = originalStartB
+  const startPosPx = startIndex * 4
+  const regionR = originalPixels[startPosPx]
+  const regionG = originalPixels[startPosPx + 1]
+  const regionB = originalPixels[startPosPx + 2]
 
   const visited = new Uint8Array(width * height)
   const stack: Array<{ x: number; y: number }> = [{ x: startX, y: startY }]
@@ -457,10 +538,6 @@ const applyRegionWithMatcher = (
       continue
 
     const pixelPos = pos * 4
-    const r = pixels[pixelPos]
-    const g = pixels[pixelPos + 1]
-    const b = pixels[pixelPos + 2]
-
     const or = originalPixels[pixelPos]
     const og = originalPixels[pixelPos + 1]
     const ob = originalPixels[pixelPos + 2]
@@ -476,19 +553,20 @@ const applyRegionWithMatcher = (
 
     const alpha = edge ? 0.7 : 1.0
 
-    if (mode === 'paint') {
-      // Preserve shadows by coloring the original pixel rather than flattening it.
-      const painted = paintFromOriginal(or, og, ob)
+    // Store the paint layer intensity so we can recolor later.
+    const aByte = Math.round(alpha * 255)
 
-      pixels[pixelPos] = painted.r * alpha + or * (1 - alpha)
-      pixels[pixelPos + 1] = painted.g * alpha + og * (1 - alpha)
-      pixels[pixelPos + 2] = painted.b * alpha + ob * (1 - alpha)
+    if (mode === 'paint') {
+      if (alphaLayer[pos] === 0)
+        paintedPixelCount.value++
+
+      alphaLayer[pos] = Math.max(alphaLayer[pos], aByte)
     }
     else {
-      // Depaint: move pixels back toward original (blend at edges for smoother boundary).
-      pixels[pixelPos] = or * alpha + r * (1 - alpha)
-      pixels[pixelPos + 1] = og * alpha + g * (1 - alpha)
-      pixels[pixelPos + 2] = ob * alpha + b * (1 - alpha)
+      if (alphaLayer[pos] > 0)
+        paintedPixelCount.value--
+
+      alphaLayer[pos] = 0
     }
 
     stack.push({ x: x + 1, y })
@@ -497,8 +575,7 @@ const applyRegionWithMatcher = (
     stack.push({ x, y: y - 1 })
   }
 
-  ctx.value.putImageData(imageData, 0, 0)
-  displayCtx.value.putImageData(imageData, 0, 0)
+  renderPaintLayer()
 }
 
 const applyRegion = (startX: number, startY: number, fillColor: { r: number; g: number; b: number }, mode: ToolMode) => {
@@ -872,19 +949,31 @@ const handleCanvasPointerCancel = (event: PointerEvent) => {
 
 // Reset to original image
 const resetImage = () => {
-  if (ctx.value && displayCtx.value && originalImageData.value && canvas.value) {
-    pushUndoSnapshot()
-    ctx.value.putImageData(originalImageData.value, 0, 0)
-    displayCtx.value.putImageData(originalImageData.value, 0, 0)
-  }
+  if (!originalImageData.value || !canvas.value)
+    return
+
+  pushUndoSnapshot()
+  paintLayerAlpha.value = new Uint8Array(canvas.value.width * canvas.value.height)
+  paintedPixelCount.value = 0
+  renderPaintLayer()
 }
 
 const clearImage = () => {
   imageUrl.value = ''
   imageFile.value = null
   toolMode.value = 'paint'
+  paintLayerAlpha.value = null
+  paintedPixelCount.value = 0
   clearHistory()
 }
+
+// Recolor all painted regions when the user changes the color.
+watch(selectedColor, () => {
+  if (!imageUrl.value || !originalImageData.value || paintedPixelCount.value === 0)
+    return
+
+  renderPaintLayer()
+})
 
 // Download edited image
 const downloadImage = () => {
@@ -989,6 +1078,64 @@ const colorPalette = [
         >
           {{ t('room_painter.upload.select_image') }}
         </VBtn>
+
+        <VDivider class="my-6" />
+
+        <h4 class="text-h6 mb-2">
+          {{ t('room_painter.samples.title') }}
+        </h4>
+        <p class="text-body-2 text-medium-emphasis mb-4">
+          {{ t('room_painter.samples.subtitle') }}
+        </p>
+
+        <div class="d-flex justify-center flex-wrap gap-2 mb-6">
+          <VChip
+            :color="sampleCategory === 'room' ? 'primary' : 'default'"
+            :variant="sampleCategory === 'room' ? 'tonal' : 'outlined'"
+            @click="sampleCategory = 'room'"
+          >
+            {{ t('room_painter.samples.categories.room') }}
+          </VChip>
+
+          <VChip
+            :color="sampleCategory === 'livingroom' ? 'primary' : 'default'"
+            :variant="sampleCategory === 'livingroom' ? 'tonal' : 'outlined'"
+            @click="sampleCategory = 'livingroom'"
+          >
+            {{ t('room_painter.samples.categories.livingroom') }}
+          </VChip>
+
+          <VChip
+            :color="sampleCategory === 'kitchen' ? 'primary' : 'default'"
+            :variant="sampleCategory === 'kitchen' ? 'tonal' : 'outlined'"
+            @click="sampleCategory = 'kitchen'"
+          >
+            {{ t('room_painter.samples.categories.kitchen') }}
+          </VChip>
+        </div>
+
+        <VRow class="justify-center">
+          <VCol
+            v-for="(sample, index) in sampleImages"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+            lg="3"
+          >
+            <VCard
+              class="cursor-pointer"
+              variant="outlined"
+              @click="loadSampleImage(sample.src)"
+            >
+              <VImg
+                :src="sample.src"
+                height="140"
+                cover
+              />
+            </VCard>
+          </VCol>
+        </VRow>
 
         <input
           ref="fileInput"

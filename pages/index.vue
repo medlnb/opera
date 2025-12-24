@@ -1,10 +1,10 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n({ useScope: 'global' })
 
 const stats = computed(() => [
-  { value: '80+', label: t('home.stats.sales_points') },
+  { value: '57+', label: t('home.stats.sales_points') },
   { value: '61+', label: t('home.stats.products_manufactured') },
   { value: '10+', label: t('home.stats.years_experience') },
 ])

@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-12-11',
 
   runtimeConfig: {
+    aiPaintUrl: process.env.NUXT_AI_PAINT_URL,
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL ,
     },
