@@ -7,12 +7,20 @@
     "common": {
         "back_to_home": "العودة إلى الصفحة الرئيسية",
         "back": "رجوع",
+        "add": "إضافة",
+        "cancel": "إلغاء",
+        "delete": "حذف",
         "next": "التالي",
         "unnamed": "بدون اسم",
         "pagination": {
             "showing": "عرض {start} إلى {end} من أصل {total} سجل"
         }
     },
+    "Required": "مطلوب",
+    "Password mismatch": "كلمتا المرور غير متطابقتين",
+    "Invalid password": "كلمة المرور غير صحيحة",
+    "Invalid phone": "رقم الهاتف غير صالح",
+    "Invalid image format": "صيغة الصورة غير مدعومة",
     "colors_page": {
         "hero_title": "مرحبًا بك في طيف الألوان",
         "hero_subtitle": "استكشف الدرجات التي تُحيي رؤيتك",
@@ -247,9 +255,11 @@
             "dashboard": "لوحة التحكم",
             "products": "المنتجات",
             "new_product": "منتج جديد",
+            "colors": "الألوان",
             "articles": "مقالات",
             "new_article": "مقال جديد",
             "orders": "الطلبات",
+            "deals": "طلبات العروض",
             "users": "المستخدمون"
         }
     },
@@ -261,6 +271,7 @@
             "subtitle": "عرض وحذف/إلغاء طلباتك",
             "close": "إغلاق",
             "empty": "ليس لديك طلبات بعد",
+            "confirm_title": "تأكيد الحذف",
             "confirm_remove": "هل تريد حذف هذا الطلب؟",
             "table": {
                 "painter": "الرسام",
@@ -371,10 +382,53 @@
     },
     "user": {
         "my_orders": "طلباتي",
+        "my_deals": "طلبات العروض الخاصة بي",
         "my_cart": "سلّتي",
         "my_favorites": "المفضلة",
         "account": "الحساب",
         "logout": "تسجيل الخروج"
+    },
+    "deals": {
+        "dialog": {
+            "title": "طلب عرض",
+            "auth_required": "يجب تسجيل الدخول لإرسال طلب عرض.",
+            "prefill_from_cart": "أريد عرضًا للمنتجات الموجودة في سلّتي.",
+            "prefill_about_product": "طلب عرض بخصوص"
+        },
+        "actions": {
+            "request_deal": "طلب عرض",
+            "submit": "إرسال الطلب"
+        },
+        "snackbar": {
+            "submitted": "تم إرسال طلب العرض",
+            "auth_required": "يرجى تسجيل الدخول لطلب عرض",
+            "submit_failed": "فشل إرسال طلب العرض"
+        },
+        "contact": {
+            "title": "معلومات التواصل"
+        },
+        "fields": {
+            "message": {
+                "label": "ملاحظة",
+                "placeholder": "اكتب ملاحظة (مطلوبة إذا كان العنوان/الولاية/البلدية فارغًا)"
+            },
+            "firstName": "الاسم",
+            "lastName": "اللقب",
+            "enterpriseName": "اسم الشركة",
+            "phone": "الهاتف",
+            "phone_placeholder": "+213...",
+            "phone_required_guest": "مطلوب للزوار",
+            "address": "العنوان",
+            "state": "الولاية",
+            "city": "البلدية",
+            "state_placeholder": "اختر ولاية",
+            "city_placeholder": "اختر بلدية"
+        },
+        "items": {
+            "title": "المنتجات",
+            "qty": "الكمية",
+            "color": "اللون"
+        }
     },
     "account": {
         "cart": {
@@ -431,6 +485,37 @@
             },
             "actions": {
                 "start_shopping": "ابدأ التسوق"
+            }
+        },
+        "deals": {
+            "table": {
+                "deal_id": "طلب",
+                "note": "ملاحظة",
+                "status": "الحالة",
+                "date": "التاريخ",
+                "actions": "إجراءات"
+            },
+            "empty": {
+                "title": "لا توجد طلبات عروض بعد",
+                "subtitle": "قدّم طلب عرض من صفحة المنتج أو من سلّتك"
+            },
+            "details": {
+                "title": "طلب عرض",
+                "back": "العودة إلى طلبات العروض",
+                "not_found_title": "الطلب غير موجود",
+                "not_found_subtitle": "قد يكون هذا الطلب قد تم حذفه",
+                "deal_number": "طلب #{id}",
+                "created_at": "تاريخ الإنشاء: {date}",
+                "message": "ملاحظة",
+                "items": "العناصر",
+                "no_items": "لم يتم توفير عناصر",
+                "contact": "التواصل",
+                "table": {
+                    "product": "المنتج",
+                    "color": "اللون",
+                    "qty": "الكمية",
+                    "note": "ملاحظة"
+                }
             }
         },
         "favorites": {
@@ -561,6 +646,8 @@
         "verification_code_placeholder": "- - - - - -",
         "new_password": "كلمة مرور جديدة",
         "confirm_password": "تأكيد كلمة المرور",
+        "enterprise_name": "اسم الشركة",
+        "enterprise_name_placeholder": "اسم الشركة",
         "first_name": "الاسم",
         "first_name_placeholder": "محمد",
         "last_name": "اللقب",
@@ -580,7 +667,40 @@
                 "phone": {
                     "title": "التحقق من الهاتف",
                     "subtitle": "تحقق من هاتفك"
+                },
+                "plan": {
+                    "title": "الخطة",
+                    "subtitle": "اختر نوع الحساب"
                 }
+            },
+            "plan": {
+                "title": "اختر نوع الحساب",
+                "subtitle": "حدد نوع الحساب المناسب لك"
+            },
+            "roles": {
+                "user": {
+                    "title": "عميل",
+                    "desc": "شراء المنتجات وطلب العروض"
+                },
+                "painter": {
+                    "title": "رسام",
+                    "desc": "تقديم خدمات الطلاء واستقبال الطلبات"
+                },
+                "enterprise": {
+                    "title": "شركة",
+                    "desc": "طلب عروض لمشاريع شركتك"
+                }
+            },
+            "service_areas": {
+                "title": "مناطق الخدمة"
+            },
+            "enterprise_name": {
+                "label": "اسم الشركة",
+                "placeholder": "اسم الشركة"
+            },
+            "errors": {
+                "enterprise_name_required": "اسم الشركة مطلوب",
+                "service_areas_required": "يرجى إضافة منطقة خدمة واحدة على الأقل"
             },
             "personal_info_title": "المعلومات الشخصية",
             "personal_info_subtitle": "أدخل معلوماتك الشخصية",
@@ -600,7 +720,10 @@
             "title": "نسيت كلمة المرور؟",
             "step_phone_description": "أدخل رقم هاتفك وسنرسل لك رمز تحقق",
             "step_code_description": "أدخل رمز التحقق المرسل إلى هاتفك",
-            "step_password_description": "أنشئ كلمة مرور جديدة لحسابك"
+            "step_password_description": "أنشئ كلمة مرور جديدة لحسابك",
+            "code_sent": "تم إرسال رمز التحقق",
+            "phone_verified_set_password": "تم التحقق من الهاتف! قم الآن بتعيين كلمة مرور جديدة",
+            "password_reset_success": "تمت إعادة تعيين كلمة المرور بنجاح! جارٍ الانتقال لتسجيل الدخول..."
         },
         "editor": {
             "title_create": "إنشاء مقال",
@@ -671,6 +794,7 @@
             "phone_password_required": "رقم الهاتف وكلمة المرور مطلوبان",
             "login_failed": "فشل تسجيل الدخول",
             "invalid_credentials": "بيانات الدخول غير صحيحة",
+            "user_already_exists": "المستخدم موجود بالفعل",
             "valid_phone_required": "يرجى إدخال رقم هاتف صحيح مكوّن من 9 أرقام",
             "failed_to_send_sms": "فشل إرسال رسالة SMS",
             "enter_6_digit_code": "يرجى إدخال الرمز المكوّن من 6 أرقام",
@@ -744,7 +868,40 @@
             "description": "استكشف مجموعتنا الواسعة من الدهانات الممتازة واعثر على اللون المثالي لمشروعك القادم.",
             "shop_now": "تسوّق الآن",
             "get_inspired": "استلهم الأفكار"
-        }
+        },
+        "catalog": {
+            "badge_title": "الكتالوج",
+            "title": "استكشف الكتالوج",
+            "description": "اكتشف منتجات تناسب كل سطح وكل مشروع.",
+            "cta": "تصفح المنتجات",
+            "item_1": "دهانات ديكور",
+            "item_2": "طلاءات",
+            "item_3": "دهانات البناء",
+            "item_4": "ملحقات"
+        },
+        "coty": {
+            "kicker": "دوليًا",
+            "title": "متوفر أيضًا في كوت ديفوار",
+            "cta": "اعرف المزيد"
+        },
+        "painters": {
+            "overline": "الرسامين",
+            "title": "ابحث عن رسام",
+            "description": "تصفح الرسامين المتاحين في منطقتك.",
+            "view_all": "عرض الكل",
+            "available": "متاح",
+            "no_painters": "لم يتم العثور على رسامين",
+            "years_exp": "{years} سنة خبرة"
+        },
+        "studio_color": {
+            "badge": "الرسام الافتراضي",
+            "title": "Studio Color",
+            "tagline": "جرّب الألوان قبل الطلاء",
+            "description": "ارفع صورة لغرفة وعاين الألوان على جدرانك.",
+            "cta": "جرّبه الآن"
+        },
+        "trend_colors_title": "ألوان رائجة",
+        "view_more_colors": "عرض المزيد من الألوان"
     },
     "products": {
         "empty": {
@@ -1097,15 +1254,126 @@
         },
         "common": {
             "status": "الحالة",
+            "search": "بحث",
             "cancel": "إلغاء",
             "delete": "حذف",
             "action_failed": "فشل الإجراء",
             "delete_failed": "فشل الحذف",
+            "filters": {
+                "all": "الكل"
+            },
+            "actions": {
+                "save": "حفظ",
+                "cancel": "إلغاء",
+                "create": "إنشاء",
+                "delete": "حذف",
+                "edit": "تعديل"
+            },
             "value": {
                 "na": "-"
             },
             "table": {
                 "actions": "إجراءات"
+            }
+        },
+        "colors": {
+            "title": "إدارة الألوان",
+            "subtitle": "إنشاء وإدارة لوحة الألوان",
+            "search_placeholder": "البحث في الألوان...",
+            "actions": {
+                "create": "إنشاء لون"
+            },
+            "table": {
+                "name": "الاسم",
+                "code": "الرمز",
+                "trend": "رائج"
+            },
+            "empty": {
+                "title": "لا توجد ألوان",
+                "subtitle": "أنشئ أول لون للبدء"
+            },
+            "form": {
+                "name": "الاسم",
+                "code": "الرمز",
+                "color_picker": "منتقي الألوان",
+                "trend": "رائج"
+            },
+            "dialogs": {
+                "create": {
+                    "title": "إنشاء لون"
+                },
+                "edit": {
+                    "title": "تعديل اللون"
+                },
+                "delete": {
+                    "title": "حذف اللون",
+                    "message": "هل أنت متأكد أنك تريد حذف هذا اللون؟"
+                }
+            },
+            "messages": {
+                "fetch_error": "فشل تحميل الألوان",
+                "create_success": "تم إنشاء اللون",
+                "create_error": "فشل إنشاء اللون",
+                "update_success": "تم تحديث اللون",
+                "update_error": "فشل تحديث اللون",
+                "delete_success": "تم حذف اللون",
+                "delete_error": "فشل حذف اللون",
+                "trend_update_success": "تم تحديث حالة الرواج",
+                "trend_update_error": "فشل تحديث حالة الرواج"
+            },
+            "validation": {
+                "name_required": "الاسم مطلوب",
+                "code_required": "الرمز مطلوب"
+            }
+        },
+        "deals": {
+            "title": "طلبات العروض",
+            "filters": {
+                "source": "المصدر"
+            },
+            "source": {
+                "guest": "زائر",
+                "user": "مستخدم",
+                "painter": "رسام",
+                "enterprise": "شركة"
+            },
+            "status": {
+                "new": "جديد",
+                "contacted": "تم التواصل",
+                "converted": "تم التحويل",
+                "closed": "مغلق"
+            },
+            "table": {
+                "deal_id": "طلب",
+                "contact": "التواصل",
+                "source": "المصدر",
+                "status": "الحالة",
+                "date": "التاريخ"
+            },
+            "details": {
+                "title": "طلب عرض",
+                "back_to_deals": "العودة إلى طلبات العروض",
+                "not_found_title": "الطلب غير موجود",
+                "not_found_subtitle": "قد يكون هذا الطلب قد تم حذفه",
+                "deal_number": "طلب #{id}",
+                "created_at": "تاريخ الإنشاء: {date}",
+                "message": "الرسالة",
+                "items": "العناصر",
+                "no_items": "لم يتم توفير عناصر",
+                "contact": "التواصل",
+                "admin": "المشرف",
+                "admin_notes": "ملاحظات المشرف",
+                "table": {
+                    "product": "المنتج",
+                    "color": "اللون",
+                    "qty": "الكمية",
+                    "note": "ملاحظة"
+                },
+                "snackbar": {
+                    "load_failed": "فشل تحميل الطلب",
+                    "updated": "تم تحديث الطلب",
+                    "update_failed": "فشل تحديث الطلب"
+                }
             }
         },
         "users": {

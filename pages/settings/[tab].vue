@@ -1,9 +1,9 @@
-<script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+<script setup>
 import { useAuthStore } from '@/stores/auth'
 import AccountSettingsAccount from '@/views/pages/account-settings/AccountSettingsAccount.vue'
 import AccountSettingsPainter from '@/views/pages/account-settings/AccountSettingsPainter.vue'
 import AccountSettingsSecurity from '@/views/pages/account-settings/AccountSettingsSecurity.vue'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute('settings-tab')
 
@@ -19,7 +19,7 @@ const activeTab = computed({
 const tabs = [
   { titleKey: 'settings.tabs.account', icon: 'tabler-users', tab: 'account' },
   { titleKey: 'settings.tabs.security', icon: 'tabler-lock', tab: 'security' },
-  user?.role !== 'admin' ? { titleKey: 'settings.tabs.painter', icon: 'tabler-brush', tab: 'painter' } : null,
+  user?.role === 'painter' ? { titleKey: 'settings.tabs.painter', icon: 'tabler-brush', tab: 'painter' } : null,
 ].filter(Boolean)
 
 useHead(() => ({

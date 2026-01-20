@@ -1,6 +1,6 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 
 const { t } = useI18n({ useScope: 'global' })
 const authStore = useAuthStore()
@@ -20,6 +20,7 @@ const myRequestsRowBusy = ref({})
 
 const myRequestsTotalPages = computed(() => {
   const total = Number(myRequestsTotal.value || 0)
+
   return Math.max(1, Math.ceil(total / myRequestsPerPage))
 })
 
@@ -56,6 +57,7 @@ const fetchMyRequests = async () => {
       showSnackbar(error.value?.data?.message || t('painters_page.my_requests.errors.load_failed'), 'error')
       myRequests.value = []
       myRequestsTotal.value = 0
+
       return
     }
 
@@ -93,6 +95,7 @@ const doRemoveMyRequest = async req => {
       return showSnackbar(error.value?.data?.message || t('painters_page.my_requests.errors.remove_failed'), 'error')
 
     const message = data.value?.message
+
     showSnackbar(message || t('painters_page.my_requests.snackbar.removed'), 'success')
     await fetchMyRequests()
   }
@@ -124,6 +127,7 @@ const closeConfirmRemove = () => {
 
 const confirmRemove = async () => {
   const req = confirmRemoveRequest.value
+
   closeConfirmRemove()
   await doRemoveMyRequest(req)
 }
@@ -132,6 +136,7 @@ onMounted(async () => {
   if (!authStore.token) {
     showSnackbar(t('painters_page.actions.sign_in_to_request'), 'info')
     navigateTo('/login')
+
     return
   }
 
@@ -181,7 +186,9 @@ useHead(() => ({
               <th>{{ t('painters_page.my_requests.table.area') }}</th>
               <th>{{ t('painters_page.my_requests.table.status') }}</th>
               <th>{{ t('painters_page.my_requests.table.date') }}</th>
-              <th style="width: 90px;">{{ t('painters_page.my_requests.table.actions') }}</th>
+              <th style="width: 90px;">
+                {{ t('painters_page.my_requests.table.actions') }}
+              </th>
             </tr>
           </thead>
           <tbody>

@@ -118,6 +118,8 @@ const subtotal = computed(() => {
 const total = computed(() => {
   return subtotal.value + (Number(checkout.value.shippingCost) || 0)
 })
+
+const isDealDialogVisible = ref(false)
 </script>
 
 <template>
@@ -295,6 +297,17 @@ const total = computed(() => {
                 >
                   {{ t('account.cart.actions.checkout') }}
                 </VBtn>
+
+                <VBtn
+                  class="mt-3"
+                  variant="tonal"
+                  color="secondary"
+                  block
+                  :disabled="cartStore.isEmpty"
+                  @click="isDealDialogVisible = true"
+                >
+                  {{ t('deals.actions.request_deal') }}
+                </VBtn>
               </VCard>
             </VCol>
           </VRow>
@@ -311,4 +324,10 @@ const total = computed(() => {
   >
     {{ snackbar.message }}
   </VSnackbar>
+
+  <DealRequestDialog
+    :is-dialog-visible="isDealDialogVisible"
+    :initial-note="t('deals.dialog.prefill_from_cart')"
+    @update:is-dialog-visible="val => (isDealDialogVisible = val)"
+  />
 </template>

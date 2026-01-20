@@ -60,7 +60,7 @@ const isSelecting = ref(false)
 const selectionStartClient = ref<{ x: number; y: number } | null>(null)
 const selectionCurrentClient = ref<{ x: number; y: number } | null>(null)
 
-type LayerSnapshot = { paintLayerAlpha: Uint8Array }
+interface LayerSnapshot { paintLayerAlpha: Uint8Array }
 
 const undoStack = ref<LayerSnapshot[]>([])
 const redoStack = ref<LayerSnapshot[]>([])
@@ -77,6 +77,7 @@ const recountPaintedPixels = () => {
   const alpha = paintLayerAlpha.value
   if (!alpha) {
     paintedPixelCount.value = 0
+
     return
   }
 

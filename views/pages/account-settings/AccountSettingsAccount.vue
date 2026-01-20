@@ -1,8 +1,8 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth.js'
 import { useValidators } from '@/utils/validators'
+import { useI18n } from 'vue-i18n'
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
@@ -19,6 +19,7 @@ const accountData = {
   ...authStore.user ?? {},
   phone: authStore.user?.phone.slice(4) ?? '',
   avatar: authStore.user?.avatar ?? `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName.charAt(0)}${authStore.user?.lastName.charAt(0)}`,
+  enterpriseName: authStore.user?.enterpriseName ?? '',
 }
 
 const refInputEl = ref()
@@ -34,11 +35,8 @@ const updateProfile = async () => {
     const result = formRef.value.validate()
     if (result && typeof result.then === 'function') {
       const r = await result
-      if (!r.valid) {
-        showSnackbar(t('settings.validation.fix_errors'), 'error')
-
-        return
-      }
+      if (!r.valid) 
+        return showSnackbar(t('settings.validation.fix_errors'), 'error')
     }
   }
 
@@ -53,6 +51,7 @@ const updateProfile = async () => {
         address: accountDataLocal.value.address,
         state: accountDataLocal.value.state,
         city: accountDataLocal.value.city,
+        enterpriseName: accountDataLocal.value.enterpriseName,
       },
     })
 
@@ -274,6 +273,18 @@ const changeAvatar = async file => {
                   v-model="accountDataLocal.lastName"
                   :placeholder="t('auth.last_name_placeholder')"
                   :label="t('auth.last_name')"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+
+              <VCol
+                v-if="accountDataLocal.role === 'enterprise'"
+                cols="12"
+              >
+                <AppTextField
+                  v-model="accountDataLocal.enterpriseName"
+                  :placeholder="t('auth.enterprise_name_placeholder')"
+                  :label="t('auth.enterprise_name')"
                   :rules="[requiredValidator]"
                 />
               </VCol>

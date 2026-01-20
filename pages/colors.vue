@@ -41,7 +41,6 @@ onMounted(() => {
         style="min-block-size: 150px;"
         height="250"
         cover
-        position="left center"
       >
         <template #placeholder>
           <div
@@ -113,10 +112,9 @@ onMounted(() => {
           >
             <VCard
               class="pa-0"
-              :to="`/products/${c.name}`"
               elevation="0"
             >
-              <div :style="{ backgroundColor: c.code, height: $vuetify.display.xs ? '60px' : '100px', borderRadius: '8px' }" />
+              <div :style="{ backgroundColor: `#${c.code}`, height: $vuetify.display.xs ? '60px' : '100px', borderRadius: '8px' }" />
               <div class="d-flex flex-column pa-2 pt-1">
                 <span class="text-subtitle-1">{{ c.name || t('common.unnamed') }}</span>
                 <span class="text-caption">{{ c.code || '—' }}</span>

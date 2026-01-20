@@ -1,14 +1,14 @@
 <script setup>
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import communes from '@/data/commune.json'
-import { useAuthStore } from '@/stores/auth.js'
+import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import logo from '@images/logo-v2.svg'
 import registerMultistepBgDark from '@images/pages/register-multistep-bg-dark.png'
 import registerMultistepBgLight from '@images/pages/register-multistep-bg-light.png'
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 definePageMeta({
   layout: 'blank',
@@ -53,8 +53,13 @@ onMounted(() => {
   getRecaptchaVerifier()
 })
 
-// Reordered: Personal info first, then phone verification
+// Steps: plan -> personal info -> phone verification
 const items = computed(() => [
+  {
+    title: t('auth.signup.steps.plan.title'),
+    subtitle: t('auth.signup.steps.plan.subtitle'),
+    icon: 'tabler-list-check',
+  },
   {
     title: t('auth.signup.steps.personal.title'),
     subtitle: t('auth.signup.steps.personal.subtitle'),
@@ -64,6 +69,24 @@ const items = computed(() => [
     title: t('auth.signup.steps.phone.title'),
     subtitle: t('auth.signup.steps.phone.subtitle'),
     icon: 'tabler-phone',
+  },
+])
+
+const radioContent = computed(() => [
+  {
+    title: t('auth.signup.roles.user.title'),
+    desc: t('auth.signup.roles.user.desc'),
+    value: 'user',
+  },
+  {
+    title: t('auth.signup.roles.painter.title'),
+    desc: t('auth.signup.roles.painter.desc'),
+    value: 'painter',
+  },
+  {
+    title: t('auth.signup.roles.enterprise.title'),
+    desc: t('auth.signup.roles.enterprise.desc'),
+    value: 'enterprise',
   },
 ])
 
@@ -78,7 +101,17 @@ const form = ref({
   address: '',
   state: '1',
   city: '1',
+  role: 'user',
+  enterpriseName: '',
+  serviceAreas: [],
 })
+
+const isPainter = computed(() => form.value.role === 'painter')
+const isEnterprise = computed(() => form.value.role === 'enterprise')
+
+// Painter service areas (separate picker)
+const serviceAreaState = ref(null)
+const serviceAreaCity = ref(null)
 
 // Build wilaya (state) options from grouped communes
 const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
@@ -96,9 +129,76 @@ const cityOptions = computed(() => {
   return group ? group.map(c => ({ id: String(c.id), label: c.name })) : []
 })
 
+function getStateLabel(stateId) {
+  return stateOptions.value.find(s => String(s.id) === String(stateId))?.label || ''
+}
+
+function getCityLabel(stateId, cityId) {
+  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
+
+  return group?.find(c => String(c.id) === String(cityId))?.name || ''
+}
+
+const serviceAreaCityOptions = computed(() => {
+  if (!serviceAreaState.value)
+    return []
+  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(serviceAreaState.value))
+
+  return group ? group.map(c => ({ id: String(c.id), label: c.name })) : []
+})
+
 watch(() => form.value.state, () => {
   form.value.city = null
 })
+
+watch(() => form.value.role, async () => {
+  // Clear role-specific fields when switching roles
+  form.value.enterpriseName = ''
+  form.value.serviceAreas = []
+  serviceAreaState.value = null
+  serviceAreaCity.value = null
+
+  // Clear any existing validation highlights/errors
+  await nextTick()
+  formRef.value?.resetValidation?.()
+})
+
+watch(serviceAreaState, () => {
+  serviceAreaCity.value = null
+})
+
+function addServiceArea() {
+  if (!serviceAreaState.value || !serviceAreaCity.value)
+    return
+
+  const newArea = { state: String(serviceAreaState.value), city: String(serviceAreaCity.value) }
+  const exists = (form.value.serviceAreas || []).some(a => String(a.state) === newArea.state && String(a.city) === newArea.city)
+  if (exists)
+    return
+
+  form.value.serviceAreas = [...(form.value.serviceAreas || []), newArea]
+  serviceAreaState.value = null
+  serviceAreaCity.value = null
+}
+
+function removeServiceArea(index) {
+  form.value.serviceAreas = (form.value.serviceAreas || []).filter((_, i) => i !== index)
+}
+
+function validateRoleExtras() {
+  if (isEnterprise.value && !String(form.value.enterpriseName || '').trim()) {
+    showSnackbar(t('auth.signup.errors.enterprise_name_required'), 'error')
+
+    return false
+  }
+  if (isPainter.value && (!Array.isArray(form.value.serviceAreas) || form.value.serviceAreas.length === 0)) {
+    showSnackbar(t('auth.signup.errors.service_areas_required'), 'error')
+
+    return false
+  }
+
+  return true
+}
 
 // Resend code cooldown
 const resendCooldown = ref(0)
@@ -111,6 +211,86 @@ function startCooldown() {
     if (resendCooldown.value <= 0)
       clearInterval(cooldownInterval)
   }, 1000)
+}
+
+const onSubmit = async () => {
+  // Ensure form is valid before submit
+  if (formRef.value) {
+    const res = formRef.value.validate?.()
+    if (res && typeof res.then === 'function') {
+      const r = await res
+      if (!r.valid) {
+        showSnackbar(t('auth.errors.fix_highlighted_errors'), 'error')
+
+        return
+      }
+    }
+  }
+
+  if (!validateRoleExtras())
+    return
+
+  try {
+    loading.value = true
+
+    // API expects a normal phone string (e.g. 0XXXXXXXXX)
+    const phone = `+213${form.value.phone}`
+
+    const payload = {
+      phone,
+      password: form.value.password,
+      firstName: form.value.firstName,
+      lastName: form.value.lastName,
+      address: form.value.address,
+      state: getStateLabel(form.value.state),
+      city: getCityLabel(form.value.state, form.value.city),
+    }
+
+    // role is optional; omit for default "user"
+    if (form.value.role && form.value.role !== 'user')
+      payload.role = form.value.role
+
+    if (form.value.role === 'enterprise')
+      payload.enterpriseName = String(form.value.enterpriseName || '').trim()
+
+    if (form.value.role === 'painter') {
+      payload.serviceAreas = (form.value.serviceAreas || []).map(a => ({
+        state: getStateLabel(a.state),
+        city: getCityLabel(a.state, a.city),
+      }))
+    }
+
+    const res = await fetch(`${config.public.apiBaseUrl}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    const data = await res.json().catch(() => null)
+    if (!res.ok) {
+      const msg = data?.message || data?.error || (res.status === 409 ? t('auth.errors.user_already_exists') : t('auth.errors.failed_to_register'))
+      throw new Error(msg)
+    }
+
+    if (data?.token) {
+      authStore.setToken(data.token)
+      authStore.patchUser(data.user)
+      showSnackbar(t('auth.signup.registration_successful'), 'success')
+      router.push('/')
+    }
+    else {
+      throw new Error(t('auth.errors.registration_failed'))
+    }
+  }
+  catch (err) {
+    console.log(err)
+    showSnackbar(t('auth.errors.registration_failed'), 'error')
+  }
+  finally {
+    loading.value = false
+  }
 }
 
 async function sendCode() {
@@ -159,67 +339,35 @@ async function verifyCode() {
 }
 
 function goToPhoneStep() {
-  // Use VForm validation before moving to phone step
+  // Use VForm validation before moving to phone step (last step)
   if (formRef.value) {
     const result = formRef.value.validate?.()
     if (result && typeof result.then === 'function') {
       result.then(r => {
-        if (r.valid)
-          currentStep.value = 1; else showSnackbar(t('auth.errors.fix_highlighted_errors'), 'error')
+        if (r.valid && validateRoleExtras())
+          currentStep.value = 2
+        else
+          showSnackbar(t('auth.errors.fix_highlighted_errors'), 'error')
       })
 
       return
     }
   }
+  if (validateRoleExtras())
+    currentStep.value = 2
+}
+
+function goToPersonalStep() {
   currentStep.value = 1
 }
 
-const onSubmit = async () => {
-  // Ensure form is valid before submit
-  if (formRef.value) {
-    const res = formRef.value.validate?.()
-    if (res && typeof res.then === 'function') {
-      const r = await res
-      if (!r.valid) {
-        showSnackbar(t('auth.errors.fix_highlighted_errors'), 'error')
-
-        return
-      }
-    }
+function goBack() {
+  if (currentStep.value === 2) {
+    confirmationResult.value = null
+    code.value = ''
   }
-  try {
-    loading.value = true
-
-    const phone = `+213${form.value.phone}`
-
-    const res = await fetch(`${config.public.apiBaseUrl}/api/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ...form.value, phone }),
-    })
-
-    if (!res.ok)
-      throw new Error(t('auth.errors.failed_to_register'))
-    const data = await res.json()
-    if (data?.token) {
-      authStore.setToken(data.token)
-      authStore.patchUser(data.user)
-      showSnackbar(t('auth.signup.registration_successful'), 'success')
-      router.push('/')
-    }
-    else {
-      throw new Error(t('auth.errors.registration_failed'))
-    }
-  }
-  catch (err) {
-    console.log(err)
-    showSnackbar(t('auth.errors.registration_failed'), 'error')
-  }
-  finally {
-    loading.value = false
-  }
+  if (currentStep.value > 0)
+    currentStep.value--
 }
 
 const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordValidator } = useValidators()
@@ -257,7 +405,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
       <VCard
         flat
         class="mt-12 mt-sm-0"
-        width="600"
+        width="700"
       >
         <AppStepper
           v-model:current-step="currentStep"
@@ -274,6 +422,32 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
           style="max-inline-size: 681px;"
         >
           <VForm ref="formRef">
+            <VWindowItem>
+              <h5 class="text-h5">
+                {{ t('auth.signup.plan.title') }}
+              </h5>
+              <p class="text-sm">
+                {{ t('auth.signup.plan.subtitle') }}
+              </p>
+
+              <CustomRadiosWithIcon
+                v-model:selected-radio="form.role"
+                :radio-content="radioContent"
+                :grid-column="{ sm: '4', cols: '12' }"
+              >
+                <template #default="{ item }">
+                  <div class="text-center">
+                    <h5 class="text-h5 text-primary pb-4">
+                      {{ item.title }}
+                    </h5>
+                    <p class="clamp-text mb-0">
+                      {{ item.desc }}
+                    </p>
+                  </div>
+                </template>
+              </CustomRadiosWithIcon>
+            </VWindowItem>
+
             <!-- Step 1: Personal Information (now first) -->
             <VWindowItem>
               <h5 class="text-h5 mb-1">
@@ -307,6 +481,19 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     :rules="[requiredValidator]"
                   />
                 </VCol>
+
+                <VCol
+                  v-if="isEnterprise"
+                  cols="12"
+                >
+                  <AppTextField
+                    v-model="form.enterpriseName"
+                    :label="t('auth.signup.enterprise_name.label')"
+                    :placeholder="t('auth.signup.enterprise_name.placeholder')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+
                 <VCol
                   cols="12"
                   md="6"
@@ -374,6 +561,74 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     :placeholder="t('auth.address_placeholder')"
                     :rules="[requiredValidator]"
                   />
+                </VCol>
+
+                <VCol
+                  v-if="isPainter"
+                  cols="12"
+                >
+                  <h6 class="text-h6 mb-2">
+                    {{ t('auth.signup.service_areas.title') }}
+                  </h6>
+
+                  <VRow align="end">
+                    <VCol
+                      cols="12"
+                      md="5"
+                    >
+                      <AppSelect
+                        v-model="serviceAreaState"
+                        item-value="id"
+                        item-title="label"
+                        :label="t('auth.wilaya')"
+                        :placeholder="t('auth.select_wilaya')"
+                        :items="stateOptions"
+                      />
+                    </VCol>
+
+                    <VCol
+                      cols="12"
+                      md="5"
+                    >
+                      <AppSelect
+                        v-model="serviceAreaCity"
+                        item-value="id"
+                        item-title="label"
+                        :label="t('auth.city')"
+                        :placeholder="t('auth.select_city')"
+                        :items="serviceAreaCityOptions"
+                      />
+                    </VCol>
+
+                    <VCol
+                      cols="12"
+                      md="2"
+                      class="d-flex align-center"
+                    >
+                      <VBtn
+                        block
+                        color="primary"
+                        :disabled="!serviceAreaState || !serviceAreaCity"
+                        @click="addServiceArea"
+                      >
+                        {{ t('common.add') }}
+                      </VBtn>
+                    </VCol>
+                  </VRow>
+
+                  <div
+                    v-if="form.serviceAreas?.length"
+                    class="d-flex flex-wrap gap-2 mt-2"
+                  >
+                    <VChip
+                      v-for="(area, i) in form.serviceAreas"
+                      :key="`${area.state}-${area.city}-${i}`"
+                      closable
+                      @click:close="removeServiceArea(i)"
+                    >
+                      {{ getStateLabel(area.state) }} - {{ getCityLabel(area.state, area.city) }}
+                    </VChip>
+                  </div>
                 </VCol>
               </VRow>
             </VWindowItem>
@@ -475,12 +730,11 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
         </VWindow>
 
         <div class="d-flex flex-wrap justify-sm-space-between justify-center gap-x-4 gap-y-2 mt-8">
-          <!-- Back button for step 2 -->
           <VBtn
-            v-if="currentStep === 1"
+            v-if="currentStep > 0"
             variant="tonal"
             color="secondary"
-            @click="currentStep = 0; confirmationResult = null; code = ''"
+            @click="goBack"
           >
             <VIcon
               icon="tabler-arrow-left"
@@ -490,9 +744,22 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
           </VBtn>
           <div v-else />
 
-          <!-- Step 1: Next button -->
+          <!-- Step 0: Next -> Personal -->
           <VBtn
             v-if="currentStep === 0"
+            :loading="loading"
+            @click="goToPersonalStep"
+          >
+            {{ t('common.next') }}
+            <VIcon
+              icon="tabler-arrow-right"
+              end
+            />
+          </VBtn>
+
+          <!-- Step 1: Next -> Phone (requires valid personal info) -->
+          <VBtn
+            v-else-if="currentStep === 1"
             :loading="loading"
             @click="goToPhoneStep"
           >

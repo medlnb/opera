@@ -1,8 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n({ useScope: 'global' })
 const authStore = useAuthStore()
@@ -102,7 +102,7 @@ const loadProfile = async () => {
   }
 }
 
-const saveAvailability = async (nextAvailable) => {
+const saveAvailability = async nextAvailable => {
   const currentRole = (authStore.user || {}).role
   const isPainter = currentRole === 'painter' || currentRole === 'admin'
   if (!isPainter)
@@ -143,6 +143,7 @@ const onAvailabilityToggle = async nextValue => {
     return
 
   const previous = availabilityLocal.value
+
   availabilityLocal.value = !!nextValue
 
   try {

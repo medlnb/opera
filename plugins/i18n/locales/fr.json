@@ -7,12 +7,20 @@
     "common": {
         "back_to_home": "Retour à l'accueil",
         "back": "Retour",
+        "add": "Ajouter",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
         "next": "Suivant",
         "unnamed": "Sans nom",
         "pagination": {
             "showing": "Affichage de {start} à {end} sur {total} entrées"
         }
     },
+    "Required": "Obligatoire",
+    "Password mismatch": "Les mots de passe ne correspondent pas",
+    "Invalid password": "Mot de passe invalide",
+    "Invalid phone": "Numéro de téléphone invalide",
+    "Invalid image format": "Format d'image invalide",
     "colors_page": {
         "hero_title": "Bienvenue dans le spectre des couleurs",
         "hero_subtitle": "Explorez des teintes qui donnent vie à votre vision",
@@ -28,7 +36,8 @@
         "hero_title": "Conseils & Astuces",
         "hero_subtitle": "Découvrez des conseils et astuces utiles pour vos projets de peinture",
         "empty": {
-            "title": "Aucun conseil disponible pour le moment"
+            "title": "Aucun conseil disponible pour le moment",
+            "subtitle": "Revenez bientôt pour des conseils utiles !"
         },
         "editor": {
             "title_create": "Créer un article",
@@ -199,9 +208,11 @@
             "dashboard": "Tableau de bord",
             "products": "Produits",
             "new_product": "Nouveau produit",
+            "colors": "Couleurs",
             "articles": "Articles",
             "new_article": "Nouvel article",
             "orders": "Commandes",
+            "deals": "Demandes de devis",
             "users": "Utilisateurs"
         }
     },
@@ -213,6 +224,7 @@
             "subtitle": "Voir et supprimer/annuler vos demandes",
             "close": "Fermer",
             "empty": "Vous n'avez pas encore de demandes",
+            "confirm_title": "Confirmer la suppression",
             "confirm_remove": "Supprimer cette demande ?",
             "table": {
                 "painter": "Peintre",
@@ -323,10 +335,53 @@
     },
     "user": {
         "my_orders": "Mes commandes",
+        "my_deals": "Mes demandes de devis",
         "my_cart": "Mon panier",
         "my_favorites": "Mes favoris",
         "account": "Compte",
         "logout": "Déconnexion"
+    },
+    "deals": {
+        "dialog": {
+            "title": "Demander un devis",
+            "auth_required": "Vous devez être connecté pour envoyer une demande de devis.",
+            "prefill_from_cart": "Je souhaite un devis pour les articles de mon panier.",
+            "prefill_about_product": "Demande de devis pour"
+        },
+        "actions": {
+            "request_deal": "Demander un devis",
+            "submit": "Envoyer la demande"
+        },
+        "snackbar": {
+            "submitted": "Demande de devis envoyée",
+            "auth_required": "Veuillez vous connecter pour demander un devis",
+            "submit_failed": "Échec de l'envoi de la demande"
+        },
+        "contact": {
+            "title": "Informations de contact"
+        },
+        "fields": {
+            "message": {
+                "label": "Note",
+                "placeholder": "Écrivez une note (obligatoire si adresse/wilaya/commune sont vides)"
+            },
+            "firstName": "Prénom",
+            "lastName": "Nom",
+            "enterpriseName": "Entreprise",
+            "phone": "Téléphone",
+            "phone_placeholder": "+213...",
+            "phone_required_guest": "Requis pour les invités",
+            "address": "Adresse",
+            "state": "Wilaya",
+            "city": "Commune",
+            "state_placeholder": "Sélectionner une wilaya",
+            "city_placeholder": "Sélectionner une commune"
+        },
+        "items": {
+            "title": "Articles",
+            "qty": "Qté",
+            "color": "Couleur"
+        }
     },
     "account": {
         "cart": {
@@ -343,6 +398,37 @@
                 "title": "Informations de livraison (Optionnel)",
                 "fields": {
                     "address": {
+                        "deals": {
+                            "table": {
+                                "deal_id": "Demande",
+                                "note": "Note",
+                                "status": "Statut",
+                                "date": "Date",
+                                "actions": "Actions"
+                            },
+                            "empty": {
+                                "title": "Aucune demande de devis",
+                                "subtitle": "Faites une demande depuis un produit ou votre panier"
+                            },
+                            "details": {
+                                "title": "Demande de devis",
+                                "back": "Retour aux demandes",
+                                "not_found_title": "Demande introuvable",
+                                "not_found_subtitle": "Cette demande a peut-être été supprimée",
+                                "deal_number": "Demande #{id}",
+                                "created_at": "Créée le : {date}",
+                                "message": "Note",
+                                "items": "Articles",
+                                "no_items": "Aucun article fourni",
+                                "contact": "Contact",
+                                "table": {
+                                    "product": "Produit",
+                                    "color": "Couleur",
+                                    "qty": "Qté",
+                                    "note": "Note"
+                                }
+                            }
+                        },
                         "label": "Adresse",
                         "placeholder": "Adresse"
                     },
@@ -368,6 +454,35 @@
             "snackbar": {
                 "order_success": "Commande passée avec succès",
                 "checkout_failed": "Échec du paiement"
+            }
+        },
+        "deals": {
+            "table": {
+                "deal_id": "Demande",
+                "note": "Note",
+                "status": "Statut",
+                "date": "Date",
+                "actions": "Actions"
+            },
+            "empty": {
+                "title": "Aucune demande de devis",
+                "subtitle": "Faites une demande depuis un produit ou votre panier"
+            },
+            "details": {
+                "title": "Demande de devis",
+                "back": "Retour aux demandes",
+                "not_found_title": "Demande introuvable",
+                "not_found_subtitle": "Cette demande a peut-être été supprimée",
+                "deal_number": "Demande #{id}",
+                "created_at": "Créée le : {date}",
+                "message": "Note",
+                "contact": "Contact",
+                "table": {
+                    "product": "Produit",
+                    "color": "Couleur",
+                    "qty": "Qté",
+                    "note": "Note"
+                }
             }
         },
         "orders": {
@@ -513,6 +628,8 @@
         "verification_code_placeholder": "- - - - - -",
         "new_password": "Nouveau mot de passe",
         "confirm_password": "Confirmer le mot de passe",
+        "enterprise_name": "Nom de l'entreprise",
+        "enterprise_name_placeholder": "Nom de l'entreprise",
         "first_name": "Prénom",
         "first_name_placeholder": "Jean",
         "last_name": "Nom",
@@ -532,7 +649,40 @@
                 "phone": {
                     "title": "Vérification du téléphone",
                     "subtitle": "Vérifiez votre téléphone"
+                },
+                "plan": {
+                    "title": "Profil",
+                    "subtitle": "Choisir le type de compte"
                 }
+            },
+            "plan": {
+                "title": "Choisir un profil",
+                "subtitle": "Sélectionnez le type de compte qui vous convient"
+            },
+            "roles": {
+                "user": {
+                    "title": "Client",
+                    "desc": "Acheter des produits et demander des devis"
+                },
+                "painter": {
+                    "title": "Peintre",
+                    "desc": "Proposer des services et recevoir des demandes"
+                },
+                "enterprise": {
+                    "title": "Entreprise",
+                    "desc": "Demander des devis pour vos projets"
+                }
+            },
+            "service_areas": {
+                "title": "Zones de service"
+            },
+            "enterprise_name": {
+                "label": "Nom de l'entreprise",
+                "placeholder": "Nom de l'entreprise"
+            },
+            "errors": {
+                "enterprise_name_required": "Le nom de l'entreprise est requis",
+                "service_areas_required": "Veuillez ajouter au moins une zone de service"
             },
             "personal_info_title": "Informations personnelles",
             "personal_info_subtitle": "Saisissez vos informations personnelles",
@@ -561,6 +711,7 @@
             "phone_password_required": "Le téléphone et le mot de passe sont requis",
             "login_failed": "Échec de la connexion",
             "invalid_credentials": "Identifiants invalides",
+            "user_already_exists": "L'utilisateur existe déjà",
             "valid_phone_required": "Veuillez entrer un numéro de téléphone valide à 9 chiffres",
             "failed_to_send_sms": "Échec de l'envoi du SMS",
             "enter_6_digit_code": "Veuillez entrer le code à 6 chiffres",
@@ -634,7 +785,40 @@
             "description": "Découvrez notre large gamme de peintures premium et trouvez la couleur parfaite pour votre prochain projet.",
             "shop_now": "Acheter maintenant",
             "get_inspired": "S'inspirer"
-        }
+        },
+        "catalog": {
+            "badge_title": "Catalogue",
+            "title": "Explorez notre catalogue",
+            "description": "Découvrez des produits pour chaque surface et projet.",
+            "cta": "Voir les produits",
+            "item_1": "Peintures décoratives",
+            "item_2": "Revêtements",
+            "item_3": "Peintures bâtiment",
+            "item_4": "Accessoires"
+        },
+        "coty": {
+            "kicker": "International",
+            "title": "Disponible aussi en Côte d'Ivoire",
+            "cta": "En savoir plus"
+        },
+        "painters": {
+            "overline": "Peintres",
+            "title": "Trouver un peintre",
+            "description": "Parcourez les peintres disponibles près de chez vous.",
+            "view_all": "Voir tout",
+            "available": "Disponible",
+            "no_painters": "Aucun peintre trouvé",
+            "years_exp": "{years} ans d'expérience"
+        },
+        "studio_color": {
+            "badge": "Peintre virtuel",
+            "title": "Studio Color",
+            "tagline": "Essayez les couleurs avant de peindre",
+            "description": "Importez une photo et prévisualisez les couleurs sur vos murs.",
+            "cta": "Essayer maintenant"
+        },
+        "trend_colors_title": "Couleurs tendance",
+        "view_more_colors": "Voir plus de couleurs"
     },
     "products": {
         "empty": {
@@ -987,15 +1171,126 @@
         },
         "common": {
             "status": "Statut",
+            "search": "Rechercher",
             "cancel": "Annuler",
             "delete": "Supprimer",
             "action_failed": "Échec de l'action",
             "delete_failed": "Échec de la suppression",
+            "filters": {
+                "all": "Tous"
+            },
+            "actions": {
+                "save": "Enregistrer",
+                "cancel": "Annuler",
+                "create": "Créer",
+                "delete": "Supprimer",
+                "edit": "Modifier"
+            },
             "value": {
                 "na": "-"
             },
             "table": {
                 "actions": "Actions"
+            }
+        },
+        "colors": {
+            "title": "Gestion des couleurs",
+            "subtitle": "Créer et gérer votre palette de couleurs",
+            "search_placeholder": "Rechercher des couleurs...",
+            "actions": {
+                "create": "Créer une couleur"
+            },
+            "table": {
+                "name": "Nom",
+                "code": "Code",
+                "trend": "Tendance"
+            },
+            "empty": {
+                "title": "Aucune couleur trouvée",
+                "subtitle": "Créez votre première couleur pour commencer"
+            },
+            "form": {
+                "name": "Nom",
+                "code": "Code",
+                "color_picker": "Sélecteur de couleur",
+                "trend": "Tendance"
+            },
+            "dialogs": {
+                "create": {
+                    "title": "Créer une couleur"
+                },
+                "edit": {
+                    "title": "Modifier la couleur"
+                },
+                "delete": {
+                    "title": "Supprimer la couleur",
+                    "message": "Voulez-vous vraiment supprimer cette couleur ?"
+                }
+            },
+            "messages": {
+                "fetch_error": "Échec du chargement des couleurs",
+                "create_success": "Couleur créée",
+                "create_error": "Échec de la création de la couleur",
+                "update_success": "Couleur mise à jour",
+                "update_error": "Échec de la mise à jour de la couleur",
+                "delete_success": "Couleur supprimée",
+                "delete_error": "Échec de la suppression de la couleur",
+                "trend_update_success": "Tendance mise à jour",
+                "trend_update_error": "Échec de la mise à jour de la tendance"
+            },
+            "validation": {
+                "name_required": "Le nom est obligatoire",
+                "code_required": "Le code est obligatoire"
+            }
+        },
+        "deals": {
+            "title": "Demandes de devis",
+            "filters": {
+                "source": "Source"
+            },
+            "source": {
+                "guest": "Invité",
+                "user": "Utilisateur",
+                "painter": "Peintre",
+                "enterprise": "Entreprise"
+            },
+            "status": {
+                "new": "Nouvelle",
+                "contacted": "Contactée",
+                "converted": "Convertie",
+                "closed": "Clôturée"
+            },
+            "table": {
+                "deal_id": "Demande",
+                "contact": "Contact",
+                "source": "Source",
+                "status": "Statut",
+                "date": "Date"
+            },
+            "details": {
+                "title": "Demande de devis",
+                "back_to_deals": "Retour aux demandes",
+                "not_found_title": "Demande introuvable",
+                "not_found_subtitle": "Cette demande a peut-être été supprimée",
+                "deal_number": "Demande #{id}",
+                "created_at": "Créée le : {date}",
+                "message": "Message",
+                "items": "Articles",
+                "no_items": "Aucun article fourni",
+                "contact": "Contact",
+                "admin": "Admin",
+                "admin_notes": "Notes admin",
+                "table": {
+                    "product": "Produit",
+                    "color": "Couleur",
+                    "qty": "Qté",
+                    "note": "Note"
+                },
+                "snackbar": {
+                    "load_failed": "Échec du chargement de la demande",
+                    "updated": "Demande mise à jour",
+                    "update_failed": "Échec de la mise à jour de la demande"
+                }
             }
         },
         "users": {

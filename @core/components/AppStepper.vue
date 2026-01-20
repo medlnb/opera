@@ -51,6 +51,11 @@ const isValidationEnabled = computed(() => {
   return props.isActiveStepValid !== undefined
 })
 
+function onUpdateModelValue(value: number) {
+  if (!isValidationEnabled.value)
+    currentStep.value = value
+}
+
 watchEffect(() => {
   // we need to check undefined because if we pass 0 as currentStep it will be falsy
   if (
@@ -66,11 +71,12 @@ watchEffect(() => {
 
 <template>
   <VSlideGroup
-    v-model="currentStep"
+    :model-value="currentStep"
     class="app-stepper"
     show-arrows
     :direction="props.direction"
     :class="`app-stepper-${props.align}`"
+    @update:model-value="onUpdateModelValue"
   >
     <VSlideGroupItem
       v-for="(item, index) in props.items"

@@ -59,7 +59,7 @@ const form = reactive({
   materielApplication: [] as string[],
   nettoyageMateriel: '',
   preparationSupport: '',
-  colors: [{ name: '', code: '#000000' }] as { name: string; code: string }[],
+  colors: [{ name: '', code: '' }] as { name: string; code: string }[],
 })
 
 // UI error highlight for missing assets
@@ -149,7 +149,7 @@ onMounted(async () => {
       form.materielApplication = Array.isArray(p.materielApplication) ? p.materielApplication : []
       form.nettoyageMateriel = p.nettoyageMateriel || ''
       form.preparationSupport = p.preparationSupport || ''
-      form.colors = Array.isArray(p.colors) && p.colors.length ? p.colors.map((c: any) => ({ name: c.name || '', code: c.code || '#000000' })) : [{ name: '', code: '#000000' }]
+      form.colors = Array.isArray(p.colors) && p.colors.length ? p.colors.map((c: any) => ({ name: c.name || '', code: c.code || '' })) : []
 
       // Optional technical PDF
       if (p.technicalFile) {
@@ -350,7 +350,7 @@ function removeVariance(index: number) {
 }
 
 function addColor() {
-  form.colors.push({ name: '', code: '#000000' })
+  form.colors.push({ name: '', code: '' })
 }
 function removeColor(index: number) {
   form.colors.splice(index, 1)
@@ -377,12 +377,14 @@ async function publishProduct() {
   if (!form.avatar)
     snackbar.value = { show: true, text: t('management.products.editor.snackbar.avatar_required'), color: 'error' }
 
-  if (!Array.isArray(form.colors) || form.colors.length === 0)
-    snackbar.value = { show: true, text: t('management.products.editor.snackbar.color_required'), color: 'error' }
+  // Colors are optional, but if a row is started it must be complete.
+  const cleanedColors = (Array.isArray(form.colors) ? form.colors : [])
+    .map(c => ({ name: String(c?.name ?? '').trim(), code: String(c?.code ?? '').trim() }))
+    .filter(c => c.name || c.code)
 
-  const invalidColor = form.colors.find(c => !c.name || !c.code)
+  const invalidColor = cleanedColors.find(c => !c.name || !c.code)
   if (invalidColor)
-    snackbar.value = { show: true, text: t('management.products.editor.snackbar.color_invalid'), color: 'error' }
+    return snackbar.value = { show: true, text: t('management.products.editor.snackbar.color_invalid'), color: 'error' }
 
   if (!Array.isArray(form.variances) || form.variances.length === 0)
     snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_required'), color: 'error' }
@@ -396,7 +398,7 @@ async function publishProduct() {
     const body = {
       ...form,
       variances: form.variances.filter(v => v.quantity),
-      colors: form.colors.filter(c => c.name && c.code),
+      colors: cleanedColors,
 
       // Only send technicalFile when set, unless admin explicitly detached it.
       ...(form.technicalFile ? { technicalFile: form.technicalFile } : {}),
@@ -876,22 +878,24 @@ function discard() {
                 :label="t('management.products.editor.colors.name')"
                 :placeholder="t('management.products.editor.colors.name_placeholder')"
                 class="flex-grow-1"
-                :rules="[requiredValidator]"
               />
-              <div>
-                <VLabel class="mb-1">
-                  {{ t('management.products.editor.colors.code') }}
-                </VLabel>
-                <div>
+              <AppTextField
+                v-model="c.code"
+                :label="t('management.products.editor.colors.code')"
+                placeholder="#RRGGBB"
+                clearable
+                class="flex-grow-1"
+              >
+                <template #append-inner>
                   <input
-                    v-model="c.code"
+                    :value="c.code || '#000000'"
                     type="color"
-                    style=" border: none; block-size: 40px; cursor: pointer;inline-size: 50px;"
+                    style="border: none; block-size: 32px; cursor: pointer; inline-size: 40px; padding: 0; background: transparent;"
+                    @input="c.code = ($event.target as HTMLInputElement).value"
                   >
-                </div>
-              </div>
+                </template>
+              </AppTextField>
               <VBtn
-                v-if="form.colors.length > 1"
                 icon
                 size="small"
                 color="error"

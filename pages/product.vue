@@ -146,6 +146,8 @@ const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
 
+const isDealDialogVisible = ref(false)
+
 onMounted(async () => {
   try {
     productLoading.value = true
@@ -550,6 +552,15 @@ function toggleFavorite() {
                     >
                       {{ t('products.details.actions.add_to_cart') }}
                     </VBtn>
+
+                    <VBtn
+                      class="mt-2 flex-fill"
+                      variant="tonal"
+                      color="secondary"
+                      @click="isDealDialogVisible = true"
+                    >
+                      {{ t('deals.actions.request_deal') }}
+                    </VBtn>
                   </div>
                 </div>
               </VCol>
@@ -761,6 +772,12 @@ function toggleFavorite() {
   >
     {{ snackbar.message }}
   </VSnackbar>
+
+  <DealRequestDialog
+    :is-dialog-visible="isDealDialogVisible"
+    :initial-note="productDetails?.title ? `${t('deals.dialog.prefill_about_product')}: ${productDetails?.title}` : ''"
+    @update:is-dialog-visible="val => (isDealDialogVisible = val)"
+  />
 </template>
 
 <style lang="scss" scoped>

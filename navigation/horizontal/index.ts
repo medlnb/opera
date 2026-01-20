@@ -49,9 +49,14 @@ export function useNavItems() {
         icon: { icon: 'tabler-brush' },
       },
       {
+        to: { name: 'painters' },
+        title: 'nav.painters',
+        icon: { icon: 'tabler-users' },
+      },
+      {
         to: { name: 'contact' },
         title: 'nav.contact',
-        icon: { icon: 'tabler-phone' },
+        icon: { icon: 'tabler-map-pin' },
       },
       (user as any)?.role as string === 'admin' && {
         title: 'nav.management.root',
@@ -70,6 +75,10 @@ export function useNavItems() {
             to: { name: 'management-product' },
           },
           {
+            title: 'nav.management.colors',
+            to: { name: 'management-colors' },
+          },
+          {
             title: 'nav.management.articles',
             to: { name: 'management-articles' },
           },
@@ -80,6 +89,10 @@ export function useNavItems() {
           {
             title: 'nav.management.orders',
             to: { name: 'management-orders' },
+          },
+          {
+            title: 'nav.management.deals',
+            to: { name: 'management-deals' },
           },
           {
             title: 'nav.management.users',

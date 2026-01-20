@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     aiPaintUrl: process.env.NUXT_AI_PAINT_URL,
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL ,
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
     },
   },
 

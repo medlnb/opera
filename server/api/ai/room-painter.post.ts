@@ -17,6 +17,7 @@ const normalizeImageToDataUrl = async (value: unknown, mimeType?: string): Promi
     const base64Candidate = value.trim()
     if (/^[A-Za-z0-9+/=]+$/.test(base64Candidate) && base64Candidate.length > 200) {
       const mt = mimeType || 'image/png'
+
       return `data:${mt};base64,${base64Candidate}`
     }
 
@@ -28,6 +29,7 @@ const normalizeImageToDataUrl = async (value: unknown, mimeType?: string): Promi
 
       const ct = res.headers.get('content-type') || mimeType || 'image/png'
       const buf = await res.arrayBuffer()
+
       return `data:${ct};base64,${toBase64(buf)}`
     }
 
@@ -37,6 +39,7 @@ const normalizeImageToDataUrl = async (value: unknown, mimeType?: string): Promi
   // If it's an object like { url: '...' }
   if (typeof value === 'object') {
     const v = value as any
+
     return (
       await normalizeImageToDataUrl(v?.imageDataUrl, v?.mimeType)
       || await normalizeImageToDataUrl(v?.dataUrl, v?.mimeType)
@@ -51,7 +54,7 @@ const normalizeImageToDataUrl = async (value: unknown, mimeType?: string): Promi
   return null
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const config = useRuntimeConfig()
   const aiPaintUrl = (config as any).aiPaintUrl as string | undefined
 
@@ -63,9 +66,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const parts = await readMultipartFormData(event)
-  if (!parts || parts.length === 0) {
+  if (!parts || parts.length === 0)
     throw createError({ statusCode: 400, statusMessage: 'Missing multipart form-data.' })
-  }
 
   const form = new FormData()
 
@@ -76,6 +78,7 @@ export default defineEventHandler(async (event) => {
     if (part.filename) {
       const bytes = new Uint8Array(part.data)
       const blob = new Blob([bytes], { type: part.type || 'application/octet-stream' })
+
       form.append(part.name, blob, part.filename)
     }
     else {
@@ -101,6 +104,7 @@ export default defineEventHandler(async (event) => {
   // If upstream returns an image directly, convert to a data URL for the client.
   if (contentType.startsWith('image/')) {
     const buf = await res.arrayBuffer()
+
     return {
       imageDataUrl: `data:${contentType};base64,${toBase64(buf)}`,
     }
@@ -108,6 +112,7 @@ export default defineEventHandler(async (event) => {
 
   // Otherwise assume JSON (many AI services return URLs or nested structures).
   const text = await res.text().catch(() => '')
+
   const json = (() => {
     try {
       return JSON.parse(text)
@@ -117,8 +122,8 @@ export default defineEventHandler(async (event) => {
     }
   })() as any
 
-  const imageDataUrl =
-    await normalizeImageToDataUrl(json)
+  const imageDataUrl
+    = await normalizeImageToDataUrl(json)
     || await normalizeImageToDataUrl(json?.imageDataUrl)
     || await normalizeImageToDataUrl(json?.dataUrl)
     || await normalizeImageToDataUrl(json?.image)
