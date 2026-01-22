@@ -55,6 +55,22 @@ const edit = ref({
   adminNotes: '',
 })
 
+const dealProductId = computed(() => {
+  const d = deal.value || {}
+  const p = d.product || null
+
+  return p?._id || d.productId || d.product || null
+})
+
+const dealProductImageSrc = computed(() => {
+  const p = deal.value?.product
+  const imageId = p?.imageUrl || p?.avatar
+  if (!imageId)
+    return ''
+
+  return `${config.public.apiBaseUrl}/api/image?id=${imageId}`
+})
+
 const fetchDeal = async () => {
   loading.value = true
   try {
@@ -213,6 +229,50 @@ onMounted(() => {
           cols="12"
           md="4"
         >
+          <VCard class="mb-6">
+            <VCardTitle>{{ t('management.deals.details.product') }}</VCardTitle>
+            <VDivider />
+            <VCardText>
+              <div class="d-flex align-center gap-3">
+                <VAvatar
+                  size="52"
+                  rounded
+                  color="grey-lighten-3"
+                >
+                  <VImg
+                    v-if="dealProductImageSrc"
+                    :src="dealProductImageSrc"
+                    cover
+                  />
+                  <VIcon
+                    v-else
+                    icon="tabler-package"
+                  />
+                </VAvatar>
+
+                <div class="flex-grow-1">
+                  <div class="font-weight-medium">
+                    {{ deal.product?.title || t('management.common.value.na') }}
+                  </div>
+                  <div
+                    v-if="deal.product?.type"
+                    class="text-caption text-disabled"
+                  >
+                    {{ String(deal.product.type) }}
+                  </div>
+                </div>
+
+                <VBtn
+                  v-if="dealProductId"
+                  icon="tabler-external-link"
+                  variant="text"
+                  color="primary"
+                  :to="{ path: '/product', query: { id: dealProductId } }"
+                />
+              </div>
+            </VCardText>
+          </VCard>
+
           <VCard class="mb-6">
             <VCardTitle>{{ t('management.deals.details.contact') }}</VCardTitle>
             <VDivider />
