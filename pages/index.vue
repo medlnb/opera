@@ -4,9 +4,13 @@ import bgBuildings from '@images/buildings.png'
 import bgCoating from '@images/coatings.png'
 import bgDecor from '@images/decor.png'
 import logoImg from '@images/logo-v2.svg'
+import roomImg1 from '@images/room/room1.png'
+import roomImg2 from '@images/room/room2.jpg'
+import roomImg4 from '@images/room/room4.png'
 import { useI18n } from 'vue-i18n'
 
 const { t, te } = useI18n({ useScope: 'global' })
+const config = useRuntimeConfig()
 
 const stats = computed(() => [
   { value: '57+', label: t('home.stats.sales_points') },
@@ -52,6 +56,7 @@ async function fetchHeroColors() {
       method: 'GET',
       query: { trend: 'true' },
     })
+
     if (error.value)
       throw error.value
 
@@ -85,6 +90,53 @@ function productTypeLabel(type) {
 // Painters section
 const paintersLoading = ref(false)
 const featuredPainters = ref([])
+
+// Homepage catalog (PDF)
+const homepageCatalogLoading = ref(false)
+const homepageCatalog = ref(null)
+
+const homepageCatalogHref = computed(() => {
+  const url = homepageCatalog.value?.url
+
+  if (!url)
+    return undefined
+
+  if (/^(https?:)?\/\//i.test(url) || url.startsWith('data:') || url.startsWith('blob:'))
+    return url
+
+  const base = config.public?.apiBaseUrl
+
+  if (!base)
+    return url
+
+  try {
+    return new URL(url, base).toString()
+  }
+  catch {
+    return url
+  }
+})
+
+async function fetchHomepageCatalog() {
+  try {
+    homepageCatalogLoading.value = true
+
+    const { data, error } = await useApi('/api/homepage/catalog', {
+      method: 'GET',
+    })
+
+    if (error.value)
+      throw error.value
+
+    homepageCatalog.value = data.value?.data ?? null
+  }
+  catch {
+    homepageCatalog.value = null
+  }
+  finally {
+    homepageCatalogLoading.value = false
+  }
+}
 
 async function fetchFeaturedPainters() {
   try {
@@ -129,9 +181,12 @@ const painterLocationLabel = painter => {
 
 const painterIsAvailable = painter => painter?.available !== false
 
+const virtualPainterImages = [roomImg1, roomImg2, roomImg4]
+
 onMounted(() => {
   fetchHeroColors()
   fetchFeaturedPainters()
+  fetchHomepageCatalog()
 })
 </script>
 
@@ -178,7 +233,7 @@ onMounted(() => {
       </VCardText>
     </VCard>
 
-    <VContainer class="home-content">      
+    <VContainer class="home-content">
       <!-- Product Types Section -->
       <section class="home-section">
         <VRow>
@@ -233,7 +288,7 @@ onMounted(() => {
         </VRow>
       </section>
 
-            <!-- Color of the Year 2026 (banner) -->
+      <!-- Color of the Year 2026 (banner) -->
       <section class="home-section home-section--compact">
         <VCard
           class="coty-banner"
@@ -273,187 +328,251 @@ onMounted(() => {
         </VCard>
       </section>
 
-
       <!-- Studio Color Section -->
       <section class="home-section">
         <VCard
-          class="studio-card"
+          class="promo-card promo-card--vp"
           variant="flat"
         >
-          <VRow no-gutters>
+          <div class="promo-card__bg promo-card__bg--vp" />
+
+          <VRow
+            no-gutters
+            class="position-relative"
+          >
             <VCol
               cols="12"
               md="6"
-              class="studio-card__left"
             >
-              <div class="studio-card__left-inner">
-                <div class="studio-badge">
-                  <div class="studio-badge__title">
-                    {{ t('home.studio_color.badge') }}
-                  </div>
+              <VCardText class="pa-6 pa-md-10">
+                <div class="text-overline text-primary mb-2">
+                  {{ t('home.studio_color.badge') }}
                 </div>
-                <div class="studio-card__tagline">
+
+                <h2 class="text-h4 font-weight-bold mb-3">
+                  {{ t('home.studio_color.title') }}
+                </h2>
+
+                <p class="text-body-1 text-medium-emphasis mb-2">
                   {{ t('home.studio_color.tagline') }}
+                </p>
+
+                <p class="text-body-1 text-medium-emphasis mb-6">
+                  {{ t('home.studio_color.description') }}
+                </p>
+
+                <div class="d-flex flex-wrap gap-3">
+                  <VBtn
+                    color="primary"
+                    size="large"
+                    to="/room-painter"
+                  >
+                    <VIcon
+                      icon="tabler-brush"
+                      class="me-2"
+                    />
+                    {{ t('home.studio_color.cta') }}
+                  </VBtn>
+
+                  <VBtn
+                    variant="outlined"
+                    color="primary"
+                    size="large"
+                    to="/colors"
+                  >
+                    <VIcon
+                      icon="tabler-palette"
+                      class="me-2"
+                    />
+                    {{ t('home.hero.view_colors') }}
+                  </VBtn>
                 </div>
-              </div>
+              </VCardText>
             </VCol>
 
             <VCol
               cols="12"
               md="6"
-              class="studio-card__right"
+              class="promo-card__media promo-card__media--vp"
             >
-              <VCardText class="pa-6 pa-md-8">
-                <div class="text-subtitle-1 font-weight-bold mb-2">
-                  {{ t('home.studio_color.title') }}
-                </div>
-                <p class="text-body-2 text-medium-emphasis mb-4">
-                  {{ t('home.studio_color.description') }}
-                </p>
-                <VBtn
-                  color="primary"
-                  variant="tonal"
-                  to="/colors"
+              <div class="vp-preview">
+                <div
+                  v-for="(img, i) in virtualPainterImages"
+                  :key="i"
+                  class="vp-preview__item"
+                  :class="`vp-preview__item--${i + 1}`"
                 >
-                  {{ t('home.studio_color.cta') }}
-                </VBtn>
-              </VCardText>
+                  <VImg
+                    :src="img"
+                    cover
+                    height="100%"
+                  />
+                </div>
+
+                <div class="vp-preview__badge">
+                  <div class="vp-preview__badge-title">
+                    {{ t('home.studio_color.badge') }}
+                  </div>
+                  <div class="vp-preview__badge-sub">
+                    {{ t('home.studio_color.tagline') }}
+                  </div>
+                </div>
+              </div>
             </VCol>
           </VRow>
         </VCard>
       </section>
 
-            <!-- Colors Preview Section -->
+      <!-- Colors Preview Section -->
       <section class="home-section">
-        <div class="d-flex align-center justify-space-between">
-          <h2 class="text-h6 font-weight-bold mb-0">
-            {{ t('home.trend_colors_title') }}
-          </h2>
-          <VBtn
-            variant="text"
-            color="primary"
-            to="/colors"
-          >
-            {{ t('home.view_more_colors') }}
-            <VIcon
-              icon="tabler-arrow-right"
-              class="ms-2"
-            />
-          </VBtn>
-        </div>
-
-        <VRow
-          dense
-          class="mt-4"
-        >
-      <template v-if="heroColorsLoading">
-        <VCol
-          v-for="i in 3"
-          :key="i"
-          cols="6"
-          sm="3"
-          md="2"
-        >
-          <VCard
-            variant="outlined"
-            class="color-card"
-          >
-            <div class="color-swatch color-swatch--placeholder" />
-            <VCardText class="py-3">
-              <div class="fade-placeholder text-subtitle-2 mb-1" />
-              <div class="fade-placeholder text-caption" />
-            </VCardText>
-          </VCard>
-        </VCol>
-      </template>
-
-      <VCol
-        v-for="(c, i) in heroColors"
-        :key="i"
-        cols="6"
-        sm="3"
-        md="2"
-      >
         <VCard
-          hover
-          variant="outlined"
-          class="color-card"
-          to="/colors"
+          class="colors-showcase"
+          variant="flat"
         >
-          <div
-            class="color-swatch"
-            :style="{ backgroundColor: `#${c.code}` }"
-          />
-          <VCardText class="py-3">
-            <div class="text-subtitle-2">
-              {{ c.name || t('common.unnamed') }}
+          <div class="colors-showcase__bg" />
+
+          <VCardText class="pa-6 pa-md-8 position-relative">
+            <div class="d-flex flex-wrap align-center justify-space-between gap-4">
+              <div>
+                <h2 class="text-h5 font-weight-bold mb-0">
+                  {{ t('home.trend_colors_title') }}
+                </h2>
+              </div>
+
+              <VBtn
+                variant="text"
+                color="primary"
+                to="/colors"
+              >
+                {{ t('home.view_more_colors') }}
+                <VIcon
+                  icon="tabler-arrow-right"
+                  class="ms-2"
+                />
+              </VBtn>
             </div>
-            <div class="text-caption text-medium-emphasis">
-              {{ c.code || '—' }}
-            </div>
+
+            <VSlideGroup
+              class="mt-5"
+              show-arrows
+            >
+              <template v-if="heroColorsLoading">
+                <VSlideGroupItem
+                  v-for="i in 6"
+                  :key="i"
+                >
+                  <VCard
+                    class="color-tile color-tile--skeleton"
+                    variant="outlined"
+                  >
+                    <VCardText class="pa-4">
+                      <VSkeletonLoader type="image, text" />
+                    </VCardText>
+                  </VCard>
+                </VSlideGroupItem>
+              </template>
+
+              <VSlideGroupItem
+                v-for="(c, i) in heroColors"
+                :key="i"
+              >
+                <VCard
+                  hover
+                  variant="outlined"
+                  class="color-tile"
+                  to="/colors"
+                >
+                  <div
+                    class="color-tile__swatch"
+                    :style="{ backgroundColor: c?.code ? `#${c.code}` : 'transparent' }"
+                  >
+                    <div class="color-tile__code">
+                      {{ c?.code ? `#${String(c.code).toUpperCase()}` : '—' }}
+                    </div>
+                  </div>
+
+                  <VCardText class="pt-0 pb-4 px-4">
+                    <div class="text-subtitle-2 font-weight-medium text-truncate">
+                      {{ c?.name || t('common.unnamed') }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      {{ t('home.hero.view_colors') }}
+                    </div>
+                  </VCardText>
+                </VCard>
+              </VSlideGroupItem>
+            </VSlideGroup>
           </VCardText>
         </VCard>
-      </VCol>
-    </VRow>
-
       </section>
 
       <!-- Catalog Section -->
       <section class="home-section">
         <VCard
-          class="catalog-card"
-          variant="flat"
+          class="catalog-simple"
+          variant="tonal"
         >
-          <VRow no-gutters>
-            <VCol
-              cols="12"
-              md="5"
-              class="catalog-card__left"
-            >
-              <VCardText class="pa-6 pa-md-8">
-                <div class="text-subtitle-1 font-weight-bold mb-2">
-                  {{ t('home.catalog.title') }}
+          <VCardText class="pa-6 pa-md-8">
+            <div class="d-flex flex-wrap align-center justify-space-between gap-4">
+              <div class="flex-grow-1">
+                <div class="text-overline text-primary mb-1">
+                  {{ t('home.catalog.badge_title') }}
                 </div>
-                <p class="text-body-2 text-medium-emphasis mb-4">
+
+                <h2 class="text-h5 font-weight-bold mb-1">
+                  {{ t('home.catalog.title') }}
+                </h2>
+
+                <p class="text-body-2 text-medium-emphasis mb-0">
                   {{ t('home.catalog.description') }}
                 </p>
-                <VBtn
-                  color="primary"
-                  variant="tonal"
-                  to="/products/decor"
-                >
-                  {{ t('home.catalog.cta') }}
-                </VBtn>
-              </VCardText>
-            </VCol>
-
-            <VCol
-              cols="12"
-              md="7"
-              class="catalog-card__right"
-            >
-              <div class="catalog-card__right-inner">
-                <div class="catalog-badge">
-                  <div class="catalog-badge__title">
-                    {{ t('home.catalog.badge_title') }}
-                  </div>
-                  <ul class="catalog-badge__list">
-                    <li>{{ t('home.catalog.item_1') }}</li>
-                    <li>{{ t('home.catalog.item_2') }}</li>
-                    <li>{{ t('home.catalog.item_3') }}</li>
-                    <li>{{ t('home.catalog.item_4') }}</li>
-                  </ul>
-                </div>
               </div>
-            </VCol>
-          </VRow>
+
+              <VBtn
+                color="primary"
+                size="large"
+                :href="homepageCatalogHref"
+                target="_blank"
+                rel="noopener noreferrer"
+                :loading="homepageCatalogLoading"
+                :disabled="!homepageCatalog?.url"
+              >
+                <VIcon
+                  icon="tabler-file-type-pdf"
+                  class="me-2"
+                />
+                {{ t('home.catalog_pdf.download') }}
+              </VBtn>
+            </div>
+
+            <div
+              v-if="homepageCatalog?.updatedAt"
+              class="mt-4"
+            >
+              <VChip
+                color="primary"
+                variant="tonal"
+                size="small"
+              >
+                <VIcon
+                  icon="tabler-clock"
+                  size="16"
+                  class="me-1"
+                />
+                {{ t('home.catalog_pdf.updated_at') }}: {{ new Date(homepageCatalog.updatedAt).toLocaleDateString() }}
+              </VChip>
+            </div>
+          </VCardText>
         </VCard>
       </section>
 
 
       <!-- Painters Section -->
       <section class="home-section">
-        <VCard class="painters-section" variant="tonal">
+        <VCard
+          class="painters-section"
+          variant="tonal"
+        >
           <VCardText class="pa-6 pa-md-8">
             <div class="d-flex align-center justify-space-between gap-4 mb-4">
               <div>
@@ -584,63 +703,63 @@ onMounted(() => {
       <section class="home-section">
         <VCard>
           <VRow no-gutters>
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <VImg
-            src="https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800"
-            height="100%"
-            min-height="300"
-            cover
-            class="about-image"
-          >
-            <template #placeholder>
-              <div class="d-flex align-center justify-center fill-height">
-                <VProgressCircular
-                  indeterminate
-                  color="primary"
-                />
-              </div>
-            </template>
-          </VImg>
-        </VCol>
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <VCardText class="pa-6 pa-md-8 d-flex flex-column justify-center h-100">
-            <div class="text-overline text-primary mb-2">
-              {{ t('home.about.overline') }}
-            </div>
-            <h2 class="text-h4 font-weight-bold mb-4">
-              {{ t('home.about.title') }}
-            </h2>
-            <p class="text-body-1 text-medium-emphasis mb-4">
-              {{ t('home.about.p1') }}
-            </p>
-            <p class="text-body-1 text-medium-emphasis mb-4">
-              {{ t('home.about.p2') }}
-            </p>
-            <p class="text-body-1 text-medium-emphasis mb-6">
-              {{ t('home.about.p3') }}
-            </p>
-            <div>
-              <VBtn
-                color="primary"
-                variant="tonal"
-                to="/tips"
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VImg
+                src="https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800"
+                height="100%"
+                min-height="300"
+                cover
+                class="about-image"
               >
-                {{ t('home.about.learn_more') }}
-                <VIcon
-                  icon="tabler-arrow-right"
-                  class="ms-2"
-                />
-              </VBtn>
-            </div>
-          </VCardText>
-        </VCol>
-      </VRow>
+                <template #placeholder>
+                  <div class="d-flex align-center justify-center fill-height">
+                    <VProgressCircular
+                      indeterminate
+                      color="primary"
+                    />
+                  </div>
+                </template>
+              </VImg>
+            </VCol>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VCardText class="pa-6 pa-md-8 d-flex flex-column justify-center h-100">
+                <div class="text-overline text-primary mb-2">
+                  {{ t('home.about.overline') }}
+                </div>
+                <h2 class="text-h4 font-weight-bold mb-4">
+                  {{ t('home.about.title') }}
+                </h2>
+                <p class="text-body-1 text-medium-emphasis mb-4">
+                  {{ t('home.about.p1') }}
+                </p>
+                <p class="text-body-1 text-medium-emphasis mb-4">
+                  {{ t('home.about.p2') }}
+                </p>
+                <p class="text-body-1 text-medium-emphasis mb-6">
+                  {{ t('home.about.p3') }}
+                </p>
+                <div>
+                  <VBtn
+                    color="primary"
+                    variant="tonal"
+                    to="/tips"
+                  >
+                    {{ t('home.about.learn_more') }}
+                    <VIcon
+                      icon="tabler-arrow-right"
+                      class="ms-2"
+                    />
+                  </VBtn>
+                </div>
+              </VCardText>
+            </VCol>
+          </VRow>
         </VCard>
       </section>
 
@@ -856,7 +975,9 @@ onMounted(() => {
 }
 
 .studio-card,
-.catalog-card {
+.catalog-card,
+.promo-card,
+.catalog-simple {
   border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
   overflow: hidden;
 }
@@ -907,48 +1028,98 @@ onMounted(() => {
   background: rgb(var(--v-theme-on-surface) / 4%);
 }
 
-.catalog-card__left {
-  background: rgb(var(--v-theme-on-surface) / 4%);
+.promo-card {
+  position: relative;
 }
 
-.catalog-card__right {
-  background: #5b5e66;
+.promo-card__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.catalog-card__right-inner {
-  padding: 22px;
+.promo-card__bg--vp {
+  background-image:
+    radial-gradient(circle at 18% 22%, rgb(var(--v-theme-primary) / 16%) 0%, transparent 45%),
+    radial-gradient(circle at 82% 78%, rgb(var(--v-theme-primary) / 10%) 0%, transparent 52%),
+    linear-gradient(180deg, rgb(var(--v-theme-surface)) 0%, rgb(var(--v-theme-surface)) 100%);
+}
+
+.promo-card__media {
+  min-block-size: 280px;
+}
+
+.promo-card__media--catalog {
+
+  .catalog-simple {
+    background: rgb(var(--v-theme-on-surface) / 3%);
+  }
+  padding: 18px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  min-block-size: 210px;
+  align-items: stretch;
 }
 
-.catalog-badge {
-  color: #fff;
-  border-radius: 10px;
-  padding: 14px 16px;
-  min-inline-size: 220px;
-}
-
-.catalog-badge__title {
-  font-weight: 800;
-  margin-block-end: 10px;
-}
-
-.catalog-badge__list {
-  margin: 0;
-  padding-inline-start: 18px;
-  font-size: 12px;
-  opacity: 0.95;
-}
-
-.catalog-thumb {
-  border-radius: 10px;
+.vp-preview {
+  position: relative;
+  inline-size: 100%;
+  max-inline-size: 560px;
+  margin-inline: auto;
+  border-radius: 18px;
   overflow: hidden;
-  inline-size: 160px;
-  background: rgb(255 255 255 / 14%);
-  border: 1px solid rgb(255 255 255 / 18%);
+  border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
+  background: rgb(var(--v-theme-on-surface) / 3%);
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+}
+
+.vp-preview__item {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.vp-preview__item--1 {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.vp-preview__item--2 {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.vp-preview__item--3 {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.vp-preview__badge {
+  position: absolute;
+  inset-inline-start: 18px;
+  inset-block-end: 18px;
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: rgb(var(--v-theme-surface) / 92%);
+  border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
+  backdrop-filter: blur(10px);
+}
+
+.vp-preview__badge-title {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.vp-preview__badge-sub {
+  font-size: 12px;
+  color: rgb(var(--v-theme-on-surface) / 70%);
+}
+
+@media (min-width: 960px) {
+  .promo-card__media {
+    min-block-size: 360px;
+  }
 }
 
 .showcase {
@@ -985,44 +1156,91 @@ onMounted(() => {
   border-bottom: 1px solid rgb(var(--v-theme-on-surface) / 10%);
 }
 
-.color-card {
+.colors-showcase {
+  position: relative;
+  border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
+  border-radius: 18px;
   overflow: hidden;
 }
 
-.color-swatch {
-  block-size: 80px;
-  inline-size: 100%;
+.colors-showcase__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 20%, rgb(var(--v-theme-primary) / 14%) 0%, transparent 45%),
+    radial-gradient(circle at 88% 80%, rgb(var(--v-theme-primary) / 10%) 0%, transparent 50%),
+    linear-gradient(180deg, rgb(var(--v-theme-surface)) 0%, rgb(var(--v-theme-surface)) 100%);
+}
+
+.colors-showcase :deep(.v-slide-group__content) {
+  gap: 14px;
+}
+
+.color-tile {
+  inline-size: 190px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
   background: rgb(var(--v-theme-surface));
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.color-swatch--placeholder {
-  background: rgb(var(--v-theme-on-surface) / 6%);
-}
-
-.fade-placeholder {
-  border-radius: 6px;
-  min-block-size: 12px;
-  animation: fade-pulse 1.2s ease-in-out infinite;
-  background-color: rgb(var(--v-theme-on-surface) / 6%);
-}
-
-.fade-placeholder.text-caption {
-  min-block-size: 10px;
-  max-inline-size: 60px;
-}
-
-.fade-placeholder.text-subtitle-2 {
-  max-inline-size: 90px;
-}
-
-@keyframes fade-pulse {
-  0%,
-  100% {
-    opacity: 0.55;
+@media (max-width: 599px) {
+  .color-tile {
+    inline-size: 168px;
   }
+}
 
-  50% {
-    opacity: 1;
-  }
+.color-tile:hover {
+  box-shadow: 0 10px 26px rgb(0 0 0 / 10%);
+  transform: translateY(-3px);
+}
+
+.color-tile__swatch {
+  position: relative;
+  margin: 12px;
+  border-radius: 16px;
+  block-size: 92px;
+  border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
+  overflow: hidden;
+}
+
+.color-tile__swatch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 22%) 0%, transparent 62%),
+    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 20%) 0%, transparent 42%);
+  pointer-events: none;
+}
+
+.v-theme--dark .color-tile__swatch::after {
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 14%) 0%, transparent 62%),
+    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 12%) 0%, transparent 42%);
+}
+
+.color-tile__code {
+  position: absolute;
+  inset-inline-start: 10px;
+  inset-block-end: 10px;
+  z-index: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border: 1px solid rgb(0 0 0 / 8%);
+  background: rgb(255 255 255 / 88%);
+  color: rgb(0 0 0 / 78%);
+  backdrop-filter: blur(8px);
+}
+
+.v-theme--dark .color-tile__code {
+  border: 1px solid rgb(var(--v-theme-on-surface) / 14%);
+  background: rgb(var(--v-theme-surface) / 92%);
+  color: rgb(var(--v-theme-on-surface) / 82%);
 }
 </style>

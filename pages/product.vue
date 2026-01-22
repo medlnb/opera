@@ -1,8 +1,8 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
@@ -775,6 +775,7 @@ function toggleFavorite() {
 
   <DealRequestDialog
     :is-dialog-visible="isDealDialogVisible"
+    :product-id="productDetails?._id"
     :initial-note="productDetails?.title ? `${t('deals.dialog.prefill_about_product')}: ${productDetails?.title}` : ''"
     @update:is-dialog-visible="val => (isDealDialogVisible = val)"
   />

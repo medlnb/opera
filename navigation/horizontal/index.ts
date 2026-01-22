@@ -67,6 +67,10 @@ export function useNavItems() {
             to: { name: 'management-dashboard' },
           },
           {
+            title: 'nav.management.homepage',
+            to: { name: 'management-homepage' },
+          },
+          {
             title: 'nav.management.products',
             to: { name: 'management' },
           },

@@ -1,7 +1,7 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
@@ -118,8 +118,6 @@ const subtotal = computed(() => {
 const total = computed(() => {
   return subtotal.value + (Number(checkout.value.shippingCost) || 0)
 })
-
-const isDealDialogVisible = ref(false)
 </script>
 
 <template>
@@ -297,17 +295,6 @@ const isDealDialogVisible = ref(false)
                 >
                   {{ t('account.cart.actions.checkout') }}
                 </VBtn>
-
-                <VBtn
-                  class="mt-3"
-                  variant="tonal"
-                  color="secondary"
-                  block
-                  :disabled="cartStore.isEmpty"
-                  @click="isDealDialogVisible = true"
-                >
-                  {{ t('deals.actions.request_deal') }}
-                </VBtn>
               </VCard>
             </VCol>
           </VRow>
@@ -324,10 +311,4 @@ const isDealDialogVisible = ref(false)
   >
     {{ snackbar.message }}
   </VSnackbar>
-
-  <DealRequestDialog
-    :is-dialog-visible="isDealDialogVisible"
-    :initial-note="t('deals.dialog.prefill_from_cart')"
-    @update:is-dialog-visible="val => (isDealDialogVisible = val)"
-  />
 </template>

@@ -38,6 +38,7 @@ async function fetchDeal() {
       throw new Error('Failed to fetch deal')
 
     const data = await res.json()
+
     deal.value = data.data
   }
   catch (err) {
@@ -124,12 +125,18 @@ function formatDate(d) {
           </div>
 
           <template v-if="String(dealNote || '').trim()">
-            <h6 class="text-h6 mb-2">{{ t('account.deals.details.message') }}</h6>
-            <p class="text-body-1">{{ dealNote }}</p>
+            <h6 class="text-h6 mb-2">
+              {{ t('account.deals.details.message') }}
+            </h6>
+            <p class="text-body-1">
+              {{ dealNote }}
+            </p>
             <VDivider class="my-6" />
           </template>
 
-          <h6 class="text-h6 mb-3">{{ t('account.deals.details.contact') }}</h6>
+          <h6 class="text-h6 mb-3">
+            {{ t('account.deals.details.contact') }}
+          </h6>
           <VList density="compact">
             <VListItem v-if="deal.contact?.address">
               <VListItemTitle>{{ t('deals.fields.address') }}: {{ deal.contact?.address }}</VListItemTitle>

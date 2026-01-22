@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
@@ -69,6 +69,7 @@ const fetchDeal = async () => {
       throw new Error('Failed to fetch deal')
 
     const data = await res.json()
+
     deal.value = data.data
 
     edit.value.status = deal.value?.status || 'new'
@@ -105,6 +106,7 @@ const saveUpdates = async () => {
       throw new Error('Update failed')
 
     const data = await res.json()
+
     deal.value = data.data
     showSnackbar(t('management.deals.details.snackbar.updated'), 'success')
   }
@@ -196,8 +198,12 @@ onMounted(() => {
               </div>
 
               <template v-if="deal.message || deal.note">
-                <h6 class="text-h6 mb-2">{{ t('management.deals.details.message') }}</h6>
-                <p class="text-body-1">{{ deal.message || deal.note }}</p>
+                <h6 class="text-h6 mb-2">
+                  {{ t('management.deals.details.message') }}
+                </h6>
+                <p class="text-body-1">
+                  {{ deal.message || deal.note }}
+                </p>
               </template>
             </VCardText>
           </VCard>
@@ -213,22 +219,22 @@ onMounted(() => {
             <VCardText>
               <VList density="compact">
                 <VListItem>
-                  <VListItemTitle>{{ t('deals.fields.phone') }}: {{ deal.contact?.phone || '-' }}</VListItemTitle>
+                  <VListItemTitle>{{ t('deals.fields.phone') }}: {{ deal.phone || '-' }}</VListItemTitle>
                 </VListItem>
                 <VListItem>
                   <VListItemTitle>
-                    {{ t('deals.fields.firstName') }}: {{ deal.contact?.firstName || '-' }} · {{ t('deals.fields.lastName') }}: {{ deal.contact?.lastName || '-' }}
+                    {{ t('deals.fields.firstName') }}: {{ deal.firstName || '-' }} · {{ t('deals.fields.lastName') }}: {{ deal.lastName || '-' }}
                   </VListItemTitle>
                 </VListItem>
-                <VListItem v-if="deal.contact?.enterpriseName">
-                  <VListItemTitle>{{ t('deals.fields.enterpriseName') }}: {{ deal.contact?.enterpriseName }}</VListItemTitle>
+                <VListItem v-if="deal.enterpriseName">
+                  <VListItemTitle>{{ t('deals.fields.enterpriseName') }}: {{ deal.enterpriseName }}</VListItemTitle>
                 </VListItem>
-                <VListItem v-if="deal.contact?.address">
-                  <VListItemTitle>{{ t('deals.fields.address') }}: {{ deal.contact?.address }}</VListItemTitle>
+                <VListItem v-if="deal.address">
+                  <VListItemTitle>{{ t('deals.fields.address') }}: {{ deal.address }}</VListItemTitle>
                 </VListItem>
-                <VListItem v-if="deal.contact?.city || deal.contact?.state">
+                <VListItem v-if="deal.city || deal.state">
                   <VListItemTitle>
-                    {{ t('deals.fields.city') }}: {{ deal.contact?.city || '-' }} · {{ t('deals.fields.state') }}: {{ deal.contact?.state || '-' }}
+                    {{ t('deals.fields.city') }}: {{ deal.city || '-' }} · {{ t('deals.fields.state') }}: {{ deal.state || '-' }}
                   </VListItemTitle>
                 </VListItem>
               </VList>

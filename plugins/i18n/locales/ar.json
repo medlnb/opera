@@ -248,11 +248,12 @@
         "tips": "نصائح",
         "inspirations": "إلهام",
         "virtual_painter": "الرسام الافتراضي",
-        "painters": "الرسامين",
+        "painters": "Allo Peintre",
         "contact": "اتصل بنا",
         "management": {
             "root": "الإدارة",
             "dashboard": "لوحة التحكم",
+            "homepage": "الصفحة الرئيسية",
             "products": "المنتجات",
             "new_product": "منتج جديد",
             "colors": "الألوان",
@@ -264,7 +265,7 @@
         }
     },
     "painters_page": {
-        "title": "الرسامين",
+        "title": "Allo Peintre",
         "my_requests": {
             "button": "طلباتي",
             "title": "طلبات الرسام الخاصة بي",
@@ -392,6 +393,7 @@
         "dialog": {
             "title": "طلب عرض",
             "auth_required": "يجب تسجيل الدخول لإرسال طلب عرض.",
+            "product_required": "يرجى فتح هذا من صفحة المنتج.",
             "prefill_from_cart": "أريد عرضًا للمنتجات الموجودة في سلّتي.",
             "prefill_about_product": "طلب عرض بخصوص"
         },
@@ -402,6 +404,7 @@
         "snackbar": {
             "submitted": "تم إرسال طلب العرض",
             "auth_required": "يرجى تسجيل الدخول لطلب عرض",
+            "product_required": "يرجى اختيار منتج أولاً",
             "submit_failed": "فشل إرسال طلب العرض"
         },
         "contact": {
@@ -490,6 +493,7 @@
         "deals": {
             "table": {
                 "deal_id": "طلب",
+                "product": "المنتج",
                 "note": "ملاحظة",
                 "status": "الحالة",
                 "date": "التاريخ",
@@ -506,6 +510,7 @@
                 "not_found_subtitle": "قد يكون هذا الطلب قد تم حذفه",
                 "deal_number": "طلب #{id}",
                 "created_at": "تاريخ الإنشاء: {date}",
+                "product": "المنتج",
                 "message": "ملاحظة",
                 "items": "العناصر",
                 "no_items": "لم يتم توفير عناصر",
@@ -614,6 +619,20 @@
     "footer": {
         "made_with": "صُنع بـ",
         "by": "بواسطة",
+        "about": "دهانات مبتكرة وعالية الجودة للمهنيين والأفراد.",
+        "rights": "جميع الحقوق محفوظة",
+        "columns": {
+            "brand": "أوبيرا للدهان",
+            "tools": "الأدوات",
+            "follow": "تابعنا"
+        },
+        "links": {
+            "about": "عن العلامة",
+            "find_store": "اعثر على نقطة بيع",
+            "find_product": "اعثر على منتج",
+            "color_studio": "ستوديو الألوان",
+            "catalogs": "كتالوجاتنا"
+        },
         "license": "الرخصة",
         "more_themes": "مزيد من القوالب",
         "documentation": "التوثيق"
@@ -879,9 +898,13 @@
             "item_3": "دهانات البناء",
             "item_4": "ملحقات"
         },
+        "catalog_pdf": {
+            "download": "فتح الكتالوج",
+            "updated_at": "آخر تحديث"
+        },
         "coty": {
             "kicker": "دوليًا",
-            "title": "متوفر أيضًا في كوت ديفوار",
+            "title": "اكتشف سحر الحياة اليومية",
             "cta": "اعرف المزيد"
         },
         "painters": {
@@ -976,6 +999,23 @@
         }
     },
     "management": {
+        "homepage": {
+            "title": "الصفحة الرئيسية",
+            "subtitle": "رفع أو استبدال ملف كتالوج PDF للصفحة الرئيسية",
+            "current_catalog": "الكتالوج الحالي",
+            "no_catalog": "لم يتم رفع أي كتالوج بعد",
+            "upload": {
+                "label": "كتالوج PDF",
+                "hint": "PDF فقط",
+                "button_upload": "رفع",
+                "button_replace": "استبدال"
+            },
+            "messages": {
+                "load_failed": "فشل تحميل إعدادات الصفحة الرئيسية",
+                "upload_failed": "فشل رفع الكتالوج",
+                "upload_success": "تم تحديث الكتالوج"
+            }
+        },
         "articles": {
             "title": "إدارة المقالات",
             "actions": {
@@ -1345,6 +1385,7 @@
             },
             "table": {
                 "deal_id": "طلب",
+                "product": "المنتج",
                 "contact": "التواصل",
                 "source": "المصدر",
                 "status": "الحالة",
@@ -1357,6 +1398,7 @@
                 "not_found_subtitle": "قد يكون هذا الطلب قد تم حذفه",
                 "deal_number": "طلب #{id}",
                 "created_at": "تاريخ الإنشاء: {date}",
+                "product": "المنتج",
                 "message": "الرسالة",
                 "items": "العناصر",
                 "no_items": "لم يتم توفير عناصر",

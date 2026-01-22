@@ -138,11 +138,12 @@
         "tips": "Tips",
         "inspirations": "Inspirations",
         "virtual_painter": "Virtual Painter",
-        "painters": "Painters",
+        "painters": "Allo Peintre",
         "contact": "Contact",
         "management": {
             "root": "Management",
             "dashboard": "Dashboard",
+            "homepage": "Homepage",
             "products": "Products",
             "new_product": "New Product",
             "colors": "Colors",
@@ -154,7 +155,7 @@
         }
     },
     "painters_page": {
-        "title": "Painters",
+        "title": "Allo Peintre",
         "my_requests": {
             "button": "My requests",
             "title": "My painter requests",
@@ -298,6 +299,7 @@
         "dialog": {
             "title": "Request a deal",
             "auth_required": "You must be signed in to submit a deal request.",
+            "product_required": "Please open this from a product page.",
             "prefill_from_cart": "I want a deal for the items in my cart.",
             "prefill_about_product": "Deal request about"
         },
@@ -308,6 +310,7 @@
         "snackbar": {
             "submitted": "Deal request submitted",
             "auth_required": "Please sign in to request a deal",
+            "product_required": "Please select a product first",
             "submit_failed": "Failed to submit deal request"
         },
         "contact": {
@@ -396,6 +399,7 @@
         "deals": {
             "table": {
                 "deal_id": "Deal",
+                "product": "Product",
                 "note": "Note",
                 "status": "Status",
                 "date": "Date",
@@ -412,6 +416,7 @@
                 "not_found_subtitle": "This deal request may have been removed",
                 "deal_number": "Deal #{id}",
                 "created_at": "Created at: {date}",
+                "product": "Product",
                 "message": "Note",
                 "items": "Items",
                 "no_items": "No items provided",
@@ -520,6 +525,20 @@
     "footer": {
         "made_with": "Made With",
         "by": "By",
+        "about": "Innovative, high-quality paints for professionals and individuals.",
+        "rights": "All rights reserved",
+        "columns": {
+            "brand": "Opéra Peinture",
+            "tools": "Tools",
+            "follow": "Follow us"
+        },
+        "links": {
+            "about": "About",
+            "find_store": "Find a store",
+            "find_product": "Find a product",
+            "color_studio": "Color Studio",
+            "catalogs": "Our catalogs"
+        },
         "license": "License",
         "more_themes": "More Themes",
         "documentation": "Documentation"
@@ -720,9 +739,13 @@
             "item_3": "Building paints",
             "item_4": "Accessories"
         },
+        "catalog_pdf": {
+            "download": "Open catalog",
+            "updated_at": "Updated"
+        },
         "coty": {
             "kicker": "International",
-            "title": "Also available in Côte d'Ivoire",
+            "title": "Discover everyday charm",
             "cta": "Learn more"
         },
         "painters": {
@@ -841,6 +864,23 @@
                 "actions": "Actions"
             }
         },
+        "homepage": {
+            "title": "Homepage",
+            "subtitle": "Upload or replace the homepage catalog PDF",
+            "current_catalog": "Current catalog",
+            "no_catalog": "No catalog uploaded yet",
+            "upload": {
+                "label": "Catalog PDF",
+                "hint": "PDF only",
+                "button_upload": "Upload",
+                "button_replace": "Replace"
+            },
+            "messages": {
+                "load_failed": "Failed to load homepage config",
+                "upload_failed": "Failed to upload catalog",
+                "upload_success": "Catalog updated"
+            }
+        },
         "colors": {
             "title": "Colors Management",
             "subtitle": "Create and manage your color palette",
@@ -910,6 +950,7 @@
             },
             "table": {
                 "deal_id": "Deal",
+                "product": "Product",
                 "contact": "Contact",
                 "source": "Source",
                 "status": "Status",
@@ -922,6 +963,7 @@
                 "not_found_subtitle": "This deal request may have been removed",
                 "deal_number": "Deal #{id}",
                 "created_at": "Created at: {date}",
+                "product": "Product",
                 "message": "Message",
                 "items": "Items",
                 "no_items": "No items provided",

@@ -1,8 +1,8 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -18,6 +18,7 @@ useHead(() => ({
 
 const headers = computed(() => ([
   { title: t('account.deals.table.deal_id'), key: 'dealId', sortable: false },
+  { title: t('account.deals.table.product'), key: 'product', sortable: false },
   { title: t('account.deals.table.note'), key: 'note', sortable: false },
   { title: t('account.deals.table.status'), key: 'status', sortable: false },
   { title: t('account.deals.table.date'), key: 'createdAt', sortable: false },
@@ -133,6 +134,38 @@ function viewDeal(deal) {
             <span class="font-weight-medium text-primary">
               #{{ String(item._id || '').slice(-8).toUpperCase() }}
             </span>
+          </template>
+
+          <template #item.product="{ item }">
+            <div class="d-flex align-center gap-3">
+              <VAvatar
+                size="40"
+                rounded
+                color="grey-lighten-3"
+              >
+                <VImg
+                  v-if="item.product?.imageUrl || item.product?.avatar"
+                  :src="`${config.public.apiBaseUrl}/api/image?id=${item.product?.imageUrl || item.product?.avatar}`"
+                  cover
+                />
+                <VIcon
+                  v-else
+                  icon="tabler-package"
+                />
+              </VAvatar>
+
+              <div>
+                <div class="font-weight-medium">
+                  {{ item.product?.title || t('management.common.value.na') }}
+                </div>
+                <div
+                  v-if="item.product?.type"
+                  class="text-caption text-disabled"
+                >
+                  {{ String(item.product.type) }}
+                </div>
+              </div>
+            </div>
           </template>
 
           <template #item.note="{ item }">

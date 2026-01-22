@@ -1,8 +1,8 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth.js'
 import { useValidators } from '@/utils/validators'
-import { useI18n } from 'vue-i18n'
 
 const snackbar = ref({ show: false, message: '', color: 'success' })
 
@@ -35,7 +35,7 @@ const updateProfile = async () => {
     const result = formRef.value.validate()
     if (result && typeof result.then === 'function') {
       const r = await result
-      if (!r.valid) 
+      if (!r.valid)
         return showSnackbar(t('settings.validation.fix_errors'), 'error')
     }
   }

@@ -201,11 +201,12 @@
         "tips": "Conseils",
         "inspirations": "Inspirations",
         "virtual_painter": "Peintre virtuel",
-        "painters": "Peintres",
+        "painters": "Allo Peintre",
         "contact": "Contact",
         "management": {
             "root": "Administration",
             "dashboard": "Tableau de bord",
+            "homepage": "Accueil",
             "products": "Produits",
             "new_product": "Nouveau produit",
             "colors": "Couleurs",
@@ -217,7 +218,7 @@
         }
     },
     "painters_page": {
-        "title": "Peintres",
+        "title": "Allo Peintre",
         "my_requests": {
             "button": "Mes demandes",
             "title": "Mes demandes de peintre",
@@ -345,6 +346,7 @@
         "dialog": {
             "title": "Demander un devis",
             "auth_required": "Vous devez être connecté pour envoyer une demande de devis.",
+            "product_required": "Veuillez ouvrir ceci depuis la page d’un produit.",
             "prefill_from_cart": "Je souhaite un devis pour les articles de mon panier.",
             "prefill_about_product": "Demande de devis pour"
         },
@@ -355,6 +357,7 @@
         "snackbar": {
             "submitted": "Demande de devis envoyée",
             "auth_required": "Veuillez vous connecter pour demander un devis",
+            "product_required": "Veuillez d’abord sélectionner un produit",
             "submit_failed": "Échec de l'envoi de la demande"
         },
         "contact": {
@@ -459,6 +462,7 @@
         "deals": {
             "table": {
                 "deal_id": "Demande",
+                "product": "Produit",
                 "note": "Note",
                 "status": "Statut",
                 "date": "Date",
@@ -475,6 +479,7 @@
                 "not_found_subtitle": "Cette demande a peut-être été supprimée",
                 "deal_number": "Demande #{id}",
                 "created_at": "Créée le : {date}",
+                "product": "Produit",
                 "message": "Note",
                 "contact": "Contact",
                 "table": {
@@ -596,6 +601,20 @@
     "footer": {
         "made_with": "Fait avec",
         "by": "par",
+        "about": "Peintures innovantes et de qualité pour les professionnels du bâtiment et les particuliers.",
+        "rights": "Tous droits réservés",
+        "columns": {
+            "brand": "Opéra Peinture",
+            "tools": "Outils",
+            "follow": "Suivez-nous"
+        },
+        "links": {
+            "about": "La marque",
+            "find_store": "Trouver un point de vente",
+            "find_product": "Trouver un produit",
+            "color_studio": "Color Studio",
+            "catalogs": "Nos catalogues"
+        },
         "license": "Licence",
         "more_themes": "Plus de thèmes",
         "documentation": "Documentation"
@@ -782,7 +801,7 @@
         },
         "cta": {
             "title": "Prêt à transformer votre espace ?",
-            "description": "Découvrez notre large gamme de peintures premium et trouvez la couleur parfaite pour votre prochain projet.",
+            "title": "Découvrez le charme au quotidien",
             "shop_now": "Acheter maintenant",
             "get_inspired": "S'inspirer"
         },
@@ -795,6 +814,10 @@
             "item_2": "Revêtements",
             "item_3": "Peintures bâtiment",
             "item_4": "Accessoires"
+        },
+        "catalog_pdf": {
+            "download": "Ouvrir le catalogue",
+            "updated_at": "Mis à jour"
         },
         "coty": {
             "kicker": "International",
@@ -893,6 +916,23 @@
         }
     },
     "management": {
+        "homepage": {
+            "title": "Accueil",
+            "subtitle": "Téléverser ou remplacer le catalogue PDF de la page d'accueil",
+            "current_catalog": "Catalogue actuel",
+            "no_catalog": "Aucun catalogue n'a encore été téléversé",
+            "upload": {
+                "label": "Catalogue PDF",
+                "hint": "PDF uniquement",
+                "button_upload": "Téléverser",
+                "button_replace": "Remplacer"
+            },
+            "messages": {
+                "load_failed": "Échec du chargement de la configuration de l'accueil",
+                "upload_failed": "Échec du téléversement du catalogue",
+                "upload_success": "Catalogue mis à jour"
+            }
+        },
         "articles": {
             "title": "Gestion des articles",
             "actions": {
@@ -1262,6 +1302,7 @@
             },
             "table": {
                 "deal_id": "Demande",
+                "product": "Produit",
                 "contact": "Contact",
                 "source": "Source",
                 "status": "Statut",
@@ -1274,6 +1315,7 @@
                 "not_found_subtitle": "Cette demande a peut-être été supprimée",
                 "deal_number": "Demande #{id}",
                 "created_at": "Créée le : {date}",
+                "product": "Produit",
                 "message": "Message",
                 "items": "Articles",
                 "no_items": "Aucun article fourni",

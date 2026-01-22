@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n'
 interface Props {
   isDialogVisible: boolean
   initialNote?: string
+  productId?: string
 }
 
 interface Emit {
@@ -56,15 +57,20 @@ watch(() => form.value.contact.state, () => {
   form.value.contact.city = ''
 })
 
-watch(() => props.initialNote, (v) => {
+watch(() => props.initialNote, v => {
   if (typeof v === 'string' && !form.value.note)
     form.value.note = v
 })
 
 const isAuthed = computed(() => Boolean(authStore.token))
 
+const hasProduct = computed(() => Boolean(String(props.productId || '').trim()))
+
 const canSubmit = computed(() => {
   if (!isAuthed.value)
+    return false
+
+  if (!hasProduct.value)
     return false
 
   const note = String(form.value.note || '').trim()
@@ -85,6 +91,12 @@ const updateModelValue = (val: boolean) => {
 async function submitDealRequest() {
   if (!canSubmit.value)
     return
+
+  if (!hasProduct.value) {
+    showSnackbar(t('deals.snackbar.product_required'), 'error')
+
+    return
+  }
 
   if (!isAuthed.value) {
     showSnackbar(t('deals.snackbar.auth_required'), 'error')
@@ -108,6 +120,7 @@ async function submitDealRequest() {
     contact.city = city
 
   const body: Record<string, any> = {
+    productId: props.productId,
     note: note || undefined,
     contact: Object.keys(contact).length ? contact : undefined,
   }
@@ -129,6 +142,7 @@ async function submitDealRequest() {
     const apiData = data.value as any
     const id = apiData?.data?.id || apiData?.id
     const submittedMsg = id ? `${t('deals.snackbar.submitted')} (#${id})` : t('deals.snackbar.submitted')
+
     showSnackbar(submittedMsg, 'success')
     emit('submitted', apiData?.data ?? apiData)
     updateModelValue(false)
@@ -169,6 +183,15 @@ async function submitDealRequest() {
           class="mb-4"
         >
           {{ t('deals.dialog.auth_required') }}
+        </VAlert>
+
+        <VAlert
+          v-else-if="!hasProduct"
+          type="error"
+          variant="tonal"
+          class="mb-4"
+        >
+          {{ t('deals.dialog.product_required') }}
         </VAlert>
 
         <VRow>

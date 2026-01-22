@@ -1,4 +1,7 @@
 <script setup>
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
@@ -6,9 +9,6 @@ import { useGenerateImageVariant } from '@core/composable/useGenerateImageVarian
 import logo from '@images/logo-v2.svg'
 import registerMultistepBgDark from '@images/pages/register-multistep-bg-dark.png'
 import registerMultistepBgLight from '@images/pages/register-multistep-bg-light.png'
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 definePageMeta({
   layout: 'blank',

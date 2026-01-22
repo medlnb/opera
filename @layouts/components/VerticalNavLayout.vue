@@ -1,8 +1,8 @@
 <script lang="ts">
-import type { PropType } from 'vue'
-import { VerticalNav } from '@layouts/components'
-import { useLayoutConfigStore } from '@layouts/stores/config'
-import type { VerticalNavItems } from '@layouts/types'
+import { VerticalNav } from '@layouts/components';
+import { useLayoutConfigStore } from '@layouts/stores/config';
+import type { VerticalNavItems } from '@layouts/types';
+import type { PropType } from 'vue';
 
 export default defineComponent({
   props: {
@@ -114,7 +114,7 @@ export default defineComponent({
               navbar,
               main,
 
-              // footer,
+              footer,
             ],
           ),
           layoutOverlay,

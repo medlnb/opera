@@ -1,8 +1,8 @@
 <script setup>
-import { useApi } from '@/composables/useApi'
 import { debounce } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { useApi } from '@/composables/useApi'
 
 definePageMeta({
   authed: true,
@@ -165,6 +165,7 @@ const setTrend = async (color, isTrend) => {
   trendUpdating.value = { ...trendUpdating.value, [id]: true }
 
   const previous = Boolean(color.isTrend)
+
   color.isTrend = Boolean(isTrend)
 
   try {
@@ -175,8 +176,11 @@ const setTrend = async (color, isTrend) => {
 
     if (error.value) {
       color.isTrend = previous
+
       const message = error.value.data?.message || t('management.colors.messages.trend_update_error')
+
       showSnackbar(message, 'error')
+
       return
     }
 
@@ -189,6 +193,7 @@ const setTrend = async (color, isTrend) => {
   }
   finally {
     const { [id]: _, ...rest } = trendUpdating.value
+
     trendUpdating.value = rest
   }
 }

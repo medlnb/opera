@@ -1,9 +1,9 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import AccountSettingsAccount from '@/views/pages/account-settings/AccountSettingsAccount.vue'
 import AccountSettingsPainter from '@/views/pages/account-settings/AccountSettingsPainter.vue'
 import AccountSettingsSecurity from '@/views/pages/account-settings/AccountSettingsSecurity.vue'
-import { useI18n } from 'vue-i18n'
 
 const route = useRoute('settings-tab')
 
