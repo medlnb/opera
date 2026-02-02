@@ -68,6 +68,8 @@
         },
         "controls": {
             "title": "Paint Controls",
+            "wall_detected": "Wall detected. Pick a color to repaint.",
+            "wall_detecting": "Detecting wall…",
             "paint": "Paint",
             "depaint": "Depaint",
             "depaint_help": "Depaint = click a painted wall area to restore the original photo there.",
@@ -765,7 +767,11 @@
             "cta": "Try it now"
         },
         "trend_colors_title": "Trend colors",
-        "view_more_colors": "View more colors"
+        "view_more_colors": "View more colors",
+        "products_preview": {
+            "title": "Products preview",
+            "subtitle": "A quick look at some of our products"
+        }
     },
     "products": {
         "empty": {

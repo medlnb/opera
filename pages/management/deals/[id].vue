@@ -1,6 +1,6 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 
 definePageMeta({
   authed: true,

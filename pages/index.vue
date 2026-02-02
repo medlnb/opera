@@ -1,13 +1,14 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { useApi } from '@/composables/useApi'
 import bgBuildings from '@images/buildings.png'
 import bgCoating from '@images/coatings.png'
 import bgDecor from '@images/decor.png'
 import logoImg from '@images/logo-v2.svg'
+import paintProductImg from '@images/paint_Product.png'
 import roomImg1 from '@images/room/room1.png'
 import roomImg2 from '@images/room/room2.jpg'
 import roomImg4 from '@images/room/room4.png'
-import { useI18n } from 'vue-i18n'
 
 const { t, te } = useI18n({ useScope: 'global' })
 const config = useRuntimeConfig()
@@ -91,6 +92,10 @@ function productTypeLabel(type) {
 const paintersLoading = ref(false)
 const featuredPainters = ref([])
 
+// Homepage products preview
+const featuredProductsLoading = ref(false)
+const featuredProducts = ref([])
+
 // Homepage catalog (PDF)
 const homepageCatalogLoading = ref(false)
 const homepageCatalog = ref(null)
@@ -161,6 +166,48 @@ async function fetchFeaturedPainters() {
   }
 }
 
+async function fetchFeaturedProducts() {
+  try {
+    featuredProductsLoading.value = true
+
+    const { data, error } = await useApi('/api/products', {
+      method: 'GET',
+      query: {
+        p: '1',
+        perPage: '3',
+      },
+    })
+
+    if (error.value)
+      throw error.value
+
+    const list = data.value?.data ?? []
+    const normalized = Array.isArray(list) ? list : []
+
+    featuredProducts.value = normalized
+      .slice(0, 3)
+      .map(p => ({
+        _id: p?._id,
+        imgSrc: p?.imageUrl,
+        avatar: p?.avatar || '',
+        title: p?.title ?? p?.name ?? t('common.unnamed'),
+        description: p?.definition ?? p?.description ?? '',
+        price: Number(p?.variances?.[0]?.price ?? 0),
+        destination: Array.isArray(p?.destination)
+          ? p.destination
+          : (p?.destination ? [p.destination] : []),
+        isFavorite: Boolean(p?.isFavorite),
+      }))
+      .filter(p => p._id && p.imgSrc)
+  }
+  catch {
+    featuredProducts.value = []
+  }
+  finally {
+    featuredProductsLoading.value = false
+  }
+}
+
 const painterDisplayName = painter => {
   const user = painter?.user
   const first = user?.firstName
@@ -183,10 +230,19 @@ const painterIsAvailable = painter => painter?.available !== false
 
 const virtualPainterImages = [roomImg1, roomImg2, roomImg4]
 
+const productThumbSrc = product => {
+  const avatar = product?.avatar
+
+  return avatar
+    ? `${config.public.apiBaseUrl}/api/image?id=${avatar}`
+    : paintProductImg
+}
+
 onMounted(() => {
   fetchHeroColors()
   fetchFeaturedPainters()
   fetchHomepageCatalog()
+  fetchFeaturedProducts()
 })
 </script>
 
@@ -254,6 +310,7 @@ onMounted(() => {
                 :src="item.img"
                 height="170"
                 cover
+                lazy-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
                 class="type-card-media"
               />
               <VCardText class="d-flex align-center gap-4">
@@ -286,6 +343,115 @@ onMounted(() => {
             </VCard>
           </VCol>
         </VRow>
+      </section>
+
+      <!-- Featured Products Section -->
+      <section class="home-section">
+        <VCard
+          variant="flat"
+          class="catalog-simple"
+        >
+          <VCardText class="pa-6 pa-md-8">
+            <div class="d-flex align-center justify-space-between gap-4 mb-4">
+              <div>
+                <div class="text-overline text-primary mb-1">
+                  {{ t('nav.products.root') }}
+                </div>
+                <h2 class="text-h5 font-weight-bold mb-0">
+                  {{ t('home.products_preview.title') }}
+                </h2>
+                <p class="text-body-2 text-medium-emphasis mt-1 mb-0">
+                  {{ t('home.products_preview.subtitle') }}
+                </p>
+              </div>
+
+              <VBtn
+                variant="text"
+                color="primary"
+                to="/products/decor"
+              >
+                {{ t('home.catalog.cta') }}
+                <VIcon
+                  icon="tabler-arrow-right"
+                  class="ms-2"
+                />
+              </VBtn>
+            </div>
+
+            <VRow v-if="featuredProductsLoading">
+              <VCol
+                v-for="i in 3"
+                :key="i"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <VCard
+                  variant="outlined"
+                  class="h-100"
+                >
+                  <VSkeletonLoader type="image, text" />
+                </VCard>
+              </VCol>
+            </VRow>
+
+            <VRow v-else-if="featuredProducts.length">
+              <VCol
+                v-for="(product, index) in featuredProducts"
+                :key="product._id || index"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <VCard
+                  hover
+                  variant="outlined"
+                  class="home-product-card h-100"
+                  :to="`/product?id=${product._id}`"
+                >
+                  <div class="home-product-media">
+                    <VImg
+                      :src="`${config.public.apiBaseUrl}/api/image?id=${product.imgSrc}`"
+                      height="170"
+                      cover
+                      lazy-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+                      class="home-product-img"
+                    >
+                      <template #placeholder>
+                        <div class="home-product-img-placeholder fill-height" />
+                      </template>
+                    </VImg>
+                  </div>
+
+                  <VCardText class="pa-4">
+                    <div class="d-flex align-center gap-3">
+                      <VImg
+                        :src="productThumbSrc(product)"
+                        width="42"
+                        height="42"
+                        cover
+                        class="home-product-thumb"
+                      />
+
+                      <div class="text-subtitle-1 font-weight-medium text-truncate">
+                        {{ product.title }}
+                      </div>
+                    </div>
+                  </VCardText>
+                </VCard>
+              </VCol>
+            </VRow>
+
+            <div
+              v-else
+              class="text-center py-6"
+            >
+              <p class="text-body-2 text-medium-emphasis mb-0">
+                {{ t('products.empty.subtitle') }}
+              </p>
+            </div>
+          </VCardText>
+        </VCard>
       </section>
 
       <!-- Color of the Year 2026 (banner) -->
@@ -406,6 +572,7 @@ onMounted(() => {
                     :src="img"
                     cover
                     height="100%"
+                    lazy-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
                   />
                 </div>
 
@@ -458,15 +625,17 @@ onMounted(() => {
             >
               <template v-if="heroColorsLoading">
                 <VSlideGroupItem
-                  v-for="i in 6"
+                  v-for="i in 2"
                   :key="i"
                 >
                   <VCard
-                    class="color-tile color-tile--skeleton"
+                    class="color-tile color-tile--loading"
                     variant="outlined"
                   >
-                    <VCardText class="pa-4">
-                      <VSkeletonLoader type="image, text" />
+                    <div class="color-tile__swatch color-tile__swatch--loading" />
+
+                    <VCardText class="pt-0 pb-4 px-4">
+                      <div class="color-tile__line color-tile__line--title" />
                     </VCardText>
                   </VCard>
                 </VSlideGroupItem>
@@ -565,7 +734,6 @@ onMounted(() => {
           </VCardText>
         </VCard>
       </section>
-
 
       <!-- Painters Section -->
       <section class="home-section">
@@ -1156,6 +1324,45 @@ onMounted(() => {
   border-bottom: 1px solid rgb(var(--v-theme-on-surface) / 10%);
 }
 
+.home-product-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.home-product-card:hover {
+  box-shadow: 0 10px 26px rgb(0 0 0 / 10%);
+  transform: translateY(-3px);
+}
+
+.home-product-media {
+  position: relative;
+}
+
+.home-product-img {
+  background: transparent;
+}
+
+.home-product-thumb {
+  flex: 0 0 auto;
+  border-radius: 0;
+  background: transparent;
+}
+
+.home-product-img-placeholder {
+  animation: home-product-pulse 1.2s ease-in-out infinite;
+  background-color: rgb(var(--v-theme-on-surface) / 6%);
+}
+
+@keyframes home-product-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 .colors-showcase {
   position: relative;
   border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
@@ -1242,5 +1449,49 @@ onMounted(() => {
   border: 1px solid rgb(var(--v-theme-on-surface) / 14%);
   background: rgb(var(--v-theme-surface) / 92%);
   color: rgb(var(--v-theme-on-surface) / 82%);
+}
+
+.color-tile--loading {
+  pointer-events: none;
+}
+
+.color-tile__swatch--loading {
+  border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
+  background-image: linear-gradient(
+    90deg,
+    rgb(var(--v-theme-on-surface) / 6%) 0%,
+    rgb(var(--v-theme-on-surface) / 12%) 45%,
+    rgb(var(--v-theme-on-surface) / 6%) 100%
+  );
+  background-size: 200% 100%;
+  animation: color-tile-shimmer 1.15s ease-in-out infinite;
+}
+
+.color-tile__line {
+  border-radius: 10px;
+  block-size: 14px;
+  border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
+  background-image: linear-gradient(
+    90deg,
+    rgb(var(--v-theme-on-surface) / 6%) 0%,
+    rgb(var(--v-theme-on-surface) / 12%) 45%,
+    rgb(var(--v-theme-on-surface) / 6%) 100%
+  );
+  background-size: 200% 100%;
+  animation: color-tile-shimmer 1.15s ease-in-out infinite;
+}
+
+.color-tile__line--title {
+  inline-size: 82%;
+}
+
+@keyframes color-tile-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 </style>

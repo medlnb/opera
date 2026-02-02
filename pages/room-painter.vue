@@ -9,24 +9,46 @@ type SampleCategory = 'room' | 'livingroom' | 'kitchen'
 
 const sampleCategory = ref<SampleCategory>('room')
 
-const sampleImagesByCategory: Record<SampleCategory, Array<{ src: string }>> = {
+type SampleImage = { src: string; maskSrc: string }
+
+const sampleImagesByCategory: Record<SampleCategory, SampleImage[]> = {
   room: [
-    { src: new URL('../assets/images/room/room1.png', import.meta.url).href },
-    { src: new URL('../assets/images/room/room2.jpg', import.meta.url).href },
-    { src: new URL('../assets/images/room/room3.png', import.meta.url).href },
-    { src: new URL('../assets/images/room/room4.png', import.meta.url).href },
+    {
+      src: new URL('../assets/images/room/room1.png', import.meta.url).href,
+      maskSrc: new URL('../assets/images/room/room1-mask.png', import.meta.url).href,
+    },
+    {
+      src: new URL('../assets/images/room/room2.jpg', import.meta.url).href,
+      maskSrc: new URL('../assets/images/room/room2-mask.png', import.meta.url).href,
+    },
   ],
   livingroom: [
-    { src: new URL('../assets/images/livingroom/livingroom1.jpg', import.meta.url).href },
-    { src: new URL('../assets/images/livingroom/livingroom2.jpg', import.meta.url).href },
-    { src: new URL('../assets/images/livingroom/livingroom3.jpg', import.meta.url).href },
-    { src: new URL('../assets/images/livingroom/livingroom4.jpg', import.meta.url).href },
-    { src: new URL('../assets/images/livingroom/livingroom5.jpg', import.meta.url).href },
+    {
+      src: new URL('../assets/images/livingroom/livingroom1.jpg', import.meta.url).href,
+      maskSrc: new URL('../assets/images/livingroom/livingroom1-mask.png', import.meta.url).href,
+    },
+    {
+      src: new URL('../assets/images/livingroom/livingroom2.jpg', import.meta.url).href,
+      maskSrc: new URL('../assets/images/livingroom/livingroom2-mask.png', import.meta.url).href,
+    },
+    {
+      src: new URL('../assets/images/livingroom/livingroom3.jpg', import.meta.url).href,
+      maskSrc: new URL('../assets/images/livingroom/livingroom3-mask.png', import.meta.url).href,
+    },
+    {
+      src: new URL('../assets/images/livingroom/livingroom5.jpg', import.meta.url).href,
+      maskSrc: new URL('../assets/images/livingroom/livingroom5-mask.png', import.meta.url).href,
+    },
   ],
   kitchen: [
-    { src: new URL('../assets/images/kitchen/kitchen1.jpg', import.meta.url).href },
-    { src: new URL('../assets/images/kitchen/kitchen2.png', import.meta.url).href },
-    { src: new URL('../assets/images/kitchen/kitchen3.jpg', import.meta.url).href },
+    {
+      src: new URL('../assets/images/kitchen/kitchen1.jpg', import.meta.url).href,
+      maskSrc: new URL('../assets/images/kitchen/kitchen1-mask.png', import.meta.url).href,
+    },
+    {
+      src: new URL('../assets/images/kitchen/kitchen3.jpg', import.meta.url).href,
+      maskSrc: new URL('../assets/images/kitchen/kitchen3-mask.png', import.meta.url).href,
+    },
   ],
 }
 
@@ -44,6 +66,116 @@ const selectedColor = ref('#FF5733')
 const originalImageData = ref<ImageData | null>(null)
 const isLoading = ref(false)
 const tolerance = ref(25)
+
+// AI wall mask (from FastAPI borderServer). Used to constrain painting.
+const wallMaskDataUrl = ref<string>('')
+const wallMaskAlpha = ref<Uint8Array | null>(null)
+
+// If the user selected a sample image, we can load its precomputed `*-mask.png`
+// locally and skip the backend request.
+const nextLocalMaskUrl = ref<string>('')
+
+const clearWallMask = () => {
+  wallMaskDataUrl.value = ''
+  wallMaskAlpha.value = null
+}
+
+const buildMaskAlphaFromDataUrl = async (dataUrl: string, width: number, height: number) => {
+  const img = new Image()
+
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve()
+    img.onerror = () => reject(new Error('Failed to load mask image'))
+    img.src = dataUrl
+  })
+
+  const maskCanvas = document.createElement('canvas')
+
+  maskCanvas.width = width
+  maskCanvas.height = height
+
+  const maskCtx = maskCanvas.getContext('2d', { willReadFrequently: true })
+  if (!maskCtx)
+    return null
+
+  maskCtx.clearRect(0, 0, width, height)
+  maskCtx.drawImage(img, 0, 0, width, height)
+
+  const pixels = maskCtx.getImageData(0, 0, width, height).data
+  const alpha = new Uint8Array(width * height)
+
+  for (let pos = 0; pos < alpha.length; pos++) {
+    const i = pos * 4
+    const a = pixels[i + 3]
+    const v = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3
+
+    alpha[pos] = (a > 0 && v > 127) ? 255 : 0
+  }
+
+  return alpha
+}
+
+const applyWallMaskToPaintLayer = (options?: { pushUndo?: boolean }) => {
+  if (!canvas.value)
+    return
+
+  const mask = wallMaskAlpha.value
+  if (!mask)
+    return
+
+  if (options?.pushUndo)
+    pushUndoSnapshot()
+
+  paintLayerAlpha.value = mask.slice()
+  recountPaintedPixels()
+  renderPaintLayer()
+}
+
+const fetchWallMaskForCurrentImage = async () => {
+  if (!canvas.value || !imageUrl.value)
+    return
+
+  try {
+    const form = new FormData()
+
+    if (imageFile.value) {
+      form.append('file', imageFile.value, imageFile.value.name)
+    }
+    else {
+      const res = await fetch(imageUrl.value)
+      if (!res.ok)
+        throw new Error(`Failed to fetch image (${res.status})`)
+
+      const blob = await res.blob()
+      const filename = blob.type?.includes('png') ? 'image.png' : 'image.jpg'
+
+      form.append('file', blob, filename)
+    }
+
+    const resp = await $fetch<{ maskDataUrl: string }>('/api/ai/wall-mask', {
+      method: 'POST',
+      body: form,
+    })
+
+    const nextMaskDataUrl = resp?.maskDataUrl
+    if (!nextMaskDataUrl) {
+      clearWallMask()
+
+      return
+    }
+
+    wallMaskDataUrl.value = nextMaskDataUrl
+    wallMaskAlpha.value = await buildMaskAlphaFromDataUrl(nextMaskDataUrl, canvas.value.width, canvas.value.height)
+
+    // Auto-paint the detected wall area (no manual selection tools).
+    applyWallMaskToPaintLayer()
+  }
+  catch (err) {
+    // Fall back to the local (color-based) region detection.
+    console.warn('Wall mask detection failed; continuing without mask.', err)
+    clearWallMask()
+  }
+}
 
 // Paint layer: stores how strongly each pixel is painted (0 = not painted).
 // This enables recoloring all painted areas when `selectedColor` changes.
@@ -236,10 +368,15 @@ const loadImageToCanvas = () => {
     return
 
   isLoading.value = true
+  clearWallMask()
+
+  const localMaskUrl = nextLocalMaskUrl.value
+
+  nextLocalMaskUrl.value = ''
 
   const img = new Image()
 
-  img.onload = () => {
+  img.onload = async () => {
     if (canvas.value && displayCanvas.value) {
       // Set canvas size to image size
       canvas.value.width = img.width
@@ -259,14 +396,30 @@ const loadImageToCanvas = () => {
         clearHistory()
       }
     }
+
+    if (localMaskUrl) {
+      try {
+        wallMaskDataUrl.value = localMaskUrl
+        wallMaskAlpha.value = await buildMaskAlphaFromDataUrl(localMaskUrl, canvas.value!.width, canvas.value!.height)
+        applyWallMaskToPaintLayer()
+      }
+      catch (err) {
+        console.warn('Failed to load local sample mask; continuing without wall mask (no backend request).', err)
+        clearWallMask()
+      }
+    }
+    else {
+      await fetchWallMaskForCurrentImage()
+    }
     isLoading.value = false
   }
   img.src = imageUrl.value
 }
 
-const loadSampleImage = (src: string) => {
+const loadSampleImage = (sample: SampleImage) => {
   imageFile.value = null
-  imageUrl.value = src
+  imageUrl.value = sample.src
+  nextLocalMaskUrl.value = sample.maskSrc
   loadImageToCanvas()
 }
 
@@ -497,8 +650,12 @@ const applyRegionWithMatcher = (
   const height = canvas.value.height
 
   const alphaLayer = paintLayerAlpha.value
+  const maskLayer = wallMaskAlpha.value
 
   const startIndex = startY * width + startX
+  if (maskLayer && maskLayer[startIndex] === 0)
+    return
+
   if (mode === 'paint') {
     if (alphaLayer[startIndex] > 0)
       return
@@ -536,6 +693,10 @@ const applyRegionWithMatcher = (
 
     const pos = y * width + x
     if (visited[pos])
+      continue
+
+    // Constrain the region traversal to the AI wall mask (when available).
+    if (maskLayer && maskLayer[pos] === 0)
       continue
 
     const pixelPos = pos * 4
@@ -953,10 +1114,16 @@ const resetImage = () => {
   if (!originalImageData.value || !canvas.value)
     return
 
-  pushUndoSnapshot()
-  paintLayerAlpha.value = new Uint8Array(canvas.value.width * canvas.value.height)
-  paintedPixelCount.value = 0
-  renderPaintLayer()
+  // Reset to the default behavior: paint the whole detected wall.
+  if (wallMaskAlpha.value) {
+    applyWallMaskToPaintLayer({ pushUndo: true })
+  }
+  else {
+    pushUndoSnapshot()
+    paintLayerAlpha.value = new Uint8Array(canvas.value.width * canvas.value.height)
+    paintedPixelCount.value = 0
+    renderPaintLayer()
+  }
 }
 
 const clearImage = () => {
@@ -965,13 +1132,28 @@ const clearImage = () => {
   toolMode.value = 'paint'
   paintLayerAlpha.value = null
   paintedPixelCount.value = 0
+  clearWallMask()
   clearHistory()
+
+  // Allow selecting the same file again (otherwise input change may not fire).
+  if (fileInput.value)
+    fileInput.value.value = ''
+}
+
+const startNewImageUpload = () => {
+  // Must be synchronous (no await) or browsers may block the file dialog.
+  clearImage()
+  triggerFilePicker()
 }
 
 // Recolor all painted regions when the user changes the color.
 watch(selectedColor, () => {
-  if (!imageUrl.value || !originalImageData.value || paintedPixelCount.value === 0)
+  if (!imageUrl.value || !originalImageData.value)
     return
+
+  // If we have an AI wall mask, painting is simply: mask = painted area.
+  if (wallMaskAlpha.value)
+    applyWallMaskToPaintLayer()
 
   renderPaintLayer()
 })
@@ -1127,7 +1309,7 @@ const colorPalette = [
             <VCard
               class="cursor-pointer"
               variant="outlined"
-              @click="loadSampleImage(sample.src)"
+              @click="loadSampleImage(sample)"
             >
               <VImg
                 :src="sample.src"
@@ -1137,14 +1319,6 @@ const colorPalette = [
             </VCard>
           </VCol>
         </VRow>
-
-        <input
-          ref="fileInput"
-          type="file"
-          accept="image/*"
-          style="display: none"
-          @change="handleImageUpload"
-        >
       </VCardText>
     </VCard>
 
@@ -1166,57 +1340,23 @@ const colorPalette = [
             </VCardTitle>
 
             <VCardText>
-              <!-- Paint mode (always enabled) -->
-              <div class="mb-6">
-                <VBtnToggle
-                  v-model="toolMode"
-                  mandatory
-                  divided
-                  class="w-100"
-                >
-                  <VBtn
-                    value="paint"
-                    prepend-icon="tabler-brush"
-                  >
-                    {{ t('room_painter.controls.paint') }}
-                  </VBtn>
-                  <VBtn
-                    value="erase"
-                    prepend-icon="tabler-eraser"
-                  >
-                    {{ t('room_painter.controls.depaint') }}
-                  </VBtn>
-                </VBtnToggle>
+              <VAlert
+                v-if="wallMaskDataUrl"
+                type="success"
+                variant="tonal"
+                class="mb-6"
+              >
+                {{ t('room_painter.controls.wall_detected') }}
+              </VAlert>
 
-                <p class="text-caption text-medium-emphasis mt-2">
-                  {{ t('room_painter.controls.depaint_help') }}
-                </p>
-
-                <p class="text-caption text-medium-emphasis mt-2">
-                  {{ t('room_painter.controls.tip_undo') }}
-                </p>
-              </div>
-
-              <!-- Selection Mode -->
-              <div class="mb-6">
-                <label class="text-sm font-weight-medium mb-2 d-block">{{ t('room_painter.controls.selection_mode') }}</label>
-                <VBtnToggle
-                  v-model="selectionMode"
-                  mandatory
-                  divided
-                  class="w-100"
-                >
-                  <VBtn value="point">
-                    {{ t('room_painter.controls.selection_point') }}
-                  </VBtn>
-                  <VBtn value="rect">
-                    {{ t('room_painter.controls.selection_rect') }}
-                  </VBtn>
-                </VBtnToggle>
-                <p class="text-caption text-medium-emphasis mt-2">
-                  {{ t('room_painter.controls.selection_help') }}
-                </p>
-              </div>
+              <VAlert
+                v-else
+                type="info"
+                variant="tonal"
+                class="mb-6"
+              >
+                {{ t('room_painter.controls.wall_detecting') }}
+              </VAlert>
 
               <!-- Color Picker -->
               <div class="mb-4">
@@ -1243,60 +1383,8 @@ const colorPalette = [
                 </div>
               </div>
 
-              <!-- Tolerance Slider -->
-              <div class="mb-6">
-                <label class="text-sm font-weight-medium mb-2 d-block">
-                  {{ t('room_painter.controls.detection_sensitivity', { value: tolerance }) }}
-                </label>
-                <VSlider
-                  v-model="tolerance"
-                  :min="5"
-                  :max="100"
-                  :step="5"
-                  thumb-label
-                  color="primary"
-                />
-                <p class="text-caption text-medium-emphasis">
-                  {{ t('room_painter.controls.detection_help') }}
-                </p>
-              </div>
-
-              <VDivider class="my-4" />
-
-              <!-- Undo/Redo -->
-              <div class="d-flex gap-3 mb-4">
-                <VBtn
-                  :disabled="!canUndo"
-                  color="default"
-                  variant="outlined"
-                  prepend-icon="tabler-arrow-back-up"
-                  @click="undoLastEdit"
-                >
-                  {{ t('room_painter.controls.undo') }}
-                </VBtn>
-                <VBtn
-                  :disabled="!canRedo"
-                  color="default"
-                  variant="outlined"
-                  prepend-icon="tabler-arrow-forward-up"
-                  @click="redoLastUndo"
-                >
-                  {{ t('room_painter.controls.redo') }}
-                </VBtn>
-              </div>
-
               <!-- Action Buttons -->
               <div class="d-flex flex-column gap-3">
-                <VBtn
-                  color="warning"
-                  variant="outlined"
-                  prepend-icon="tabler-refresh"
-                  block
-                  @click="resetImage"
-                >
-                  {{ t('room_painter.controls.reset_image') }}
-                </VBtn>
-
                 <VBtn
                   color="success"
                   variant="flat"
@@ -1312,40 +1400,11 @@ const colorPalette = [
                   variant="outlined"
                   prepend-icon="tabler-photo"
                   block
-                  @click="clearImage"
+                  @click="startNewImageUpload"
                 >
                   {{ t('room_painter.controls.upload_new_image') }}
                 </VBtn>
               </div>
-            </VCardText>
-          </VCard>
-
-          <!-- Instructions Card -->
-          <VCard class="mt-4 d-none d-md-block">
-            <VCardTitle class="text-sm">
-              <VIcon
-                icon="tabler-info-circle"
-                class="me-2"
-                size="20"
-              />
-              {{ t('room_painter.how_to_use.title') }}
-            </VCardTitle>
-            <VCardText>
-              <ol class="text-sm ps-4">
-                <li class="mb-2">
-                  {{ t('room_painter.how_to_use.step_1') }}
-                </li>
-                <li class="mb-2">
-                  {{ t('room_painter.how_to_use.step_2') }}
-                </li>
-                <li class="mb-2">
-                  {{ t('room_painter.how_to_use.step_3') }}
-                </li>
-                <li class="mb-2">
-                  {{ t('room_painter.how_to_use.step_4') }}
-                </li>
-                <li>{{ t('room_painter.how_to_use.step_5') }}</li>
-              </ol>
             </VCardText>
           </VCard>
         </VCol>
@@ -1357,7 +1416,7 @@ const colorPalette = [
         >
           <VCard>
             <VCardText>
-              <div class="canvas-container painting-mode">
+              <div class="canvas-container">
                 <canvas
                   ref="canvas"
                   style="display: none;"
@@ -1365,17 +1424,6 @@ const colorPalette = [
                 <canvas
                   ref="displayCanvas"
                   class="display-canvas"
-                  @click="handleCanvasClick"
-                  @pointerdown="handleCanvasPointerDown"
-                  @pointermove="handleCanvasPointerMove"
-                  @pointerup="handleCanvasPointerUp"
-                  @pointercancel="handleCanvasPointerCancel"
-                />
-
-                <div
-                  v-if="selectionOverlayStyle"
-                  class="selection-rect"
-                  :style="selectionOverlayStyle"
                 />
 
                 <div
@@ -1401,79 +1449,12 @@ const colorPalette = [
       >
         <VCard class="pa-2">
           <div class="d-flex align-center gap-2 flex-wrap">
-            <VBtnToggle
-              v-model="toolMode"
-              mandatory
-              divided
-              density="compact"
-              class="mobile-tool-toggle"
-            >
-              <VBtn
-                value="paint"
-                prepend-icon="tabler-brush"
-                size="small"
-              >
-                {{ t('room_painter.controls.paint') }}
-              </VBtn>
-              <VBtn
-                value="erase"
-                prepend-icon="tabler-eraser"
-                size="small"
-              >
-                {{ t('room_painter.controls.depaint') }}
-              </VBtn>
-            </VBtnToggle>
-
-            <VBtn
-              :disabled="!canUndo"
-              color="default"
-              variant="outlined"
-              size="small"
-              prepend-icon="tabler-arrow-back-up"
-              @click="undoLastEdit"
-            >
-              {{ t('room_painter.controls.undo') }}
-            </VBtn>
-            <VBtn
-              :disabled="!canRedo"
-              color="default"
-              variant="outlined"
-              size="small"
-              prepend-icon="tabler-arrow-forward-up"
-              @click="redoLastUndo"
-            >
-              {{ t('room_painter.controls.redo') }}
-            </VBtn>
-
             <input
               v-model="selectedColor"
               type="color"
               class="color-picker color-picker--sm"
               :aria-label="t('room_painter.aria.selected_color')"
             >
-          </div>
-
-          <div class="d-flex align-center gap-2 mt-2">
-            <VBtnToggle
-              v-model="selectionMode"
-              mandatory
-              divided
-              density="compact"
-              class="w-100"
-            >
-              <VBtn
-                value="point"
-                size="small"
-              >
-                {{ t('room_painter.controls.selection_point') }}
-              </VBtn>
-              <VBtn
-                value="rect"
-                size="small"
-              >
-                {{ t('room_painter.controls.selection_rect') }}
-              </VBtn>
-            </VBtnToggle>
           </div>
 
           <div class="mobile-color-row mt-2">
@@ -1489,16 +1470,6 @@ const colorPalette = [
 
           <div class="d-flex gap-2 mt-2">
             <VBtn
-              color="warning"
-              variant="outlined"
-              size="small"
-              prepend-icon="tabler-refresh"
-              @click="resetImage"
-            >
-              {{ t('room_painter.mobile.reset') }}
-            </VBtn>
-
-            <VBtn
               color="success"
               variant="flat"
               size="small"
@@ -1513,7 +1484,7 @@ const colorPalette = [
               variant="outlined"
               size="small"
               prepend-icon="tabler-photo"
-              @click="clearImage"
+              @click="startNewImageUpload"
             >
               {{ t('room_painter.mobile.new') }}
             </VBtn>
@@ -1522,6 +1493,14 @@ const colorPalette = [
       </div>
     </div>
   </div>
+
+  <input
+    ref="fileInput"
+    type="file"
+    accept="image/*"
+    style="display: none"
+    @change="handleImageUpload"
+  >
 </template>
 
 <style scoped lang="scss">
@@ -1605,7 +1584,7 @@ const colorPalette = [
 
 @media (max-width: 959.98px) {
   .room-painter-page {
-    padding-block-end: 170px;
+    padding-block-end: 80px;
   }
 }
 
@@ -1622,9 +1601,6 @@ const colorPalette = [
   margin-inline: auto;
   max-inline-size: 100%;
 
-  &.painting-mode {
-    cursor: crosshair;
-  }
 }
 
 .display-canvas {
@@ -1634,15 +1610,6 @@ const colorPalette = [
   max-inline-size: 100%;
   object-fit: contain;
   touch-action: none;
-}
-
-.selection-rect {
-  position: absolute;
-  z-index: 5;
-  border: 2px solid rgb(var(--v-theme-primary));
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.04);
-  pointer-events: none;
 }
 
 .loading-overlay {

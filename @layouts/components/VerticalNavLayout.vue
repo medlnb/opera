@@ -1,8 +1,8 @@
 <script lang="ts">
-import { VerticalNav } from '@layouts/components';
-import { useLayoutConfigStore } from '@layouts/stores/config';
-import type { VerticalNavItems } from '@layouts/types';
-import type { PropType } from 'vue';
+import type { PropType } from 'vue'
+import { VerticalNav } from '@layouts/components'
+import { useLayoutConfigStore } from '@layouts/stores/config'
+import type { VerticalNavItems } from '@layouts/types'
 
 export default defineComponent({
   props: {

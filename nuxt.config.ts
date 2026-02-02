@@ -7,6 +7,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     aiPaintUrl: process.env.NUXT_AI_PAINT_URL,
+    borderServerUrl: process.env.NUXT_BORDER_SERVER_URL || 'http://127.0.0.1:8000',
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
     },

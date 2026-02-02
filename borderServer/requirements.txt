@@ -1,0 +1,20 @@
+# Wall segmentation (Python 3.10)
+# Note: torch install on Windows can take a while.
+
+numpy>=1.24
+pillow>=10.0
+transformers>=4.36
+accelerate>=0.25
+safetensors>=0.4
+
+# Some transformer vision backbones/utilities may require this
+timm>=0.9
+scipy>=1.10
+
+# API endpoint
+fastapi>=0.110
+uvicorn>=0.24
+python-multipart>=0.0.6
+
+# PyTorch (CPU by default; CUDA requires a matching build)
+torch>=2.1

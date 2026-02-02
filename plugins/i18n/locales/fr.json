@@ -131,6 +131,8 @@
         },
         "controls": {
             "title": "Commandes de peinture",
+            "wall_detected": "Mur détecté. Choisissez une couleur pour repeindre.",
+            "wall_detecting": "Détection du mur…",
             "paint": "Peindre",
             "depaint": "Dépeindre",
             "depaint_help": "Dépeindre = cliquez sur une zone déjà peinte pour restaurer la photo d'origine à cet endroit.",
@@ -841,7 +843,11 @@
             "cta": "Essayer maintenant"
         },
         "trend_colors_title": "Couleurs tendance",
-        "view_more_colors": "Voir plus de couleurs"
+        "view_more_colors": "Voir plus de couleurs",
+        "products_preview": {
+            "title": "Aperçu des produits",
+            "subtitle": "Un aperçu rapide de quelques-uns de nos produits"
+        }
     },
     "products": {
         "empty": {

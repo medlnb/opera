@@ -41,6 +41,7 @@ onMounted(() => {
         style="min-block-size: 150px;"
         height="250"
         cover
+        position="left center"
       >
         <template #placeholder>
           <div
@@ -136,6 +137,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.hero-img :deep(.v-img__img),
+.hero-img :deep(img) {
+  object-position: left center !important;
+  background-position: left center !important;
+}
+
 .hero-placeholder {
   block-size: 250px;
 }
@@ -159,17 +166,13 @@ onMounted(() => {
 .hero-title {
   font-size: 1.5rem;
   font-weight: 1200;
-  text-shadow:
-    0 1px 2px rgba(var(--v-theme-surface), 0.9),
-    0 0 1px rgba(var(--v-theme-on-surface), 0.25);
+  text-shadow: none;
 }
 
 .hero-subtitle {
   font-size: 1rem;
   font-weight: 1200;
-  text-shadow:
-    0 1px 2px rgba(var(--v-theme-surface), 0.9),
-    0 0 1px rgba(var(--v-theme-on-surface), 0.25);
+  text-shadow: none;
 }
 
 .hero-wrap {
@@ -184,22 +187,6 @@ onMounted(() => {
 
 .hero-overlay {
   position: absolute;
-}
-
-.hero-overlay::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  /* Soft halo behind text for readability (no visible box). */
-  background:
-    radial-gradient(
-      ellipse at center,
-      rgba(var(--v-theme-surface), 0.92) 0%,
-      rgba(var(--v-theme-surface), 0.55) 38%,
-      rgba(var(--v-theme-surface), 0.18) 58%,
-      rgba(var(--v-theme-surface), 0) 82%
-    );
 }
 
 @media (min-width: 600px) {

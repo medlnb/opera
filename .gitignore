@@ -48,3 +48,14 @@ public/mockServiceWorker.js
 # Env files
 .env*
 !.env.example
+
+# Python / ML (borderServer)
+borderServer/.venv/
+borderServer/__pycache__/
+borderServer/outputs/
+*.pyc
+*.pth
+
+# Hugging Face / Transformers caches (if created inside repo)
+**/.cache/
+**/huggingface/

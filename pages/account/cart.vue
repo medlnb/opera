@@ -1,7 +1,7 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
-import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,

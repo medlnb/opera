@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import paint_Product from '@images/paint_Product.png'
 import { useAuthStore } from '@/stores/auth'
+import paint_Product from '@images/paint_Product.png'
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -79,6 +79,7 @@ async function toggleFavorite() {
         height="200"
         width="100%"
         cover
+        lazy-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
       >
         <template #placeholder>
           <div

@@ -34,6 +34,12 @@ const filters = ref({
   available: null,
 })
 
+const showFilters = ref(false)
+
+const toggleFilters = () => {
+  showFilters.value = !showFilters.value
+}
+
 watch(() => filters.value.state, () => {
   filters.value.city = null
 })
@@ -274,69 +280,85 @@ useHead(() => ({
             </p>
           </div>
 
-          <VBtn
-            variant="tonal"
-            color="primary"
-            prepend-icon="tabler-list"
-            @click="openMyRequests"
-          >
-            {{ t('painters_page.my_requests.button') }}
-          </VBtn>
+          <div class="d-flex flex-wrap gap-2">
+            <VBtn
+              variant="outlined"
+              color="primary"
+              prepend-icon="tabler-filter"
+              :append-icon="showFilters ? 'tabler-chevron-up' : 'tabler-chevron-down'"
+              @click="toggleFilters"
+            >
+              {{ t('products.filters.button') }}
+            </VBtn>
+
+            <VBtn
+              variant="tonal"
+              color="primary"
+              prepend-icon="tabler-list"
+              @click="openMyRequests"
+            >
+              {{ t('painters_page.my_requests.button') }}
+            </VBtn>
+          </div>
         </div>
 
-        <VRow class="mt-4">
-          <VCol
-            cols="12"
-            md="4"
-          >
-            <AppSelect
-              v-model="filters.state"
-              item-value="id"
-              item-title="label"
-              :items="stateOptions"
-              :label="t('painters_page.filters.state')"
-              :placeholder="t('painters_page.filters.state_placeholder')"
-              clearable
-            />
-          </VCol>
-
-          <VCol
-            cols="12"
-            md="4"
-          >
-            <AppSelect
-              v-model="filters.city"
-              item-value="id"
-              item-title="label"
-              :items="getCityOptionsForState(filters.state)"
-              :label="t('painters_page.filters.city')"
-              :placeholder="t('painters_page.filters.city_placeholder')"
-              clearable
-              :disabled="!filters.state"
-            />
-          </VCol>
-
-          <VCol
-            cols="12"
-            md="4"
-          >
-            <div>
-              <label class="text-sm font-weight-medium mb-2 d-block">
-                {{ t('painters_page.filters.available') }}
-              </label>
-
-              <VBtn
-                block
-                :variant="isAvailableOnly ? 'tonal' : 'outlined'"
-                color="primary"
-                :prepend-icon="isAvailableOnly ? 'tabler-check' : undefined"
-                @click="toggleAvailableOnly"
+        <VExpandTransition>
+          <div v-show="showFilters">
+            <VRow class="mt-4">
+              <VCol
+                cols="12"
+                md="4"
               >
-                {{ t('painters_page.filters.available_only') }}
-              </VBtn>
-            </div>
-          </VCol>
-        </VRow>
+                <AppSelect
+                  v-model="filters.state"
+                  item-value="id"
+                  item-title="label"
+                  :items="stateOptions"
+                  :label="t('painters_page.filters.state')"
+                  :placeholder="t('painters_page.filters.state_placeholder')"
+                  clearable
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="4"
+              >
+                <AppSelect
+                  v-model="filters.city"
+                  item-value="id"
+                  item-title="label"
+                  :items="getCityOptionsForState(filters.state)"
+                  :label="t('painters_page.filters.city')"
+                  :placeholder="t('painters_page.filters.city_placeholder')"
+                  clearable
+                  :disabled="!filters.state"
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="4"
+              >
+                <div>
+                  <label class="text-sm font-weight-medium mb-2 d-block">
+                    {{ t('painters_page.filters.available') }}
+                  </label>
+
+                  <VBtn
+                    block
+                    :variant="isAvailableOnly ? 'tonal' : 'outlined'"
+                    color="primary"
+                    :prepend-icon="isAvailableOnly ? 'tabler-check' : undefined"
+                    @click="toggleAvailableOnly"
+                  >
+                    {{ t('painters_page.filters.available_only') }}
+                  </VBtn>
+                </div>
+              </VCol>
+            </VRow>
+          </div>
+        </VExpandTransition>
       </VCardText>
     </VCard>
 
