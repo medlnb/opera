@@ -1,5 +1,4 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useApi } from '@/composables/useApi'
 import bgBuildings from '@images/buildings.png'
 import bgCoating from '@images/coatings.png'
@@ -9,6 +8,7 @@ import paintProductImg from '@images/paint_Product.png'
 import roomImg1 from '@images/room/room1.png'
 import roomImg2 from '@images/room/room2.jpg'
 import roomImg4 from '@images/room/room4.png'
+import { useI18n } from 'vue-i18n'
 
 const { t, te } = useI18n({ useScope: 'global' })
 const config = useRuntimeConfig()
@@ -93,7 +93,7 @@ const paintersLoading = ref(false)
 const featuredPainters = ref([])
 
 // Homepage products preview
-const featuredProductsLoading = ref(false)
+const featuredProductsLoading = ref(true)
 const featuredProducts = ref([])
 
 // Homepage catalog (PDF)
@@ -378,19 +378,35 @@ onMounted(() => {
               </VBtn>
             </div>
 
-            <VRow v-if="featuredProductsLoading">
+            <VRow
+              v-if="featuredProductsLoading"
+              class="justify-center"
+            >
               <VCol
-                v-for="i in 3"
-                :key="i"
                 cols="12"
                 sm="6"
                 md="4"
               >
                 <VCard
                   variant="outlined"
-                  class="h-100"
+                  class="home-product-card h-100"
                 >
-                  <VSkeletonLoader type="image, text" />
+                  <div class="home-product-media">
+                    <div
+                      class="home-product-img-placeholder"
+                      style="height: 170px;"
+                    />
+                  </div>
+
+                  <VCardText class="pa-4">
+                    <div class="d-flex align-center gap-3">
+                      <div class="home-product-skeleton-thumb" />
+                      <div class="flex-grow-1">
+                        <div class="home-product-skeleton-line home-product-skeleton-line--title" />
+                        <div class="home-product-skeleton-line home-product-skeleton-line--sub" />
+                      </div>
+                    </div>
+                  </VCardText>
                 </VCard>
               </VCol>
             </VRow>
@@ -1348,8 +1364,86 @@ onMounted(() => {
 }
 
 .home-product-img-placeholder {
+  position: relative;
+  overflow: hidden;
   animation: home-product-pulse 1.2s ease-in-out infinite;
-  background-color: rgb(var(--v-theme-on-surface) / 6%);
+  background-color: rgb(var(--v-theme-on-surface) / 12%);
+}
+
+.home-product-img-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 38%),
+    transparent
+  );
+  animation: home-product-shimmer 1.3s ease-in-out infinite;
+}
+
+.home-product-skeleton-thumb {
+  inline-size: 42px;
+  block-size: 42px;
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+  animation: home-product-pulse 1.2s ease-in-out infinite;
+  background-color: rgb(var(--v-theme-on-surface) / 12%);
+}
+
+.home-product-skeleton-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 38%),
+    transparent
+  );
+  animation: home-product-shimmer 1.3s ease-in-out infinite;
+}
+
+.home-product-skeleton-line {
+  block-size: 12px;
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  animation: home-product-pulse 1.2s ease-in-out infinite;
+  background-color: rgb(var(--v-theme-on-surface) / 12%);
+}
+
+.home-product-skeleton-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 38%),
+    transparent
+  );
+  animation: home-product-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes home-product-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.home-product-skeleton-line--title {
+  inline-size: 70%;
+}
+
+.home-product-skeleton-line--sub {
+  inline-size: 45%;
+  margin-top: 10px;
 }
 
 @keyframes home-product-pulse {
