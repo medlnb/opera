@@ -378,10 +378,7 @@ onMounted(() => {
               </VBtn>
             </div>
 
-            <VRow
-              v-if="featuredProductsLoading"
-              class="justify-center"
-            >
+            <VRow v-if="featuredProductsLoading">
               <VCol
                 cols="12"
                 sm="6"
