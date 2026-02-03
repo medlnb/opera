@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useApi } from '@/composables/useApi'
 import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
@@ -356,6 +357,9 @@ const onKeyDown = (event: KeyboardEvent) => {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
+
+  // Load color palette from backend (fallback to defaults if unavailable).
+  fetchBackendColors()
 })
 
 onBeforeUnmount(() => {
@@ -1169,8 +1173,101 @@ const downloadImage = () => {
   }
 }
 
-// Predefined color palette
-const colorPalette = [
+const backendColorsLoading = ref(false)
+const backendColorPalette = ref<string[]>([])
+const customColors = ref<string[]>([])
+
+const normalizeHexColor = (value: unknown): string | null => {
+  let v = String(value ?? '').trim()
+  if (!v)
+    return null
+
+  if (!v.startsWith('#'))
+    v = `#${v}`
+
+  // Expand #RGB -> #RRGGBB
+  if (/^#[0-9a-fA-F]{3}$/.test(v)) {
+    const r = v[1]
+    const g = v[2]
+    const b = v[3]
+    v = `#${r}${r}${g}${g}${b}${b}`
+  }
+
+  if (!/^#[0-9a-fA-F]{6}$/.test(v))
+    return null
+
+  return v.toUpperCase()
+}
+
+const selectedColorModel = computed({
+  get: () => selectedColor.value,
+  set: (value: string) => {
+    const normalized = normalizeHexColor(value)
+    if (normalized)
+      selectedColor.value = normalized
+  },
+})
+
+const addSelectedToQuickColors = () => {
+  const normalized = normalizeHexColor(selectedColor.value)
+  if (!normalized)
+    return
+
+  const existing = new Set(customColors.value.map(c => c.toUpperCase()))
+  if (existing.has(normalized))
+    return
+
+  customColors.value = [normalized, ...customColors.value].slice(0, 24)
+}
+
+const customPickerDialog = ref(false)
+const customPickerTemp = ref<string>(selectedColor.value)
+
+const openCustomPicker = () => {
+  customPickerTemp.value = selectedColor.value
+  customPickerDialog.value = true
+}
+
+const applyCustomPicker = () => {
+  const normalized = normalizeHexColor(customPickerTemp.value)
+  if (normalized)
+    selectedColor.value = normalized
+  customPickerDialog.value = false
+}
+
+const fetchBackendColors = async () => {
+  try {
+    backendColorsLoading.value = true
+
+    const { data, error } = await useApi<{ colors?: any[] }>('/api/products/colors', {
+      method: 'GET',
+    })
+
+    if (error.value)
+      throw error.value
+
+    const list = data.value?.colors ?? []
+    const normalizedList = Array.isArray(list) ? list : []
+
+    const next = normalizedList
+      .map((c: any) => normalizeHexColor(c?.code ?? c?.hex ?? c))
+      .filter(Boolean) as string[]
+
+    backendColorPalette.value = Array.from(new Set(next)).slice(0, 24)
+
+    if (backendColorPalette.value.length > 0 && selectedColor.value === '#FF5733')
+      selectedColor.value = backendColorPalette.value[0]
+  }
+  catch {
+    backendColorPalette.value = []
+  }
+  finally {
+    backendColorsLoading.value = false
+  }
+}
+
+// Predefined color palette (fallback)
+const defaultColorPalette = [
   '#FFFFFF',
   '#F5F5F5',
   '#EEEEEE',
@@ -1196,6 +1293,12 @@ const colorPalette = [
   '#A8E6CF',
   '#C7CEEA',
 ]
+
+const colorPalette = computed(() => {
+  const base = backendColorPalette.value.length ? backendColorPalette.value : defaultColorPalette
+  const merged = [...customColors.value, ...base]
+  return Array.from(new Set(merged.map(c => c.toUpperCase()))).slice(0, 24)
+})
 </script>
 
 <template>
@@ -1361,11 +1464,38 @@ const colorPalette = [
               <!-- Color Picker -->
               <div class="mb-4">
                 <label class="text-sm font-weight-medium mb-2 d-block">{{ t('room_painter.controls.selected_color') }}</label>
-                <input
-                  v-model="selectedColor"
-                  type="color"
-                  class="color-picker"
-                >
+                <div class="d-flex align-center gap-3 flex-wrap">
+                  <input
+                    v-model="selectedColorModel"
+                    type="color"
+                    class="color-picker"
+                  >
+
+                  <VTextField
+                    v-model="selectedColorModel"
+                    density="compact"
+                    variant="outlined"
+                    hide-details
+                    style="max-width: 160px"
+                    placeholder="#RRGGBB"
+                  />
+
+                  <VBtn
+                    size="small"
+                    variant="outlined"
+                    @click="openCustomPicker"
+                  >
+                    {{ t('room_painter.controls.more_colors') }}
+                  </VBtn>
+
+                  <VBtn
+                    size="small"
+                    variant="tonal"
+                    @click="addSelectedToQuickColors"
+                  >
+                    {{ t('room_painter.controls.add_to_quick_colors') }}
+                  </VBtn>
+                </div>
               </div>
 
               <!-- Color Palette -->
@@ -1382,6 +1512,42 @@ const colorPalette = [
                   />
                 </div>
               </div>
+
+              <VDialog
+                v-model="customPickerDialog"
+                max-width="420"
+              >
+                <VCard>
+                  <VCardTitle>
+                    {{ t('room_painter.controls.more_colors') }}
+                  </VCardTitle>
+
+                  <VCardText>
+                    <VColorPicker
+                      v-model="customPickerTemp"
+                      mode="hex"
+                      hide-inputs
+                    />
+                  </VCardText>
+
+                  <VCardActions>
+                    <VSpacer />
+                    <VBtn
+                      variant="text"
+                      @click="customPickerDialog = false"
+                    >
+                      {{ t('common.cancel') }}
+                    </VBtn>
+                    <VBtn
+                      color="primary"
+                      variant="flat"
+                      @click="applyCustomPicker"
+                    >
+                      {{ t('common.apply') }}
+                    </VBtn>
+                  </VCardActions>
+                </VCard>
+              </VDialog>
 
               <!-- Action Buttons -->
               <div class="d-flex flex-column gap-3">

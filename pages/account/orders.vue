@@ -1,8 +1,8 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -29,6 +29,39 @@ const loading = ref(false)
 const page = ref(1)
 const perPage = ref(10)
 const totalItems = ref(0)
+
+function getOrderItemTitle(item) {
+  return item?.title || item?.product?.title || item?.productName || ''
+}
+
+function getOrderItemTitles(orderItems) {
+  if (!Array.isArray(orderItems))
+    return []
+
+  return orderItems
+    .map(getOrderItemTitle)
+    .map(v => String(v || '').trim())
+    .filter(Boolean)
+}
+
+function previewTitles(titles, max = 2) {
+  if (!Array.isArray(titles) || titles.length === 0)
+    return ''
+
+  if (titles.length <= max)
+    return titles.join(', ')
+
+  return `${titles.slice(0, max).join(', ')} +${titles.length - max}`
+}
+
+function chipTitles(titles, max = 4) {
+  if (!Array.isArray(titles) || titles.length === 0)
+    return { visible: [], remaining: 0 }
+
+  const visible = titles.slice(0, max)
+  const remaining = Math.max(0, titles.length - visible.length)
+  return { visible, remaining }
+}
 
 async function fetchOrders() {
   if (!authStore.token) {
@@ -58,6 +91,7 @@ async function fetchOrders() {
     items.value = list.map(o => ({
       ...o,
       itemsCount: Array.isArray(o.items) ? o.items.length : 0,
+      itemTitles: getOrderItemTitles(o.items),
     }))
     totalItems.value = Number(data.pagination?.total ?? list.length)
   }
@@ -119,12 +153,55 @@ function formatDate(d) {
           class="text-no-wrap"
         >
           <template #item.itemsCount="{ item }">
-            <VAvatar
-              size="28"
-              variant="tonal"
-            >
-              <span class="text-body-2 font-weight-medium">{{ item.itemsCount }}</span>
-            </VAvatar>
+            <div class="d-flex align-center gap-3">
+              <VAvatar
+                size="28"
+                variant="tonal"
+              >
+                <span class="text-body-2 font-weight-medium">{{ item.itemsCount }}</span>
+              </VAvatar>
+
+              <div
+                v-if="item.itemTitles && item.itemTitles.length"
+                class="d-flex flex-wrap gap-1 order-items-chips"
+              >
+                <VChip
+                  v-for="(title, idx) in chipTitles(item.itemTitles, 4).visible"
+                  :key="idx"
+                  label
+                  size="x-small"
+                  color="secondary"
+                  variant="tonal"
+                >
+                  {{ title }}
+                </VChip>
+
+                <VTooltip
+                  v-if="chipTitles(item.itemTitles, 4).remaining"
+                  location="top"
+                >
+                  <template #activator="{ props }">
+                    <VChip
+                      v-bind="props"
+                      label
+                      size="x-small"
+                      color="secondary"
+                      variant="outlined"
+                    >
+                      +{{ chipTitles(item.itemTitles, 4).remaining }}
+                    </VChip>
+                  </template>
+                  <div style="max-width: 320px; white-space: normal;">
+                    <div
+                      v-for="(title, tIdx) in item.itemTitles"
+                      :key="tIdx"
+                    >
+                      {{ title }}
+                    </div>
+                  </div>
+                </VTooltip>
+              </div>
+            </div>
           </template>
           <template #item.createdAt="{ item }">
             {{ formatDate(item.createdAt) }}
@@ -201,3 +278,9 @@ function formatDate(d) {
     </VCard>
   </div>
 </template>
+
+<style scoped>
+.order-items-chips {
+  max-width: 360px;
+}
+</style>

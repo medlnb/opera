@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
-import { useI18n } from 'vue-i18n'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 import { useAuthStore } from '@/stores/auth'
 
@@ -103,6 +103,8 @@ const deleteProduct = async (id: string) => {
     deleting.delete(id)
   }
 }
+
+const goToProduct = (id: string) => navigateTo(`/product?id=${encodeURIComponent(id)}`)
 </script>
 
 <template>
@@ -169,7 +171,13 @@ const deleteProduct = async (id: string) => {
 
         <!-- product  -->
         <template #item.product="{ item }">
-          <div class="d-flex align-center gap-x-2">
+          <div
+            class="d-flex align-center gap-x-2 favorite-product"
+            role="button"
+            tabindex="0"
+            @click="goToProduct(item.id)"
+            @keydown.enter.prevent="goToProduct(item.id)"
+          >
             <VAvatar
               v-if="item.image"
               size="38"
@@ -214,6 +222,7 @@ const deleteProduct = async (id: string) => {
               <VIcon
                 icon="tabler-trash"
                 color="error"
+                @click.stop
                 @click="deleteProduct(item.id)"
               />
             </template>
@@ -244,5 +253,9 @@ const deleteProduct = async (id: string) => {
 .product-widget{
   border-block-end: 1px solid rgba(var(--v-theme-on-surface), var(--v-border-opacity));
   padding-block-end: 1rem;
+}
+
+.favorite-product {
+  cursor: pointer;
 }
 </style>

@@ -8,6 +8,7 @@
         "back_to_home": "Retour à l'accueil",
         "back": "Retour",
         "add": "Ajouter",
+        "apply": "Appliquer",
         "cancel": "Annuler",
         "delete": "Supprimer",
         "next": "Suivant",
@@ -37,7 +38,9 @@
         "hero_subtitle": "Découvrez des conseils et astuces utiles pour vos projets de peinture",
         "empty": {
             "title": "Aucun conseil disponible pour le moment",
-            "subtitle": "Revenez bientôt pour des conseils utiles !"
+            "subtitle": "Revenez bientôt pour des conseils utiles !",
+            "more_colors": "Plus de couleurs",
+            "add_to_quick_colors": "Ajouter aux couleurs rapides"
         },
         "editor": {
             "title_create": "Créer un article",

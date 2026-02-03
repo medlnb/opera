@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useApi } from '@/composables/useApi'
+import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const colors = ref([])
@@ -164,12 +164,14 @@ onMounted(() => {
 }
 
 .hero-title {
+  color: rgb(219, 219, 219);
   font-size: 1.5rem;
   font-weight: 1200;
   text-shadow: none;
 }
 
 .hero-subtitle {
+  color: white;
   font-size: 1rem;
   font-weight: 1200;
   text-shadow: none;
