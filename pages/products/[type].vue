@@ -1,9 +1,9 @@
 <script setup>
+import ProductCard from '@/components/ProductCard.vue'
+import { useAuthStore } from '@/stores/auth'
 import { debounce } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import ProductCard from '@/components/ProductCard.vue'
 
 const { t, te } = useI18n({ useScope: 'global' })
 const authStore = useAuthStore()
@@ -166,7 +166,7 @@ const resetFilters = async () => {
 <template>
   <div>
     <VCard class="mb-6 pa-4">
-      <template #title>
+      <VCardTitle class="px-0 pb-4">
         <div class="d-flex align-center justify-space-between">
           <VCardTitle>
             {{ typeTitle }}
@@ -179,7 +179,7 @@ const resetFilters = async () => {
             {{ t('products.filters.button') }}
           </VBtn>
         </div>
-      </template>
+      </VCardTitle>
       <VRow
         v-if="loading"
         class="px-4"

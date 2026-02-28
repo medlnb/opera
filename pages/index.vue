@@ -289,7 +289,7 @@ onMounted(() => {
       </VCardText>
     </VCard>
 
-    <VContainer class="home-content">
+    <VContainer class="home-content px-0">
       <!-- Product Types Section -->
       <section class="home-section">
         <VRow>

@@ -1,8 +1,8 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()

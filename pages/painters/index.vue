@@ -1,7 +1,7 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n({ useScope: 'global' })
 const authStore = useAuthStore()
