@@ -1,7 +1,9 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
+import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
+import { useValidators } from '@/utils/validators'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
@@ -18,11 +20,15 @@ useHead(() => ({
 }))
 
 const checkout = ref({
-  shippingCost: 0,
   address: '',
-  state: '',
-  city: '',
+  state: undefined,
+  city: undefined,
+  sellpoint: null,
 })
+
+const sellpoints = ref([])
+const sellpointsLoading = ref(false)
+const sellpointRef = ref(null)
 
 const checkoutLoading = ref(false)
 const updatingItem = reactive(new Set())
@@ -33,6 +39,26 @@ const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
 
+// Build wilaya (state) options from grouped communes
+const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
+
+const stateOptions = computed(() =>
+  wilayaGroups.map(g => ({ id: String(g[0].wilaya_id), label: g[0].name })),
+)
+
+// Cities (communes) for selected wilaya
+const cityOptions = computed(() => {
+  if (!checkout.value.state)
+    return []
+  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(checkout.value.state))
+
+  return group ? group.map(c => ({ id: String(c.id), label: c.name })) : []
+})
+
+watch(() => checkout.value.state, () => {
+  checkout.value.city = null
+})
+
 onMounted(() => {
   if (!authStore.token) {
     navigateTo('/login')
@@ -40,7 +66,42 @@ onMounted(() => {
     return
   }
   cartStore.fetchCart()
+  fetchSellpoints()
 })
+
+function getStateLabel(stateId) {
+  return stateOptions.value.find(s => String(s.id) === String(stateId))?.label || ''
+}
+
+function getCityLabel(stateId, cityId) {
+  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
+
+  return group?.find(c => String(c.id) === String(cityId))?.name || ''
+}
+
+async function fetchSellpoints() {
+  sellpointsLoading.value = true
+  try {
+    const res = await fetch(`${config.public.apiBaseUrl}/api/cart/sellpoints`, {
+      headers: { Authorization: `Bearer ${authStore.token}` },
+    })
+
+    if (!res.ok)
+      throw new Error('Failed to fetch sellpoints')
+    const data = await res.json()
+
+    sellpoints.value = data.data.map(sp => ({
+      id: sp._id,
+      label: `${getCityLabel(sp.state, sp.city)}, ${getStateLabel(sp.state)}`,
+    })) || []
+  }
+  catch (err) {
+    console.error(err)
+  }
+  finally {
+    sellpointsLoading.value = false
+  }
+}
 
 async function updateQuantity(item, delta) {
   const key = `${item.product}-${item.variance}-${item.color}`
@@ -64,7 +125,7 @@ async function updateQuantity(item, delta) {
 }
 
 async function removeItem(item) {
-  const key = `${item.product}-${item.variance}-${item.color}`
+  const key = `${item.product}-${item.variance}`
   if (updatingItem.has(key))
     return
 
@@ -73,7 +134,6 @@ async function removeItem(item) {
     await cartStore.removeItem({
       productId: item.product,
       variance: item.variance,
-      color: item.color,
     })
   }
   finally {
@@ -82,9 +142,9 @@ async function removeItem(item) {
 }
 
 async function handleCheckout() {
-  if (cartStore.isEmpty)
+  const { valid } = await sellpointRef.value.validate()
+  if (!valid || cartStore.isEmpty)
     return
-
   checkoutLoading.value = true
   try {
     const order = await cartStore.checkout({
@@ -93,6 +153,7 @@ async function handleCheckout() {
         state: checkout.value.state || undefined,
         city: checkout.value.city || undefined,
       },
+      sellpoint: checkout.value.sellpoint || undefined,
     })
 
     if (order)
@@ -109,15 +170,7 @@ async function handleCheckout() {
   }
 }
 
-const subtotal = computed(() => {
-  return cartStore.items.reduce((sum, item) => {
-    return sum + (item.price || 0) * (item.qty || 1)
-  }, 0)
-})
-
-const total = computed(() => {
-  return subtotal.value + (Number(checkout.value.shippingCost) || 0)
-})
+const { requiredValidator } = useValidators()
 </script>
 
 <template>
@@ -186,13 +239,7 @@ const total = computed(() => {
                 {{ item.title }}
               </VListItemTitle>
               <VListItemSubtitle>
-                <span v-if="item.variance">{{ t('account.cart.item.size') }}: {{ item.quantity }}</span>
-                <span v-if="item.color"> · {{ t('account.cart.item.color') }}: {{ item.color }}</span>
-              </VListItemSubtitle>
-              <VListItemSubtitle class="mt-1">
-                <span class="text-primary font-weight-medium">{{ item.price }} {{ t('account.cart.currency_dzd') }}</span>
-                <span class="text-disabled"> × {{ item.qty }}</span>
-                <span class="font-weight-bold"> = {{ (item.price || 0) * (item.qty || 1) }} {{ t('account.cart.currency_dzd') }}</span>
+                <span>{{ item.name }}</span>
               </VListItemSubtitle>
 
               <template #append>
@@ -232,15 +279,39 @@ const total = computed(() => {
 
           <VDivider class="my-4" />
 
-          <VRow>
-            <VCol
-              cols="12"
-              md="6"
-            >
+          <VRow align="end">
+            <VCol cols="12">
               <h6 class="text-h6 mb-3">
                 {{ t('account.cart.shipping.title') }}
               </h6>
               <VRow>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppSelect
+                    v-model="checkout.state"
+                    item-value="id"
+                    item-title="label"
+                    :label="t('auth.wilaya')"
+                    :placeholder="t('auth.select_wilaya')"
+                    :items="stateOptions"
+                  />
+                </VCol>
+
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppSelect
+                    v-model="checkout.city"
+                    :label="t('auth.city')"
+                    item-value="id"
+                    item-title="label"
+                    :placeholder="t('auth.select_city')"
+                    :items="cityOptions"
+                  />
+                </VCol>
                 <VCol cols="12">
                   <AppTextField
                     v-model="checkout.address"
@@ -248,56 +319,65 @@ const total = computed(() => {
                     :placeholder="t('account.cart.shipping.fields.address.placeholder')"
                   />
                 </VCol>
-                <VCol cols="6">
-                  <AppTextField
-                    v-model="checkout.state"
-                    :label="t('account.cart.shipping.fields.state.label')"
-                    :placeholder="t('account.cart.shipping.fields.state.placeholder')"
-                  />
-                </VCol>
-                <VCol cols="6">
-                  <AppTextField
-                    v-model="checkout.city"
-                    :label="t('account.cart.shipping.fields.city.label')"
-                    :placeholder="t('account.cart.shipping.fields.city.placeholder')"
-                  />
-                </VCol>
               </VRow>
             </VCol>
-
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <VCard
-                variant="outlined"
-                class="pa-4"
-              >
-                <h6 class="text-h6 mb-4">
-                  {{ t('account.cart.summary.title') }}
-                </h6>
-                <div class="d-flex justify-space-between mb-2">
-                  <span class="text-body-1">{{ t('account.cart.summary.subtotal') }}</span>
-                  <span class="text-body-1 font-weight-medium">{{ subtotal }} {{ t('account.cart.currency_dzd') }}</span>
-                </div>
-                <VDivider class="my-3" />
-                <div class="d-flex justify-space-between mb-4">
-                  <span class="text-h6">{{ t('account.cart.summary.total') }}</span>
-                  <span class="text-h6 text-primary">{{ total }} {{ t('account.cart.currency_dzd') }}</span>
-                </div>
-                <VBtn
-                  color="primary"
-                  block
-                  size="large"
-                  :loading="checkoutLoading"
-                  :disabled="cartStore.isEmpty"
-                  @click="handleCheckout"
-                >
-                  {{ t('account.cart.actions.checkout') }}
-                </VBtn>
-              </VCard>
-            </VCol>
           </VRow>
+
+          <VDivider class="mt-8 mb-4" />
+
+          <VCard
+            flat
+            class="pt-4"
+          >
+            <h6 class="text-h6 mb-3">
+              {{ t('account.cart.sellpoint.title') }}
+            </h6>
+            <div
+              v-if="sellpointsLoading"
+              class="text-center py-4"
+            >
+              <VProgressCircular
+                indeterminate
+                color="primary"
+                size="24"
+              />
+            </div>
+            <VRow
+              v-else
+              dense
+            >
+              <VCol cols="12">
+                <VForm ref="sellpointRef">
+                  <AppSelect
+                    v-model="checkout.sellpoint"
+                    item-value="id"
+                    item-title="label"
+                    :label="t('account.cart.sellpoint.label')"
+                    :placeholder="t('account.cart.sellpoint.placeholder')"
+                    :items="sellpoints"
+                    :rules="[requiredValidator]"
+                  />
+                </VForm>
+              </VCol>
+            </VRow>
+          </VCard>
+
+          <VDivider class="mt-8 mb-4" />
+
+          <VCard
+            flat
+            class="pa-4 d-flex justify-end"
+          >
+            <VBtn
+              color="primary"
+              size="large"
+              :loading="checkoutLoading"
+              :disabled="cartStore.isEmpty"
+              @click="handleCheckout"
+            >
+              {{ t('account.cart.actions.checkout') }}
+            </VBtn>
+          </VCard>
         </template>
       </VCardText>
     </VCard>

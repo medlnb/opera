@@ -34,7 +34,6 @@ export const useCartStore = defineStore('cart', {
         if (!res.ok)
           throw new Error('Failed to fetch cart')
         const data = await res.json()
-
         this.items = data.data?.items || []
       }
       catch (err) {
@@ -45,7 +44,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async addItem({ productId, variance, color, qty }) {
+    async addItem({ productId, variance, qty }) {
       const authStore = useAuthStore()
       if (!authStore.token) {
         navigateTo('/login')
@@ -62,7 +61,7 @@ export const useCartStore = defineStore('cart', {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authStore.token}`,
           },
-          body: JSON.stringify({ productId, variance, color, qty }),
+          body: JSON.stringify({ productId, variance, qty }),
         })
 
         if (!res.ok)
@@ -83,7 +82,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async updateItem({ productId, variance, color, qty }) {
+    async updateItem({ productId, variance, qty }) {
       const authStore = useAuthStore()
       if (!authStore.token)
         return false
@@ -92,7 +91,7 @@ export const useCartStore = defineStore('cart', {
         this.loading = true
 
         const res = await fetch(
-          `${this.apiBaseUrl}/api/cart/items/${encodeURIComponent(productId)}/${encodeURIComponent(variance)}/${encodeURIComponent(color)}`,
+          `${this.apiBaseUrl}/api/cart/items/${encodeURIComponent(productId)}/${encodeURIComponent(variance)}`,
           {
             method: 'PUT',
             headers: {
@@ -121,7 +120,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async removeItem({ productId, variance, color }) {
+    async removeItem({ productId, variance }) {
       const authStore = useAuthStore()
       if (!authStore.token)
         return false
@@ -130,7 +129,7 @@ export const useCartStore = defineStore('cart', {
         this.loading = true
 
         const res = await fetch(
-          `${this.apiBaseUrl}/api/cart/items/${encodeURIComponent(productId)}/${encodeURIComponent(variance)}/${encodeURIComponent(color)}`,
+          `${this.apiBaseUrl}/api/cart/items/${encodeURIComponent(productId)}/${encodeURIComponent(variance)}`,
           {
             method: 'DELETE',
             headers: {
@@ -190,7 +189,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async checkout({ contact = {} } = {}) {
+    async checkout({ contact = {}, sellpoint } = {}) {
       const authStore = useAuthStore()
       if (!authStore.token) {
         navigateTo('/login')
@@ -201,13 +200,13 @@ export const useCartStore = defineStore('cart', {
       try {
         this.loading = true
 
-        const res = await fetch(`${this.apiBaseUrl}/api/orders`, {
+        const res = await fetch(`${this.apiBaseUrl}/api/cart/checkout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authStore.token}`,
           },
-          body: JSON.stringify({ contact }),
+          body: JSON.stringify({ contact, sellpoint }),
         })
 
         if (!res.ok)
@@ -216,7 +215,7 @@ export const useCartStore = defineStore('cart', {
 
         this.items = [] // Cart is now empty after checkout
 
-        return data.message
+        return data.data
       }
       catch (err) {
         console.error(err)

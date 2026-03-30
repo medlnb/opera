@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 definePageMeta({
   admin: true,
@@ -43,7 +43,7 @@ const form = reactive({
   technicalFile: null as string | null,
   destination: [] as string[],
   properties: [] as string[],
-  variances: [{ quantity: '', price: 0 }] as { quantity: string; price: number }[],
+  variances: [{ name: '', price: '', color: '' }] as { name: string; price: string; color?: string; }[],
 
   // Caracteristiques technique
   densite: '',
@@ -59,7 +59,6 @@ const form = reactive({
   materielApplication: [] as string[],
   nettoyageMateriel: '',
   preparationSupport: '',
-  colors: [{ name: '', code: '' }] as { name: string; code: string }[],
 })
 
 // UI error highlight for missing assets
@@ -68,11 +67,6 @@ const coverInvalid = computed(() => showAssetErrors.value && !form.imageUrl)
 const avatarInvalid = computed(() => showAssetErrors.value && !form.avatar)
 
 const TYPE_OPTIONS = ['decor', 'buildings', 'coating']
-const DESTINATION_OPTIONS = ['Habitations', 'Bureaux', 'Hotel', 'Restaurants', 'Showroom', 'Magasins']
-const SUPPORT_OPTIONS = ['Platre', 'Ciment', 'Enduit', 'Brique']
-const MATERIEL_OPTIONS = ['Eponge nature', 'tampon décore', 'Lisseuse', 'couteau', 'brosse', 'Pinceau', 'Lisseuse inox', 'Pinceau plat spalter', 'spatule plasque']
-const ASPECT_OPTIONS = ['Mitallise', 'Brillant', 'Soyeux', 'Lumineux', 'Marbre Ultra Brillant']
-
 const typeOptions = computed(() => TYPE_OPTIONS.map(value => ({
   title: t(`management.products.types.${value}`),
   value,
@@ -137,7 +131,7 @@ onMounted(async () => {
       form.definition = p.definition || ''
       form.destination = Array.isArray(p.destination) ? p.destination : []
       form.properties = Array.isArray(p.properties) ? p.properties : []
-      form.variances = Array.isArray(p.variances) && p.variances.length ? p.variances.map((v: any) => ({ quantity: v.quantity || '', price: Number(v.price) || 0 })) : [{ quantity: '', price: 0 }]
+      form.variances = Array.isArray(p.variances) && p.variances.length ? p.variances.map((v: any) => ({ name: v.name || '', price: v.price || '', color: v.color || '' })) : [{ name: '', price: '', color: '' }]
       form.densite = p.densite || ''
       form.rendement = p.rendement || ''
       form.tempsSachage = p.tempsSachage || ''
@@ -149,7 +143,6 @@ onMounted(async () => {
       form.materielApplication = Array.isArray(p.materielApplication) ? p.materielApplication : []
       form.nettoyageMateriel = p.nettoyageMateriel || ''
       form.preparationSupport = p.preparationSupport || ''
-      form.colors = Array.isArray(p.colors) && p.colors.length ? p.colors.map((c: any) => ({ name: c.name || '', code: c.code || '' })) : []
 
       // Optional technical PDF
       if (p.technicalFile) {
@@ -343,17 +336,10 @@ function selectAvatarFile() {
 }
 
 function addVariance() {
-  form.variances.push({ quantity: '', price: 0 })
+  form.variances.push({ name:"", price: '', color: '' })
 }
 function removeVariance(index: number) {
   form.variances.splice(index, 1)
-}
-
-function addColor() {
-  form.colors.push({ name: '', code: '' })
-}
-function removeColor(index: number) {
-  form.colors.splice(index, 1)
 }
 
 async function publishProduct() {
@@ -377,29 +363,18 @@ async function publishProduct() {
   if (!form.avatar)
     snackbar.value = { show: true, text: t('management.products.editor.snackbar.avatar_required'), color: 'error' }
 
-  // Colors are optional, but if a row is started it must be complete.
-  const cleanedColors = (Array.isArray(form.colors) ? form.colors : [])
-    .map(c => ({ name: String(c?.name ?? '').trim(), code: String(c?.code ?? '').trim() }))
-    .filter(c => c.name || c.code)
-
-  const invalidColor = cleanedColors.find(c => !c.name || !c.code)
-  if (invalidColor)
-    return snackbar.value = { show: true, text: t('management.products.editor.snackbar.color_invalid'), color: 'error' }
-
   if (!Array.isArray(form.variances) || form.variances.length === 0)
     snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_required'), color: 'error' }
 
-  const invalidVariance = form.variances.find(v => !v.quantity || Number(v.price) <= 0)
+  const invalidVariance = form.variances.find(v => !v.name || !v.price)
   if (invalidVariance)
     snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_invalid'), color: 'error' }
 
   saving.value = true
-  try {
+  try {   
     const body = {
       ...form,
-      variances: form.variances.filter(v => v.quantity),
-      colors: cleanedColors,
-
+      variances: form.variances.filter(v => v.name && v.price),
       // Only send technicalFile when set, unless admin explicitly detached it.
       ...(form.technicalFile ? { technicalFile: form.technicalFile } : {}),
       ...(detachTechnicalFile.value ? { technicalFile: null } : {}),
@@ -865,102 +840,64 @@ function discard() {
           </VCardText>
         </VCard>
 
-        <!-- Colors -->
-        <VCard :title="t('management.products.editor.sections.colors')">
+        <!-- Variances -->
+        <VCard :title="t('management.products.editor.sections.variances')">
           <VCardText>
             <div
-              v-for="(c, idx) in form.colors"
+              v-for="(c, idx) in form.variances"
               :key="idx"
-              class="d-flex gap-2 align-center mb-3"
+              class="d-flex gap-2 mb-3"
             >
-              <AppTextField
-                v-model="c.name"
-                :label="t('management.products.editor.colors.name')"
-                :placeholder="t('management.products.editor.colors.name_placeholder')"
-                class="flex-grow-1"
-              />
-              <AppTextField
-                v-model="c.code"
-                :label="t('management.products.editor.colors.code')"
-                placeholder="#RRGGBB"
-                clearable
-                class="flex-grow-1"
-              >
-                <template #append-inner>
-                  <input
-                    :value="c.code || '#000000'"
-                    type="color"
-                    style="border: none; block-size: 32px; cursor: pointer; inline-size: 40px; padding: 0; background: transparent;"
-                    @input="c.code = ($event.target as HTMLInputElement).value"
+              <VRow dense>
+                <VCol cols="8">
+                  <AppTextField
+                    v-model="c.name"
+                    :label="t('management.products.editor.fields.title')"
+                    :placeholder="t('management.products.editor.fields.title')"
+                    class="flex-grow-1"
                   >
-                </template>
-              </AppTextField>
-              <VBtn
-                icon
-                size="small"
-                color="error"
-                variant="text"
-                @click="removeColor(idx)"
-              >
-                <VIcon icon="tabler-trash" />
-              </VBtn>
+                    <template #append-inner>
+                      <div class="d-flex align-center">
+                        <input
+                          :value="c.color"
+                          type="color"
+                          style="border: none; block-size: 32px; cursor: pointer; inline-size: 32px; padding: 0; background: transparent;"
+                          @click.stop
+                          @input="c.color = ($event.target as HTMLInputElement).value"
+                          clearable
+                        >
+                        <VIcon
+                          v-if="c.color"
+                          icon="tabler-x"
+                          size="16"
+                          class="ml-1 text-disabled"
+                          @click.stop="c.color = undefined">
+                        </VIcon>
+                      </div>
+                    </template>
+                  </AppTextField>
+                </VCol>
+                <VCol cols="3">
+                  <AppTextField
+                    v-model="c.price"
+                    :label="t('management.products.editor.variances.price_dzd')"
+                    placeholder="0.00"
+                    class="flex-grow-1"
+                  />
+                </VCol>
+                <VCol cols="1" class="d-flex align-end mt-5">
+                  <VBtn
+                    icon
+                    color="error"
+                    variant="text"
+                    @click="removeVariance(idx)"
+                  >
+                    <VIcon icon="tabler-trash" />
+                  </VBtn>
+                </VCol>
+              </VRow>
             </div>
             <VBtn
-              variant="tonal"
-              @click="addColor"
-            >
-              {{ t('management.products.editor.colors.add') }}
-            </VBtn>
-          </VCardText>
-        </VCard>
-
-        <!-- Variances -->
-        <VCard
-          class="mt-6"
-          :title="t('management.products.editor.sections.variances')"
-        >
-          <VCardText>
-            <VRow
-              v-for="(v, idx) in form.variances"
-              :key="idx"
-              class="mb-2"
-              dense
-            >
-              <VCol :cols="form.variances.length > 1 ? 5 : 6">
-                <AppTextField
-                  v-model="v.quantity"
-                  :label="t('management.products.editor.variances.quantity')"
-                  :placeholder="t('management.products.editor.variances.quantity_placeholder')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-              <VCol :cols="form.variances.length > 1 ? 5 : 6">
-                <AppTextField
-                  v-model.number="v.price"
-                  :label="t('management.products.editor.variances.price_dzd')"
-                  type="number"
-                  :rules="[requiredValidator]"
-                  @input="v.price = Number(String(v.price).replace(/[^0-9]/g, ''))"
-                />
-              </VCol>
-              <VCol
-                v-if="form.variances.length > 1"
-                cols="2"
-                class="d-flex align-center"
-              >
-                <VBtn
-                  icon
-                  size="small"
-                  color="error"
-                  variant="text"
-                  @click="removeVariance(idx)"
-                >
-                  <VIcon icon="tabler-trash" />
-                </VBtn>
-              </VCol>
-            </VRow>
-            <VBtn
-              class="mt-2"
               variant="tonal"
               @click="addVariance"
             >
@@ -968,6 +905,7 @@ function discard() {
             </VBtn>
           </VCardText>
         </VCard>
+
       </VCol>
     </VRow>
   </VForm>

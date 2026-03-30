@@ -53,13 +53,8 @@ onMounted(() => {
   getRecaptchaVerifier()
 })
 
-// Steps: plan -> personal info -> phone verification
+// Steps: personal info -> phone verification
 const items = computed(() => [
-  {
-    title: t('auth.signup.steps.plan.title'),
-    subtitle: t('auth.signup.steps.plan.subtitle'),
-    icon: 'tabler-list-check',
-  },
   {
     title: t('auth.signup.steps.personal.title'),
     subtitle: t('auth.signup.steps.personal.subtitle'),
@@ -69,24 +64,6 @@ const items = computed(() => [
     title: t('auth.signup.steps.phone.title'),
     subtitle: t('auth.signup.steps.phone.subtitle'),
     icon: 'tabler-phone',
-  },
-])
-
-const radioContent = computed(() => [
-  {
-    title: t('auth.signup.roles.user.title'),
-    desc: t('auth.signup.roles.user.desc'),
-    value: 'user',
-  },
-  {
-    title: t('auth.signup.roles.painter.title'),
-    desc: t('auth.signup.roles.painter.desc'),
-    value: 'painter',
-  },
-  {
-    title: t('auth.signup.roles.enterprise.title'),
-    desc: t('auth.signup.roles.enterprise.desc'),
-    value: 'enterprise',
   },
 ])
 
@@ -101,17 +78,7 @@ const form = ref({
   address: '',
   state: '1',
   city: '1',
-  role: 'user',
-  enterpriseName: '',
-  serviceAreas: [],
 })
-
-const isPainter = computed(() => form.value.role === 'painter')
-const isEnterprise = computed(() => form.value.role === 'enterprise')
-
-// Painter service areas (separate picker)
-const serviceAreaState = ref(null)
-const serviceAreaCity = ref(null)
 
 // Build wilaya (state) options from grouped communes
 const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
@@ -139,66 +106,9 @@ function getCityLabel(stateId, cityId) {
   return group?.find(c => String(c.id) === String(cityId))?.name || ''
 }
 
-const serviceAreaCityOptions = computed(() => {
-  if (!serviceAreaState.value)
-    return []
-  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(serviceAreaState.value))
-
-  return group ? group.map(c => ({ id: String(c.id), label: c.name })) : []
-})
-
 watch(() => form.value.state, () => {
   form.value.city = null
 })
-
-watch(() => form.value.role, async () => {
-  // Clear role-specific fields when switching roles
-  form.value.enterpriseName = ''
-  form.value.serviceAreas = []
-  serviceAreaState.value = null
-  serviceAreaCity.value = null
-
-  // Clear any existing validation highlights/errors
-  await nextTick()
-  formRef.value?.resetValidation?.()
-})
-
-watch(serviceAreaState, () => {
-  serviceAreaCity.value = null
-})
-
-function addServiceArea() {
-  if (!serviceAreaState.value || !serviceAreaCity.value)
-    return
-
-  const newArea = { state: String(serviceAreaState.value), city: String(serviceAreaCity.value) }
-  const exists = (form.value.serviceAreas || []).some(a => String(a.state) === newArea.state && String(a.city) === newArea.city)
-  if (exists)
-    return
-
-  form.value.serviceAreas = [...(form.value.serviceAreas || []), newArea]
-  serviceAreaState.value = null
-  serviceAreaCity.value = null
-}
-
-function removeServiceArea(index) {
-  form.value.serviceAreas = (form.value.serviceAreas || []).filter((_, i) => i !== index)
-}
-
-function validateRoleExtras() {
-  if (isEnterprise.value && !String(form.value.enterpriseName || '').trim()) {
-    showSnackbar(t('auth.signup.errors.enterprise_name_required'), 'error')
-
-    return false
-  }
-  if (isPainter.value && (!Array.isArray(form.value.serviceAreas) || form.value.serviceAreas.length === 0)) {
-    showSnackbar(t('auth.signup.errors.service_areas_required'), 'error')
-
-    return false
-  }
-
-  return true
-}
 
 // Resend code cooldown
 const resendCooldown = ref(0)
@@ -227,9 +137,6 @@ const onSubmit = async () => {
     }
   }
 
-  if (!validateRoleExtras())
-    return
-
   try {
     loading.value = true
 
@@ -244,20 +151,6 @@ const onSubmit = async () => {
       address: form.value.address,
       state: getStateLabel(form.value.state),
       city: getCityLabel(form.value.state, form.value.city),
-    }
-
-    // role is optional; omit for default "user"
-    if (form.value.role && form.value.role !== 'user')
-      payload.role = form.value.role
-
-    if (form.value.role === 'enterprise')
-      payload.enterpriseName = String(form.value.enterpriseName || '').trim()
-
-    if (form.value.role === 'painter') {
-      payload.serviceAreas = (form.value.serviceAreas || []).map(a => ({
-        state: getStateLabel(a.state),
-        city: getCityLabel(a.state, a.city),
-      }))
     }
 
     const res = await fetch(`${config.public.apiBaseUrl}/api/auth/register`, {
@@ -339,13 +232,13 @@ async function verifyCode() {
 }
 
 function goToPhoneStep() {
-  // Use VForm validation before moving to phone step (last step)
+  // Use VForm validation before moving to phone step
   if (formRef.value) {
     const result = formRef.value.validate?.()
     if (result && typeof result.then === 'function') {
       result.then(r => {
-        if (r.valid && validateRoleExtras())
-          currentStep.value = 2
+        if (r.valid)
+          currentStep.value = 1
         else
           showSnackbar(t('auth.errors.fix_highlighted_errors'), 'error')
       })
@@ -353,16 +246,11 @@ function goToPhoneStep() {
       return
     }
   }
-  if (validateRoleExtras())
-    currentStep.value = 2
-}
-
-function goToPersonalStep() {
   currentStep.value = 1
 }
 
 function goBack() {
-  if (currentStep.value === 2) {
+  if (currentStep.value === 1) {
     confirmationResult.value = null
     code.value = ''
   }
@@ -422,33 +310,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
           style="max-inline-size: 681px;"
         >
           <VForm ref="formRef">
-            <VWindowItem>
-              <h5 class="text-h5">
-                {{ t('auth.signup.plan.title') }}
-              </h5>
-              <p class="text-sm">
-                {{ t('auth.signup.plan.subtitle') }}
-              </p>
-
-              <CustomRadiosWithIcon
-                v-model:selected-radio="form.role"
-                :radio-content="radioContent"
-                :grid-column="{ sm: '4', cols: '12' }"
-              >
-                <template #default="{ item }">
-                  <div class="text-center">
-                    <h5 class="text-h5 text-primary pb-4">
-                      {{ item.title }}
-                    </h5>
-                    <p class="clamp-text mb-0">
-                      {{ item.desc }}
-                    </p>
-                  </div>
-                </template>
-              </CustomRadiosWithIcon>
-            </VWindowItem>
-
-            <!-- Step 1: Personal Information (now first) -->
+            <!-- Step 0: Personal Information -->
             <VWindowItem>
               <h5 class="text-h5 mb-1">
                 {{ t('auth.signup.personal_info_title') }}
@@ -478,18 +340,6 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     v-model="form.lastName"
                     :label="t('auth.last_name')"
                     :placeholder="t('auth.last_name_placeholder')"
-                    :rules="[requiredValidator]"
-                  />
-                </VCol>
-
-                <VCol
-                  v-if="isEnterprise"
-                  cols="12"
-                >
-                  <AppTextField
-                    v-model="form.enterpriseName"
-                    :label="t('auth.signup.enterprise_name.label')"
-                    :placeholder="t('auth.signup.enterprise_name.placeholder')"
                     :rules="[requiredValidator]"
                   />
                 </VCol>
@@ -561,74 +411,6 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
                     :placeholder="t('auth.address_placeholder')"
                     :rules="[requiredValidator]"
                   />
-                </VCol>
-
-                <VCol
-                  v-if="isPainter"
-                  cols="12"
-                >
-                  <h6 class="text-h6 mb-2">
-                    {{ t('auth.signup.service_areas.title') }}
-                  </h6>
-
-                  <VRow align="end">
-                    <VCol
-                      cols="12"
-                      md="5"
-                    >
-                      <AppSelect
-                        v-model="serviceAreaState"
-                        item-value="id"
-                        item-title="label"
-                        :label="t('auth.wilaya')"
-                        :placeholder="t('auth.select_wilaya')"
-                        :items="stateOptions"
-                      />
-                    </VCol>
-
-                    <VCol
-                      cols="12"
-                      md="5"
-                    >
-                      <AppSelect
-                        v-model="serviceAreaCity"
-                        item-value="id"
-                        item-title="label"
-                        :label="t('auth.city')"
-                        :placeholder="t('auth.select_city')"
-                        :items="serviceAreaCityOptions"
-                      />
-                    </VCol>
-
-                    <VCol
-                      cols="12"
-                      md="2"
-                      class="d-flex align-center"
-                    >
-                      <VBtn
-                        block
-                        color="primary"
-                        :disabled="!serviceAreaState || !serviceAreaCity"
-                        @click="addServiceArea"
-                      >
-                        {{ t('common.add') }}
-                      </VBtn>
-                    </VCol>
-                  </VRow>
-
-                  <div
-                    v-if="form.serviceAreas?.length"
-                    class="d-flex flex-wrap gap-2 mt-2"
-                  >
-                    <VChip
-                      v-for="(area, i) in form.serviceAreas"
-                      :key="`${area.state}-${area.city}-${i}`"
-                      closable
-                      @click:close="removeServiceArea(i)"
-                    >
-                      {{ getStateLabel(area.state) }} - {{ getCityLabel(area.state, area.city) }}
-                    </VChip>
-                  </div>
                 </VCol>
               </VRow>
             </VWindowItem>
@@ -744,22 +526,9 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
           </VBtn>
           <div v-else />
 
-          <!-- Step 0: Next -> Personal -->
+          <!-- Step 0: Next -> Phone (requires valid personal info) -->
           <VBtn
             v-if="currentStep === 0"
-            :loading="loading"
-            @click="goToPersonalStep"
-          >
-            {{ t('common.next') }}
-            <VIcon
-              icon="tabler-arrow-right"
-              end
-            />
-          </VBtn>
-
-          <!-- Step 1: Next -> Phone (requires valid personal info) -->
-          <VBtn
-            v-else-if="currentStep === 1"
             :loading="loading"
             @click="goToPhoneStep"
           >
@@ -770,7 +539,7 @@ const { phoneValidator, requiredValidator, passwordValidator, confirmPasswordVal
             />
           </VBtn>
 
-          <!-- Step 2: Send Code or Verify -->
+          <!-- Step 1: Send Code or Verify -->
           <VBtn
             v-else-if="!confirmationResult"
             :disabled="!recaptchaVerifier || !form.phone || form.phone.length !== 9"

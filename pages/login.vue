@@ -1,5 +1,4 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useValidators } from '@/utils/validators'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
@@ -7,6 +6,7 @@ import logo from '@images/logo-v2.svg'
 import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { themeConfig } from '@themeConfig'
+import { useI18n } from 'vue-i18n'
 
 const config = useRuntimeConfig()
 
@@ -50,6 +50,7 @@ const submit = async () => {
       throw new Error(msg || t('auth.errors.login_failed'))
     }
     const data = await res.json()
+    console.log(data)
     if (data?.token)
       authStore.setToken(data.token)
     if (data?.user)

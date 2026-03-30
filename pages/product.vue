@@ -121,9 +121,6 @@ const order = ref({
   qty: 1,
 })
 
-const isColorRequired = computed(() => (productDetails.value?.colors?.length ?? 0) > 0)
-const isColorSelected = computed(() => order.value.color !== null)
-
 const canAddToCart = computed(() => {
   if (productLoading.value)
     return false
@@ -131,10 +128,7 @@ const canAddToCart = computed(() => {
   if (!productDetails.value?._id)
     return false
 
-  if (isColorRequired.value && !isColorSelected.value)
-    return false
-
-  if (order.value.variance === null)
+  if (!order.value.variance)
     return false
 
   return true
@@ -145,8 +139,6 @@ const snackbar = ref({ show: false, message: '', color: 'success' })
 const showSnackbar = (message, color = 'success') => {
   snackbar.value = { show: true, message, color }
 }
-
-const isDealDialogVisible = ref(false)
 
 onMounted(async () => {
   try {
@@ -170,11 +162,6 @@ onMounted(async () => {
   }
 })
 
-function selectColor(i) {
-  order.value.color = i
-  panelStatus.value = undefined
-}
-
 function selectVariance(i) {
   order.value.variance = order.value.variance === i ? null : i
   panelStatus.value = undefined
@@ -183,37 +170,19 @@ function selectVariance(i) {
 async function addToCart() {
   if (!authStore.token)
     return navigateTo('/login')
+
   if (!productDetails.value?._id)
     return
 
-  if (isColorRequired.value && order.value.color === null) {
-    panelStatus.value = 0
-    showSnackbar(t('products.details.snackbar.select_color'), 'error')
-
-    return
-  }
-
-  if (order.value.variance === null) {
-    panelStatus.value = 1
-
-    return
-  }
-  const variance = productDetails.value.variances.find(v => v._id === order.value.variance)
-  if (!variance?.quantity)
-    return
-
-  // Get selected color name or use empty string if no colors
-  const colorName = productDetails.value.colors?.length && order.value.color != null
-    ? productDetails.value.colors[order.value.color].name
-    : ''
+  if (!order.value.variance) 
+    return panelStatus.value = 0
 
   try {
     addingToCart.value = true
 
     const success = await cartStore.addItem({
       productId: productDetails.value._id,
-      variance: variance._id,
-      color: colorName,
+      variance: order.value.variance,
       qty: Math.max(1, Number(order.value.qty) || 1),
     })
 
@@ -222,9 +191,8 @@ async function addToCart() {
       order.value.qty = 1
       showSnackbar(t('products.details.snackbar.added_to_cart'), 'success')
     }
-    else {
-      showSnackbar(t('products.details.snackbar.add_to_cart_failed'), 'error')
-    }
+    else showSnackbar(t('products.details.snackbar.add_to_cart_failed'), 'error')
+    
   }
   catch (err) {
     console.error(err)
@@ -406,65 +374,22 @@ function toggleFavorite() {
                     class="expansion-panels-width-border"
                   >
                     <VExpansionPanel
-                      v-if="productDetails?.colors.length"
-                      elevation="0"
-                      :value="0"
-                    >
-                      <template #title>
-                        <div>
-                          <h5 class="text-h5 mb-1">
-                            {{ t('products.details.panels.colors') }}
-                          </h5>
-                          <div
-                            v-if="productDetails && order.color != null"
-                            class="d-flex flex-wrap gap-1"
-                          >
-                            <VChip size="x-small">
-                              {{ productDetails.colors[order.color].name }}
-                            </VChip>
-                          </div>
-                        </div>
-                      </template>
-                      <template #text>
-                        <VList class="card-list px-2">
-                          <VListItem
-                            v-for="(color, index) in productDetails?.colors ?? []"
-                            :key="index"
-                            class="py-4"
-                          >
-                            <template #prepend>
-                              <VCheckbox
-                                class="me-3"
-                                :model-value="index === order.color"
-                                @update:model-value="() => selectColor(index)"
-                              />
-                            </template>
-                            <VListItemTitle class="d-flex align-center gap-2">
-                              {{ color.name }}
-                              <div
-                                class="inline-block"
-                                :style="`width: 40px; height: 20px; background-color: ${color.code}; border-radius: 4px; margin-right: 8px;`"
-                              />
-                            </VListItemTitle>
-                          </VListItem>
-                        </VList>
-                      </template>
-                    </VExpansionPanel>
-                    <VExpansionPanel
                       elevation="0"
                       :value="1"
                     >
                       <template #title>
                         <div>
                           <h5 class="text-h5 mb-1">
-                            {{ t('products.details.panels.size') }}
+                            {{ t('management.products.table.variances') }}
                           </h5>
                           <div
                             v-if="productDetails && order.variance != null"
                             class="d-flex flex-wrap gap-1"
                           >
                             <VChip size="x-small">
-                              {{ productDetails.variances.find(v => v._id === order.variance)?.quantity ?? '-' }}
+                              {{ productDetails.variances.find(v => v._id === order.variance)?.name ?? '-' }}
+                            </VChip>
+                            <VChip v-if="productDetails.variances.find(v => v._id === order.variance)?.color" size="x-small" :style="{ width: '30px' ,backgroundColor: productDetails.variances.find(v => v._id === order.variance).color }">
                             </VChip>
                           </div>
                         </div>
@@ -483,12 +408,9 @@ function toggleFavorite() {
                                 @update:model-value="() => selectVariance(variance._id)"
                               />
                             </template>
-                            <VListItemTitle class="text-high-emphasis font-weight-medium mb-1">
-                              {{ variance.quantity }}
+                            <VListItemTitle class="text-high-emphasis font-weight-medium mb-1 d-flex align-center justify-space-between">
+                              {{ variance.name }} <VChip  v-if="variance.color" size="x-small" :style="{ width: '30px' ,backgroundColor: variance.color }" />
                             </VListItemTitle>
-                            <VListItemSubtitle>
-                              <span class="text-disabled text-base">{{ variance.price }} {{ t('products.details.currency_dzd') }}</span>
-                            </VListItemSubtitle>
                           </VListItem>
                         </VList>
                       </template>
@@ -553,14 +475,7 @@ function toggleFavorite() {
                       {{ t('products.details.actions.add_to_cart') }}
                     </VBtn>
 
-                    <VBtn
-                      class="mt-2 flex-fill"
-                      variant="tonal"
-                      color="secondary"
-                      @click="isDealDialogVisible = true"
-                    >
-                      {{ t('deals.actions.request_deal') }}
-                    </VBtn>
+
                   </div>
                 </div>
               </VCol>
@@ -773,12 +688,6 @@ function toggleFavorite() {
     {{ snackbar.message }}
   </VSnackbar>
 
-  <DealRequestDialog
-    :is-dialog-visible="isDealDialogVisible"
-    :product-id="productDetails?._id"
-    :initial-note="productDetails?.title ? `${t('deals.dialog.prefill_about_product')}: ${productDetails?.title}` : ''"
-    @update:is-dialog-visible="val => (isDealDialogVisible = val)"
-  />
 </template>
 
 <style lang="scss" scoped>

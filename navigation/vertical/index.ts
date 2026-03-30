@@ -58,6 +58,11 @@ export function useNavItems() {
         title: 'nav.contact',
         icon: { icon: 'tabler-map-pin' },
       },
+      (user as any)?.role as string === 'sellpoint' && {
+        to: { name: 'sellpoint' },
+        title: 'nav.orders',
+        icon: { icon: 'tabler-shopping-cart' },
+      },
       (user as any)?.role as string === 'admin' && {
         title: 'nav.management.root',
         icon: { icon: 'tabler-user-shield' },
@@ -93,10 +98,6 @@ export function useNavItems() {
           {
             title: 'nav.management.orders',
             to: { name: 'management-orders' },
-          },
-          {
-            title: 'nav.management.deals',
-            to: { name: 'management-deals' },
           },
           {
             title: 'nav.management.users',

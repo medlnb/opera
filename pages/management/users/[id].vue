@@ -1,9 +1,9 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
+import { useI18n } from 'vue-i18n'
+import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
@@ -24,6 +24,13 @@ const ordersLoading = ref(false)
 const totalOrders = ref(0)
 const page = ref(1)
 const itemsPerPage = ref(5)
+
+// Sells state (for sellpoint role)
+const sells = ref([])
+const sellsLoading = ref(false)
+const totalSells = ref(0)
+const sellsPage = ref(1)
+const sellsItemsPerPage = ref(5)
 
 // Dialog states
 const deleteDialog = ref(false)
@@ -46,7 +53,17 @@ const getStatusLabel = status => {
 const orderHeaders = computed(() => [
   { title: t('management.orders.table.order_id'), key: 'orderId', sortable: false },
   { title: t('management.orders.table.items'), key: 'items', sortable: false },
-  { title: t('management.orders.table.total'), key: 'total', sortable: false },
+  { title: t('account.orders.sellpoint'), key: 'sellpoint', sortable: false },
+  { title: t('management.orders.table.status'), key: 'status', sortable: false },
+  { title: t('management.orders.table.date'), key: 'createdAt', sortable: false },
+  { title: t('management.common.table.actions'), key: 'actions', sortable: false, align: 'end' },
+])
+
+// Sells table headers (same columns as orders)
+const sellHeaders = computed(() => [
+  { title: t('management.orders.table.order_id'), key: 'orderId', sortable: false },
+  { title: t('management.orders.table.items'), key: 'items', sortable: false },
+  { title: t('management.orders.table.customer'), key: 'user', sortable: false },
   { title: t('management.orders.table.status'), key: 'status', sortable: false },
   { title: t('management.orders.table.date'), key: 'createdAt', sortable: false },
   { title: t('management.common.table.actions'), key: 'actions', sortable: false, align: 'end' },
@@ -115,7 +132,6 @@ const fetchUser = async () => {
 
     if (res.ok) {
       const data = await res.json()
-
       user.value = data.data
     }
   }
@@ -156,6 +172,37 @@ const fetchOrders = async () => {
   }
   finally {
     ordersLoading.value = false
+  }
+}
+
+// Fetch sells made by this sellpoint user
+const fetchSells = async () => {
+  sellsLoading.value = true
+  try {
+    const params = new URLSearchParams({
+      p: sellsPage.value,
+      perPage: sellsItemsPerPage.value,
+    })
+
+    const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users/${route.params.id}/sells?${params}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+    })
+
+    if (res.ok) {
+      const data = await res.json()
+
+      sells.value = data.data || []
+      totalSells.value = data.pagination?.total || 0
+    }
+  }
+  catch (error) {
+    console.error('Failed to fetch sells:', error)
+  }
+  finally {
+    sellsLoading.value = false
   }
 }
 
@@ -254,6 +301,20 @@ watch(page, () => {
 watch(itemsPerPage, () => {
   page.value = 1
   fetchOrders()
+})
+
+watch(sellsPage, () => {
+  fetchSells()
+})
+
+watch(sellsItemsPerPage, () => {
+  sellsPage.value = 1
+  fetchSells()
+})
+
+watch(user, newUser => {
+  if (newUser?.role === 'sellpoint')
+    fetchSells()
 })
 
 onMounted(() => {
@@ -457,11 +518,128 @@ onMounted(() => {
           </VCard>
         </VCol>
 
-        <!-- User Orders -->
+        <!-- User Details -->
         <VCol
           cols="12"
           md="8"
         >
+          <!-- Sells History (sellpoint role only) -->
+          <VCard
+            v-if="user.role === 'sellpoint'"
+            class="mb-6"
+          >
+            <VCardTitle class="d-flex align-center justify-space-between">
+              <span>{{ t('management.users.details.sells_history') }}</span>
+              <VChip
+                label
+                color="warning"
+                size="small"
+              >
+                {{ t('management.users.details.sells_count', { count: totalSells }) }}
+              </VChip>
+            </VCardTitle>
+            <VDivider />
+
+            <VDataTableServer
+              v-model:items-per-page="sellsItemsPerPage"
+              v-model:page="sellsPage"
+              :headers="sellHeaders"
+              :items="sells"
+              :items-length="totalSells"
+              :loading="sellsLoading"
+              item-value="_id"
+              class="text-no-wrap"
+            >
+              <template #loading>
+                <div class="d-flex justify-center py-6">
+                  <VProgressCircular
+                    indeterminate
+                    color="primary"
+                  />
+                </div>
+              </template>
+
+              <template #item.orderId="{ item }">
+                <span class="font-weight-medium text-primary">
+                  #{{ item._id?.slice(-8).toUpperCase() }}
+                </span>
+              </template>
+
+              <template #item.items="{ item }">
+                <VChip
+                  label
+                  size="small"
+                  color="secondary"
+                >
+                  {{ t('management.orders.table.items_count', { count: item.items?.length || 0 }) }}
+                </VChip>
+              </template>
+
+              <template #item.user="{ item }">
+                <div v-if="item.user">
+                  <div class="font-weight-medium">
+                    {{ item.user.firstName }} {{ item.user.lastName }}
+                  </div>
+                  <div class="text-caption text-disabled">
+                    {{ item.user.phone }}
+                  </div>
+                </div>
+              </template>
+
+              <template #item.status="{ item }">
+                <VChip
+                  label
+                  size="small"
+                  :color="getStatusColor(item.status)"
+                  variant="tonal"
+                >
+                  {{ getStatusLabel(item.status) }}
+                </VChip>
+              </template>
+
+              <template #item.createdAt="{ item }">
+                {{ formatDate(item.createdAt) }}
+              </template>
+
+              <template #item.actions="{ item }">
+                <VBtn
+                  icon="tabler-eye"
+                  size="small"
+                  variant="text"
+                  @click="viewOrder(item)"
+                />
+              </template>
+
+              <template #no-data>
+                <div class="text-center py-12">
+                  <VIcon
+                    icon="tabler-receipt-off"
+                    size="48"
+                    class="text-disabled mb-4"
+                  />
+                  <p class="text-body-1 text-disabled">
+                    {{ t('management.users.details.no_sells_yet') }}
+                  </p>
+                </div>
+              </template>
+
+              <template #bottom>
+                <VDivider />
+                <div class="d-flex align-center justify-space-between flex-wrap gap-3 pa-5 pt-3">
+                  <p class="text-sm text-medium-emphasis mb-0">
+                    {{ paginationMeta({ page: sellsPage, itemsPerPage: sellsItemsPerPage }, totalSells, t) }}
+                  </p>
+                  <VPagination
+                    v-model="sellsPage"
+                    :length="Math.min(Math.ceil(totalSells / sellsItemsPerPage), 5)"
+                    :total-visible="$vuetify.display.xs ? 1 : Math.min(Math.ceil(totalSells / sellsItemsPerPage), 5)"
+                  />
+                </div>
+              </template>
+            </VDataTableServer>
+          </VCard>
+
+          <!-- User Orders -->
           <VCard>
             <VCardTitle class="d-flex align-center justify-space-between">
               <span>{{ t('management.users.details.orders_history') }}</span>
@@ -511,11 +689,17 @@ onMounted(() => {
                 </VChip>
               </template>
 
-              <template #item.total="{ item }">
-                <span class="font-weight-medium">
-                  {{ item.total?.toLocaleString() || 0 }} DZD
-                </span>
+              <template #item.sellpoint="{ item }">
+                <div v-if="item.sellpoint">
+                  <div class="font-weight-medium">
+                    {{ item.sellpoint.firstName }} {{ item.sellpoint.lastName }}
+                  </div>
+                  <div class="text-caption text-disabled">
+                    {{ item.sellpoint.phone }}
+                  </div>
+                </div>
               </template>
+
 
               <template #item.status="{ item }">
                 <VChip

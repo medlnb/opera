@@ -12,4 +12,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   if ((!token || user?.role != 'admin') && to.meta.admin)
     return navigateTo('/')
+
+  if ((!token || user?.role != 'sellpoint') && to.meta.sellpoint)
+    return navigateTo('/')
 })

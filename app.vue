@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useTheme } from 'vuetify'
+import Help from '@core/components/Help.vue'
 import ScrollToTop from '@core/components/ScrollToTop.vue'
 import initCore from '@core/initCore'
 import { initConfigStore, useConfigStore } from '@core/stores/config'
 import { hexToRgb } from '@layouts/utils'
+import { useTheme } from 'vuetify'
 
 const { global } = useTheme()
 
@@ -27,6 +28,7 @@ if (isMobile)
       </NuxtLayout>
 
       <ScrollToTop />
+      <Help />
     </VApp>
   </VLocaleProvider>
 </template>

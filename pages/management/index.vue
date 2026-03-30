@@ -1,9 +1,9 @@
 <script setup>
+import { useAuthStore } from '@/stores/auth'
+import { paginationMeta } from '@api-utils/paginationMeta'
 import { debounce } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
-import { paginationMeta } from '@api-utils/paginationMeta'
-import { useAuthStore } from '@/stores/auth'
 
 definePageMeta({
   admin: true,
@@ -18,7 +18,6 @@ const headers = computed(() => [
   { title: t('management.products.table.title'), key: 'title', sortable: true },
   { title: t('management.products.table.type'), key: 'type', sortable: true },
   { title: t('management.products.table.variances'), key: 'variances', sortable: false },
-  { title: t('management.products.table.colors'), key: 'colors', sortable: false },
   { title: t('management.common.table.actions'), key: 'actions', sortable: false },
 ])
 
@@ -71,8 +70,7 @@ async function fetchProducts() {
       ...p,
       title: p.title ?? p.name ?? t('common.unnamed'),
       type: p.type ?? p.category ?? '',
-      variances: p.variances?.map(v => `${v.quantity} - ${v.price} Dzd`) ?? [],
-      colors: p.colors ?? [],
+      variances: p.variances?.map(v => `${v.name} - ${v.price}dzd`) ?? [],
     }))
     totalItems.value = Number(data.pagination?.total ?? items.value.length)
   }
@@ -229,20 +227,12 @@ function goEdit(item) {
             {{ item.type || t('management.common.value.na') }}
           </VChip>
         </template>
-        <template #item.variances="{ item }">
+        <template #item.variances="{ item }" >
           <VSelect
+            v-if="item.variances.length"
             :items="item.variances"
             :model-value="item.variances?.[0] ?? null"
             item-title="variance"
-            class="ma-0"
-          />
-        </template>
-        <template #item.colors="{ item }">
-          <VSelect
-            v-if="item.colors && item.colors.length > 0"
-            :model-value="item.colors?.[0] ?? null"
-            :items="item.colors"
-            item-title="name"
             class="ma-0"
           />
         </template>

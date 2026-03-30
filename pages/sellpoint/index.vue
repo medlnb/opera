@@ -6,7 +6,7 @@ import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 definePageMeta({
   authed: true,
-  admin: true,
+  sellpoint: true,
 })
 
 const router = useRouter()
@@ -46,8 +46,8 @@ const statusOptions = computed(() => [
 
 // Table headers
 const headers = computed(() => [
+  { title: t('management.orders.table.order_id'), key: 'orderId', sortable: false },
   { title: t('management.orders.table.customer'), key: 'user', sortable: false },
-  { title: t('account.orders.sellpoint'), key: 'sellpoint', sortable: false },
   { title: t('management.orders.table.items'), key: 'items', sortable: false },
   { title: t('management.orders.table.status'), key: 'status', sortable: false },
   { title: t('management.orders.table.date'), key: 'createdAt', sortable: false },
@@ -66,7 +66,7 @@ const fetchOrders = async () => {
     if (statusFilter.value !== 'all')
       params.append('status', statusFilter.value)
 
-    const res = await fetch(`${config.public.apiBaseUrl}/api/admin/orders?${params}`, {
+    const res = await fetch(`${config.public.apiBaseUrl}/api/sellpoint?${params}`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${authStore.token}`,
@@ -119,11 +119,6 @@ const getStatusColor = status => {
   }
 
   return colors[status] || 'default'
-}
-
-// View order details
-const viewOrder = order => {
-  router.push(`/management/orders/${order._id}`)
 }
 
 // Update data table options
@@ -202,8 +197,14 @@ onMounted(() => {
           </div>
         </template>
 
+        <template #item.orderId="{ item }">
+          <span class="font-weight-medium text-primary">
+            #{{ item._id?.slice(-8).toUpperCase() }}
+          </span>
+        </template>
+
         <template #item.user="{ item }">
-          <div>
+          <div v-if="item.user">
             <div class="font-weight-medium">
               {{ item.user.firstName }} {{ item.user.lastName }}
             </div>
@@ -211,17 +212,10 @@ onMounted(() => {
               {{ item.user.phone }}
             </div>
           </div>
-        </template>
-
-        <template #item.sellpoint="{ item }">
-          <div v-if="item.sellpoint">
-            <div class="font-weight-medium">
-              {{ item.sellpoint.firstName }} {{ item.sellpoint.lastName }}
-            </div>
-            <div class="text-caption text-disabled">
-              {{ item.sellpoint.phone }}
-            </div>
-          </div>
+          <span
+            v-else
+            class="text-disabled"
+          >{{ t('management.common.value.na') }}</span>
         </template>
 
         <template #item.items="{ item }">
@@ -254,7 +248,7 @@ onMounted(() => {
             icon="tabler-eye"
             size="small"
             variant="text"
-            @click="viewOrder(item)"
+            :to="`/sellpoint/${item._id}`"
           />
         </template>
 

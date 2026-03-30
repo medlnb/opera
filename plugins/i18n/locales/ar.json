@@ -255,6 +255,7 @@
         "virtual_painter": "الرسام الافتراضي",
         "painters": "Allo Peintre",
         "contact": "اتصل بنا",
+        "orders": "الطلبات",
         "management": {
             "root": "الإدارة",
             "dashboard": "لوحة التحكم",
@@ -449,6 +450,11 @@
                 "size": "الحجم",
                 "color": "اللون"
             },
+            "sellpoint": {
+                "title": "اختر نقطة بيع",
+                "label": "نقطة البيع",
+                "placeholder": "هذه هي النقطة التي سيتم معالجة طلبك وشحنه منها. يجب أن تكون نفسها لجميع العناصر في السلة."
+            },
             "shipping": {
                 "title": "معلومات الشحن (اختياري)",
                 "fields": {
@@ -487,6 +493,7 @@
                 "total": "الإجمالي",
                 "date": "التاريخ"
             },
+            "sellpoint": "نقطة البيع",
             "empty": {
                 "title": "لا توجد طلبات بعد",
                 "subtitle": "سيظهر سجل طلباتك هنا"
@@ -1306,6 +1313,7 @@
             "search": "بحث",
             "cancel": "إلغاء",
             "delete": "حذف",
+            "required": "مطلوب",
             "action_failed": "فشل الإجراء",
             "delete_failed": "فشل الحذف",
             "filters": {
@@ -1476,6 +1484,23 @@
                 "unbanned": "تم رفع الحظر عن المستخدم بنجاح",
                 "deleted": "تم حذف المستخدم بنجاح"
             },
+            "create_sellpoint": {
+                "title": "إنشاء حساب نقطة بيع",
+                "first_name": "الاسم",
+                "last_name": "اللقب",
+                "phone": "رقم الهاتف",
+                "password": "كلمة المرور",
+                "password_min": "الحد الأدنى 6 أحرف",
+                "wilaya": "الولاية",
+                "city": "البلدية",
+                "address": "العنوان",
+                "location": "رمز خرائط غوغل / الإحداثيات",
+                "submit": "إنشاء نقطة بيع",
+                "snackbar": {
+                    "success": "تم إنشاء نقطة البيع بنجاح",
+                    "failed": "فشل إنشاء نقطة البيع"
+                }
+            },
             "details": {
                 "back_to_users": "العودة إلى المستخدمين",
                 "not_found_title": "المستخدم غير موجود",
@@ -1485,6 +1510,9 @@
                 "orders_history": "سجل الطلبات",
                 "orders_count": "{count} طلبات",
                 "no_orders_yet": "لا توجد طلبات بعد",
+                "sells_history": "سجل المبيعات",
+                "sells_count": "{count} مبيعات",
+                "no_sells_yet": "لا توجد مبيعات بعد",
                 "snackbar": {
                     "load_failed": "فشل تحميل تفاصيل المستخدم"
                 }
@@ -1536,7 +1564,9 @@
                 "location": "الموقع",
                 "address": "العنوان",
                 "view_customer": "عرض الزبون",
+                "view_sellpoint": "عرض نقطة البيع",
                 "customer_not_available": "معلومات الزبون غير متاحة",
+                "sellpoint_not_available": "معلومات نقطة البيع غير متاحة",
                 "order_timeline": "خط سير الطلب",
                 "timeline": {
                     "order_placed": "تم إنشاء الطلب"

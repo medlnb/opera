@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
-  admin: true,
+  sellpoint: true,
 })
 
 const route = useRoute()
@@ -74,25 +74,6 @@ const getCityLabel = (stateId, cityId) => {
   return city ? city.name : null
 }
 
-const getStateLabelAr = stateId => {
-  if (!stateId)
-    return null
-  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
-
-  return group ? (group[0].ar_name || null) : null
-}
-
-const getCityLabelAr = (stateId, cityId) => {
-  if (!stateId || !cityId)
-    return null
-  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
-  if (!group)
-    return null
-  const city = group.find(c => String(c.id) === String(cityId))
-
-  return city ? (city.ar_name || null) : null
-}
-
 const displayOrderLocation = computed(() => {
   const state = getStateLabel(order.value?.user?.state)
   const city = getCityLabel(order.value?.user?.state, order.value?.user?.city)
@@ -104,7 +85,7 @@ const displayOrderLocation = computed(() => {
 const fetchOrder = async () => {
   loading.value = true
   try {
-    const res = await fetch(`${config.public.apiBaseUrl}/api/admin/orders/${route.params.id}`, {
+    const res = await fetch(`${config.public.apiBaseUrl}/api/sellpoint/${route.params.id}`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${authStore.token}`,
@@ -113,7 +94,6 @@ const fetchOrder = async () => {
 
     if (res.ok) {
       const data = await res.json()
-
       order.value = data.data
     }
   }
@@ -130,7 +110,7 @@ const fetchOrder = async () => {
 const updateStatus = async newStatus => {
   updating.value = true
   try {
-    const res = await fetch(`${config.public.apiBaseUrl}/api/admin/orders/${route.params.id}/status`, {
+    const res = await fetch(`${config.public.apiBaseUrl}/api/sellpoint/${route.params.id}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -177,7 +157,7 @@ onMounted(() => {
     <VBtn
       variant="text"
       color="primary"
-      to="/management/orders"
+      to="/sellpoint"
       class="mb-4"
     >
       <VIcon
@@ -261,6 +241,7 @@ onMounted(() => {
                   <tr>
                     <th>{{ t('management.orders.details.table.product') }}</th>
                     <th>{{ t('management.orders.details.table.variance') }}</th>
+                    <th>{{ t('management.orders.details.table.color') }}</th>
                     <th class="text-center">
                       {{ t('management.orders.details.table.qty') }}
                     </th>
@@ -276,7 +257,8 @@ onMounted(() => {
                         {{ item.title || t('management.orders.details.unknown_product') }}
                       </div>
                     </td>
-                    <td>{{ item.name || t('management.common.value.na') }}</td>
+                    <td>{{ item.quantity || t('management.common.value.na') }}</td>
+                    <td>{{ item.color || t('management.common.value.na') }}</td>
                     <td class="text-center">
                       {{ item.qty }}
                     </td>
@@ -285,70 +267,7 @@ onMounted(() => {
               </VTable>
             </VCardText>
           </VCard>
-
-          
-          <!-- Order Timeline -->
-          <VCard>
-            <VCardTitle>{{ t('management.orders.details.order_timeline') }}</VCardTitle>
-            <VDivider />
-            <VCardText>
-              <VTimeline
-                side="end"
-                density="compact"
-              >
-                <VTimelineItem
-                  dot-color="success"
-                  size="x-small"
-                >
-                  <div class="text-caption">
-                    {{ t('management.orders.details.timeline.order_placed') }}
-                  </div>
-                  <div class="text-body-2">
-                    {{ formatDate(order.createdAt) }}
-                  </div>
-                </VTimelineItem>
-                <VTimelineItem
-                  v-if="order.status !== 'pending'"
-                  dot-color="info"
-                  size="x-small"
-                >
-                  <div class="text-caption">
-                    {{ t('management.orders.status.confirmed') }}
-                  </div>
-                </VTimelineItem>
-                <VTimelineItem
-                  v-if="['shipped', 'delivered'].includes(order.status)"
-                  dot-color="primary"
-                  size="x-small"
-                >
-                  <div class="text-caption">
-                    {{ t('management.orders.status.shipped') }}
-                  </div>
-                </VTimelineItem>
-                <VTimelineItem
-                  v-if="order.status === 'delivered'"
-                  dot-color="success"
-                  size="x-small"
-                >
-                  <div class="text-caption">
-                    {{ t('management.orders.status.delivered') }}
-                  </div>
-                </VTimelineItem>
-                <VTimelineItem
-                  v-if="order.status === 'cancelled'"
-                  dot-color="error"
-                  size="x-small"
-                >
-                  <div class="text-caption">
-                    {{ t('management.orders.status.cancelled') }}
-                  </div>
-                </VTimelineItem>
-              </VTimeline>
-            </VCardText>
-          </VCard>
         </VCol>
-
-
 
         <!-- Sidebar -->
         <VCol
@@ -424,19 +343,6 @@ onMounted(() => {
                     {{ order.user.address }}
                   </div>
                 </div>
-                <VBtn
-                  variant="tonal"
-                  color="primary"
-                  size="small"
-                  :to="`/management/users/${order.user._id}`"
-                  class="mt-2"
-                >
-                  <VIcon
-                    icon="tabler-user"
-                    class="me-2"
-                  />
-                  {{ t('management.orders.details.view_customer') }}
-                </VBtn>
               </div>
               <div
                 v-else
@@ -447,67 +353,63 @@ onMounted(() => {
             </VCardText>
           </VCard>
 
-          <!-- Sellpoint Info -->
-          <VCard class="mb-6">
-            <VCardTitle>{{ t('account.orders.sellpoint') }}</VCardTitle>
+          <!-- Order Timeline -->
+          <VCard>
+            <VCardTitle>{{ t('management.orders.details.order_timeline') }}</VCardTitle>
             <VDivider />
             <VCardText>
-              <div
-                v-if="order.sellpoint"
-                class="d-flex flex-column gap-3"
+              <VTimeline
+                side="end"
+                density="compact"
               >
-                <div>
-                  <div class="text-caption text-disabled">
-                    {{ t('management.orders.details.name') }}
-                  </div>
-                  <div class="font-weight-medium">
-                    {{ order.sellpoint.firstName }} {{ order.sellpoint.lastName }}
-                  </div>
-                </div>
-                <div>
-                  <div class="text-caption text-disabled">
-                    {{ t('management.orders.details.phone') }}
-                  </div>
-                  <div class="font-weight-medium">
-                    <a :href="`tel:${order.sellpoint.phone}`">{{ order.sellpoint.phone }}</a>
-                  </div>
-                </div>
-                <div v-if="order.sellpoint.state || order.sellpoint.city">
-                  <div class="text-caption text-disabled">
-                    {{ t('management.orders.details.location') }}
-                  </div>
-                  <div class="font-weight-medium">
-                    {{ displayOrderLocation || t('management.common.value.na') }}
-                  </div>
-                </div>
-                <div v-if="order.sellpoint.address">
-                  <div class="text-caption text-disabled">
-                    {{ t('management.orders.details.address') }}
-                  </div>
-                  <div class="font-weight-medium">
-                    {{ order.sellpoint.address }}
-                  </div>
-                </div>
-                <VBtn
-                  variant="tonal"
-                  color="primary"
-                  size="small"
-                  :to="`/management/users/${order.sellpoint._id}`"
-                  class="mt-2"
+                <VTimelineItem
+                  dot-color="success"
+                  size="x-small"
                 >
-                  <VIcon
-                    icon="tabler-user"
-                    class="me-2"
-                  />
-                  {{ t('management.orders.details.view_sellpoint') }}
-                </VBtn>
-              </div>
-              <div
-                v-else
-                class="text-disabled"
-              >
-                {{ t('management.orders.details.sellpoint_not_available') }}
-              </div>
+                  <div class="text-caption">
+                    {{ t('management.orders.details.timeline.order_placed') }}
+                  </div>
+                  <div class="text-body-2">
+                    {{ formatDate(order.createdAt) }}
+                  </div>
+                </VTimelineItem>
+                <VTimelineItem
+                  v-if="order.status !== 'pending'"
+                  dot-color="info"
+                  size="x-small"
+                >
+                  <div class="text-caption">
+                    {{ t('management.orders.status.confirmed') }}
+                  </div>
+                </VTimelineItem>
+                <VTimelineItem
+                  v-if="['shipped', 'delivered'].includes(order.status)"
+                  dot-color="primary"
+                  size="x-small"
+                >
+                  <div class="text-caption">
+                    {{ t('management.orders.status.shipped') }}
+                  </div>
+                </VTimelineItem>
+                <VTimelineItem
+                  v-if="order.status === 'delivered'"
+                  dot-color="success"
+                  size="x-small"
+                >
+                  <div class="text-caption">
+                    {{ t('management.orders.status.delivered') }}
+                  </div>
+                </VTimelineItem>
+                <VTimelineItem
+                  v-if="order.status === 'cancelled'"
+                  dot-color="error"
+                  size="x-small"
+                >
+                  <div class="text-caption">
+                    {{ t('management.orders.status.cancelled') }}
+                  </div>
+                </VTimelineItem>
+              </VTimeline>
             </VCardText>
           </VCard>
         </VCol>

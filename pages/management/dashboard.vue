@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 definePageMeta({
   authed: true,
@@ -15,20 +15,16 @@ const error = ref('')
 const { t, te, d } = useI18n({ useScope: 'global' })
 
 const stats = ref({
-  totalRevenue: 0,
   totalOrders: 0,
   totalUsers: 0,
   totalProducts: 0,
   pendingOrders: 0,
-  thisMonthRevenue: 0,
-  lastMonthRevenue: 0,
   thisMonthOrders: 0,
   newUsersThisMonth: 0,
 })
 
 const recentOrders = ref([])
 const topProducts = ref([])
-const revenueByMonth = ref([])
 
 const ordersByStatus = ref({
   pending: 0,
@@ -56,7 +52,6 @@ async function fetchDashboard() {
     stats.value = data.stats || stats.value
     recentOrders.value = data.recentOrders || []
     topProducts.value = data.topProducts || []
-    revenueByMonth.value = data.revenueByMonth || []
     ordersByStatus.value = data.ordersByStatus || ordersByStatus.value
   }
   catch (err) {
@@ -73,8 +68,6 @@ onMounted(() => {
 })
 
 // Helpers
-const formatCurrency = val => `${val?.toLocaleString()} DZD`
-
 const formatDate = date => {
   if (!date)
     return t('management.common.value.na')
@@ -115,12 +108,6 @@ const getStatusColor = status => {
   return colors[status] || 'default'
 }
 
-const revenueGrowth = computed(() => {
-  if (!stats.value.lastMonthRevenue)
-    return 0
-
-  return (((stats.value.thisMonthRevenue - stats.value.lastMonthRevenue) / stats.value.lastMonthRevenue) * 100).toFixed(1)
-})
 </script>
 
 <template>
@@ -201,36 +188,7 @@ const revenueGrowth = computed(() => {
         <VCol
           cols="12"
           sm="6"
-          lg="3"
-        >
-          <VCard height="100">
-            <VCardText class="d-flex align-center gap-4">
-              <VAvatar
-                color="primary"
-                variant="tonal"
-                size="48"
-                rounded
-              >
-                <VIcon
-                  icon="tabler-currency-dollar"
-                  size="28"
-                />
-              </VAvatar>
-              <div>
-                <div class="text-caption text-disabled">
-                  {{ t('management.dashboard.stats.total_revenue') }}
-                </div>
-                <div class="text-h5 font-weight-medium">
-                  {{ formatCurrency(stats.totalRevenue) }}
-                </div>
-              </div>
-            </VCardText>
-          </VCard>
-        </VCol>
-        <VCol
-          cols="12"
-          sm="6"
-          lg="3"
+          lg="4"
         >
           <VCard height="100">
             <VCardText class="d-flex align-center gap-4">
@@ -268,7 +226,7 @@ const revenueGrowth = computed(() => {
         <VCol
           cols="12"
           sm="6"
-          lg="3"
+          lg="4"
         >
           <VCard height="100">
             <VCardText class="d-flex align-center gap-4">
@@ -298,7 +256,7 @@ const revenueGrowth = computed(() => {
         <VCol
           cols="12"
           sm="6"
-          lg="3"
+          lg="4"
         >
           <VCard height="100">
             <VCardText class="d-flex align-center gap-4">
@@ -326,85 +284,14 @@ const revenueGrowth = computed(() => {
         </VCol>
       </VRow>
 
-      <!-- Revenue & Orders Overview -->
+      <!-- Orders Overview -->
       <VRow class="mb-6">
-        <VCol
-          cols="12"
-          md="8"
-        >
+        <VCol cols="12">
           <VCard>
-            <VCardTitle class="d-flex align-center justify-space-between">
-              <span>{{ t('management.dashboard.sections.revenue_overview') }}</span>
-              <VChip
-                label
-                size="small"
-                :color="Number(revenueGrowth) >= 0 ? 'success' : 'error'"
-              >
-                <VIcon
-                  :icon="Number(revenueGrowth) >= 0 ? 'tabler-trending-up' : 'tabler-trending-down'"
-                  size="16"
-                  class="me-1"
-                />
-                {{ revenueGrowth }}%
-              </VChip>
-            </VCardTitle>
-            <VDivider />
-            <VCardText>
-              <div class="d-flex gap-6 mb-6">
-                <div>
-                  <div class="text-caption text-disabled">
-                    {{ t('management.dashboard.sections.this_month') }}
-                  </div>
-                  <div class="text-h6 font-weight-medium text-primary">
-                    {{ formatCurrency(stats.thisMonthRevenue) }}
-                  </div>
-                </div>
-                <div>
-                  <div class="text-caption text-disabled">
-                    {{ t('management.dashboard.sections.last_month') }}
-                  </div>
-                  <div class="text-h6 font-weight-medium">
-                    {{ formatCurrency(stats.lastMonthRevenue) }}
-                  </div>
-                </div>
-                <div>
-                  <div class="text-caption text-disabled">
-                    {{ t('management.dashboard.sections.orders_this_month') }}
-                  </div>
-                  <div class="text-h6 font-weight-medium">
-                    {{ stats.thisMonthOrders }}
-                  </div>
-                </div>
-              </div>
-
-              <!-- Simple bar chart representation -->
-              <div class="revenue-chart">
-                <div
-                  v-for="item in revenueByMonth"
-                  :key="item.month"
-                  class="chart-bar-container"
-                >
-                  <div
-                    class="chart-bar bg-primary"
-                    :style="{ height: `${(item.revenue / 500000) * 150}px` }"
-                  />
-                  <div class="chart-label text-caption text-disabled">
-                    {{ item.month }}
-                  </div>
-                </div>
-              </div>
-            </VCardText>
-          </VCard>
-        </VCol>
-        <VCol
-          cols="12"
-          md="4"
-        >
-          <VCard class="h-100">
             <VCardTitle>{{ t('management.dashboard.sections.orders_by_status') }}</VCardTitle>
             <VDivider />
             <VCardText>
-              <div class="d-flex flex-column gap-4">
+              <div class="d-flex flex-wrap gap-4 mb-4">
                 <div
                   v-for="(count, status) in ordersByStatus"
                   :key="status"
@@ -422,6 +309,7 @@ const revenueGrowth = computed(() => {
                     size="small"
                     :color="getStatusColor(status)"
                     variant="tonal"
+                    class="ms-2"
                   >
                     {{ count }}
                   </VChip>
@@ -469,7 +357,6 @@ const revenueGrowth = computed(() => {
                 <tr>
                   <th>{{ t('management.dashboard.table.order') }}</th>
                   <th>{{ t('management.dashboard.table.customer') }}</th>
-                  <th>{{ t('management.dashboard.table.total') }}</th>
                   <th>{{ t('management.dashboard.table.status') }}</th>
                   <th>{{ t('management.dashboard.table.date') }}</th>
                 </tr>
@@ -488,9 +375,6 @@ const revenueGrowth = computed(() => {
                     </NuxtLink>
                   </td>
                   <td>{{ order.user.firstName }} {{ order.user.lastName }}</td>
-                  <td class="font-weight-medium">
-                    {{ formatCurrency(order.total) }}
-                  </td>
                   <td>
                     <VChip
                       label
@@ -552,9 +436,6 @@ const revenueGrowth = computed(() => {
                     {{ product.title }}
                   </VListItemTitle>
                   <VListItemSubtitle>{{ t('management.dashboard.sales', { count: product.sales }) }}</VListItemSubtitle>
-                  <template #append>
-                    <span class="text-primary font-weight-medium">{{ formatCurrency(product.revenue) }}</span>
-                  </template>
                 </VListItem>
               </VList>
             </VCardText>
@@ -566,29 +447,4 @@ const revenueGrowth = computed(() => {
 </template>
 
 <style scoped>
-.revenue-chart {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  height: 180px;
-  gap: 8px;
-}
-
-.chart-bar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-
-.chart-bar {
-  width: 100%;
-  max-width: 40px;
-  border-radius: 4px 4px 0 0;
-  transition: height 0.3s ease;
-}
-
-.chart-label {
-  margin-top: 8px;
-}
 </style>

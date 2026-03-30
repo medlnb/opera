@@ -1,4 +1,5 @@
 <script setup>
+import communes from '@/data/commune.json'
 import { useAuthStore } from '@/stores/auth'
 import { paginationMeta } from '@api-utils/paginationMeta'
 import { useI18n } from 'vue-i18n'
@@ -19,10 +20,33 @@ useHead(() => ({
 
 const headers = [
   { title: t('account.orders.table.items'), key: 'itemsCount', sortable: false },
+  { title: 'Sellpoint', key: 'sellpoint', sortable: false },
   { title: t('account.orders.table.status'), key: 'status' },
-  { title: t('account.orders.table.total'), key: 'total' },
   { title: t('account.orders.table.date'), key: 'createdAt' },
+  { title: t('management.common.table.actions'), key: 'actions', sortable: false, align: 'end' },
 ]
+
+// Location helpers
+const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
+
+function getStateLabel(stateId) {
+  if (!stateId)
+    return null
+  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
+
+  return group ? group[0].name : String(stateId)
+}
+
+function getCityLabel(stateId, cityId) {
+  if (!stateId || !cityId)
+    return null
+  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(stateId))
+  if (!group)
+    return String(cityId)
+  const city = group.find(c => String(c.id) === String(cityId))
+
+  return city ? city.name : String(cityId)
+}
 
 const items = ref([])
 const loading = ref(false)
@@ -150,7 +174,7 @@ function formatDate(d) {
           :items="items"
           :items-length="totalItems"
           :loading="loading"
-          class="text-no-wrap"
+          class=""
         >
           <template #item.itemsCount="{ item }">
             <div class="d-flex align-center gap-3">
@@ -206,8 +230,15 @@ function formatDate(d) {
           <template #item.createdAt="{ item }">
             {{ formatDate(item.createdAt) }}
           </template>
-          <template #item.subtotal="{ item }">
-            {{ item.subtotal }} DZD
+          <template #item.sellpoint="{ item }">
+            <div
+              v-if="item.sellpoint"
+              class="d-flex flex-column gap-1 py-1"
+            >
+              <span><strong>{{ item.sellpoint.phone }}</strong> </span>
+              <span>{{ getStateLabel(item.sellpoint.state) }}, {{ getCityLabel(item.sellpoint.state, item.sellpoint.city) }}</span>
+            </div>
+            <span v-else class="text-disabled">—</span>
           </template>
           <template #item.shippingCost="{ item }">
             {{ item.shippingCost || 0 }} DZD
@@ -225,6 +256,16 @@ function formatDate(d) {
               {{ item.status }}
             </VChip>
           </template>
+
+          <template #item.actions="{ item }">
+            <VBtn
+              icon="tabler-eye"
+              size="small"
+              variant="text"
+              :to="`/account/orders/${item._id}`"
+            />
+          </template>
+
 
           <template #loading>
             <div class="py-8 text-center">

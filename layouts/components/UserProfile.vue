@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.js'
+import { useI18n } from 'vue-i18n'
 
 const authStore = useAuthStore()
 
@@ -8,7 +8,6 @@ const { t } = useI18n({ useScope: 'global' })
 
 const items = [
   { title: 'user.my_orders', to: { name: '/account/orders' }, icon: { icon: 'tabler-shopping-cart' } },
-  { title: 'user.my_deals', to: { name: '/account/deals' }, icon: { icon: 'tabler-file-invoice' } },
   { title: 'user.my_cart', to: { name: '/account/cart' }, icon: { icon: 'tabler-shopping-bag' } },
   { title: 'user.my_favorites', to: { name: '/account/favorites' }, icon: { icon: 'tabler-heart' } },
   { title: 'user.account', to: { name: '/settings/account' }, icon: { icon: 'tabler-user' } },

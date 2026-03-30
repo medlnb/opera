@@ -34,7 +34,7 @@ const scrollToTop = () => {
 
   // To keep button on top of v-layout. E.g. Email app
   z-index: 999;
-  inset-block-end: 5%;
-  inset-inline-end: 25px;
+  inset-block-end: 12%;
+  inset-inline-end: 26px;
 }
 </style>

@@ -1,9 +1,10 @@
 <script setup>
+import communes from '@/data/commune.json'
+import { useAuthStore } from '@/stores/auth'
+import { paginationMeta } from '@api-utils/paginationMeta'
 import { debounce } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
-import { paginationMeta } from '@api-utils/paginationMeta'
-import { useAuthStore } from '@/stores/auth'
 
 definePageMeta({
   authed: true,
@@ -36,13 +37,13 @@ const showSnackbar = (message, color = 'success') => {
 const page = ref(1)
 const itemsPerPage = ref(10)
 const search = ref('')
-const bannedFilter = ref('all')
+const roleFilter = ref('all')
 
 // Filter options
-const bannedOptions = computed(() => [
+const roleOptions = computed(() => [
   { title: t('management.users.filters.banned.all'), value: 'all' },
-  { title: t('management.users.status.active'), value: 'false' },
-  { title: t('management.users.status.banned'), value: 'true' },
+  { title: t('account.orders.sellpoint'), value: 'sellpoint' },
+  { title: t('nav.management.users'), value: 'user' },
 ])
 
 // Table headers
@@ -67,8 +68,8 @@ const fetchUsers = async () => {
     if (search.value.trim())
       params.append('search', search.value.trim())
 
-    if (bannedFilter.value !== 'all')
-      params.append('banned', bannedFilter.value)
+    if (roleFilter.value !== 'all')
+      params.append('role', roleFilter.value)
 
     const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users?${params}`, {
       headers: {
@@ -236,7 +237,7 @@ watch(itemsPerPage, () => {
   fetchUsers()
 })
 
-watch(bannedFilter, () => {
+watch(roleFilter, () => {
   page.value = 1
   fetchUsers()
 })
@@ -249,6 +250,99 @@ watch(search, () => {
 onMounted(() => {
   fetchUsers()
 })
+
+// ── Create Sellpoint ──────────────────────────────────────────
+const createLoading = ref(false)
+const createFormRef = ref(null)
+
+const createForm = ref({
+  phone: '',
+  password: '',
+  firstName: '',
+  lastName: '',
+  address: '',
+  state: '',
+  city: '',
+  location: '',
+})
+
+const createFormErrors = ref({})
+
+const wilayaGroups = (communes || []).filter(g => Array.isArray(g) && g.length)
+
+const createStateOptions = computed(() =>
+  wilayaGroups.map(g => ({ id: String(g[0].wilaya_id), label: g[0].name })),
+)
+
+const createCityOptions = computed(() => {
+  if (!createForm.value.state)
+    return []
+  const group = wilayaGroups.find(g => String(g[0].wilaya_id) === String(createForm.value.state))
+
+  return group ? group.map(c => ({ id: String(c.id), label: c.name })) : []
+})
+
+watch(() => createForm.value.state, () => {
+  createForm.value.city = ''
+})
+
+const resetCreateForm = () => {
+  createForm.value = {
+    phone: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    address: '',
+    state: '1',
+    city: '1',
+    location: '',
+  }
+  createFormErrors.value = {}
+  nextTick(() => {
+    createFormRef.value?.reset()
+    createFormRef.value?.resetValidation()
+  })
+}
+
+const submitCreateSellpoint = async () => {
+  createFormErrors.value = {}
+  createLoading.value = true
+  try {
+    const res = await fetch(`${config.public.apiBaseUrl}/api/admin/users/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: `+213${createForm.value.phone.trim()}`,
+        password: createForm.value.password,
+        firstName: createForm.value.firstName.trim(),
+        lastName: createForm.value.lastName.trim(),
+        address: createForm.value.address.trim(),
+        state: createForm.value.state,
+        city: createForm.value.city,
+        role: 'sellpoint',
+        location: createForm.value.location.trim(),
+      }),
+    })
+
+    const data = await res.json()
+
+    if (res.ok || res.status === 201) {
+      showSnackbar(t('management.users.create_sellpoint.snackbar.success'), 'success')
+      resetCreateForm()
+      await fetchUsers()
+    }
+    else {
+      showSnackbar(data.message || t('management.users.create_sellpoint.snackbar.failed'), 'error')
+    }
+  }
+  catch (err) {
+    console.error('Failed to create sellpoint:', err)
+    showSnackbar(t('management.users.create_sellpoint.snackbar.failed'), 'error')
+  }
+  finally {
+    createLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -274,8 +368,8 @@ onMounted(() => {
           </VTextField>
 
           <VSelect
-            v-model="bannedFilter"
-            :items="bannedOptions"
+            v-model="roleFilter"
+            :items="roleOptions"
             :label="t('management.common.status')"
             density="compact"
             style="min-inline-size: 150px;"
@@ -418,6 +512,134 @@ onMounted(() => {
           </div>
         </template>
       </VDataTableServer>
+    </VCard>
+
+    <!-- Create Sellpoint Card -->
+    <VCard
+      :title="t('management.users.create_sellpoint.title')"
+      class="mt-6"
+    >
+      <VDivider class="my-4" />
+      <VCardText>
+        <VForm ref="createFormRef">
+          <VRow>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="createForm.firstName"
+                :label="t('management.users.create_sellpoint.first_name')"
+                :rules="[v => !!v || t('management.common.required')]"
+                required
+              />
+            </VCol>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="createForm.lastName"
+                :label="t('management.users.create_sellpoint.last_name')"
+                :rules="[v => !!v || t('management.common.required')]"
+                required
+              />
+            </VCol>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <AppTextField
+                v-model="createForm.phone"
+                placeholder="XXXXXXXXX"
+                maxlength="9"
+                :rules="[v => !!v || t('management.common.required')]"
+                dir="ltr"
+                @input="createForm.phone = createForm.phone.replace(/\D/g, '')"
+              >
+                <template #prepend-inner>
+                  <p
+                    class="mb-0"
+                    style="margin-block-start: 1px;"
+                  >
+                    +213
+                  </p>
+                </template>
+              </AppTextField>
+            </VCol>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VTextField
+                v-model="createForm.password"
+                :label="t('management.users.create_sellpoint.password')"
+                type="password"
+                :rules="[v => !!v || t('management.common.required'), v => v.length >= 6 || t('management.users.create_sellpoint.password_min')]"
+                required
+              />
+            </VCol>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VSelect
+                v-model="createForm.state"
+                :items="createStateOptions"
+                item-title="label"
+                item-value="id"
+                :label="t('management.users.create_sellpoint.wilaya')"
+                :rules="[v => !!v || t('management.common.required')]"
+                required
+              />
+            </VCol>
+            <VCol
+              cols="12"
+              md="6"
+            >
+              <VSelect
+                v-model="createForm.city"
+                :items="createCityOptions"
+                item-title="label"
+                item-value="id"
+                :label="t('management.users.create_sellpoint.city')"
+                :disabled="!createForm.state"
+                :rules="[v => !!v || t('management.common.required')]"
+                required
+              />
+            </VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="createForm.address"
+                :label="t('management.users.create_sellpoint.address')"
+                :rules="[v => !!v || t('management.common.required')]"
+                required
+              />
+            </VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="createForm.location"
+                :label="t('management.users.create_sellpoint.location')"
+                placeholder="e.g. 36.737232,3.086472"
+              />
+            </VCol>
+            <VCol cols="12">
+              <div class="d-flex justify-end">
+                <VSpacer />
+                <VBtn
+                  color="primary"
+                  variant="flat"
+                  prepend-icon="tabler-user-plus"
+                  :loading="createLoading"
+                  @click="submitCreateSellpoint"
+                >
+                  {{ t('management.users.create_sellpoint.submit') }}
+                </VBtn>
+              </div>
+            </VCol>
+          </VRow>
+        </VForm>
+      </VCardText>
     </VCard>
 
     <!-- Ban/Unban Dialog -->

@@ -8,7 +8,6 @@ const props = defineProps({
   avatar: { type: String, default: '' },
   title: { type: String, required: true },
   description: { type: String, required: true },
-  price: { type: Number, required: true },
   destination: { type: null },
   isFavorite: { type: Boolean, default: false },
 })
@@ -105,10 +104,6 @@ async function toggleFavorite() {
         <VCardItem class="px-3 pb-0 pt-3">
           <VCardTitle>{{ title }}</VCardTitle>
         </VCardItem>
-
-        <VCardText class="text-subtitle-4 px-3 pb-2">
-          <span class="font-weight-bold">{{ price }}</span> Dzd
-        </VCardText>
 
         <VCardText class="px-3 pb-2">
           {{ description }}

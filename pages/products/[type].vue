@@ -115,8 +115,6 @@ const fetchData = async () => {
   if (route.query.supports)
     params.set('supports', route.query.supports.toString())
 
-  // price filters removed
-
   const res = await fetch(`${config.public.apiBaseUrl}/api/products?${params.toString()}`, { headers })
   const data = await res.json()
 
@@ -124,7 +122,6 @@ const fetchData = async () => {
     ...ele,
     finishing: ele.aspectdifilmsec,
     description: ele.definition,
-    price: ele.variances[0].price,
     imgSrc: ele.imageUrl,
     avatar: ele.avatar || '',
     isFavorite: ele.isFavorite || false,
@@ -221,7 +218,6 @@ const resetFilters = async () => {
           :avatar="product.avatar"
           :title="product.title"
           :description="product.description"
-          :price="product.price"
           :destination="product.destination"
           :is-favorite="product.isFavorite"
           @toggle-favorite="handleToggleFavorite"
