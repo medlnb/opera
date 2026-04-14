@@ -50,7 +50,6 @@ const submit = async () => {
       throw new Error(msg || t('auth.errors.login_failed'))
     }
     const data = await res.json()
-    console.log(data)
     if (data?.token)
       authStore.setToken(data.token)
     if (data?.user)

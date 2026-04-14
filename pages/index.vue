@@ -88,10 +88,6 @@ function productTypeLabel(type) {
   return te(key) ? t(key) : String(type)
 }
 
-// Painters section
-const paintersLoading = ref(false)
-const featuredPainters = ref([])
-
 // Homepage products preview
 const featuredProductsLoading = ref(true)
 const featuredProducts = ref([])
@@ -143,29 +139,6 @@ async function fetchHomepageCatalog() {
   }
 }
 
-async function fetchFeaturedPainters() {
-  try {
-    paintersLoading.value = true
-
-    const { data, error } = await useApi('/api/painters', {
-      query: { available: 'true' },
-    })
-
-    if (error.value)
-      throw error.value
-
-    const list = data.value?.data ?? []
-
-    featuredPainters.value = Array.isArray(list) ? list.slice(0, 3) : []
-  }
-  catch {
-    featuredPainters.value = []
-  }
-  finally {
-    paintersLoading.value = false
-  }
-}
-
 async function fetchFeaturedProducts() {
   try {
     featuredProductsLoading.value = true
@@ -208,26 +181,6 @@ async function fetchFeaturedProducts() {
   }
 }
 
-const painterDisplayName = painter => {
-  const user = painter?.user
-  const first = user?.firstName
-  const last = user?.lastName
-
-  if (first || last)
-    return `${first ?? ''} ${last ?? ''}`.trim()
-
-  return user?.name || t('common.unnamed')
-}
-
-const painterLocationLabel = painter => {
-  if (painter?.city && painter?.state)
-    return `${painter.city} • ${painter.state}`
-
-  return painter?.city || painter?.state || '—'
-}
-
-const painterIsAvailable = painter => painter?.available !== false
-
 const virtualPainterImages = [roomImg1, roomImg2, roomImg4]
 
 const productThumbSrc = product => {
@@ -240,7 +193,6 @@ const productThumbSrc = product => {
 
 onMounted(() => {
   fetchHeroColors()
-  fetchFeaturedPainters()
   fetchHomepageCatalog()
   fetchFeaturedProducts()
 })
@@ -290,6 +242,110 @@ onMounted(() => {
     </VCard>
 
     <VContainer class="home-content px-0">
+      <!-- Color of the Year 2026 (banner) -->
+
+      <!-- Colors Preview Section -->
+      <section class="home-section mt-0">
+        <VCard
+          class="colors-showcase bg-background"
+          flat
+        >
+          <!-- <div class="colors-showcase__bg" /> -->
+
+          <section class="home-section home-section--compact mb-4 mt-0">
+            <VCard
+              class="coty-banner"
+              variant="flat"
+            >
+              <VCardText class="d-flex flex-wrap align-center justify-space-between gap-4 pa-4 pa-md-5">
+                <div class="d-flex align-center gap-4">
+                  <VImg
+                    :src="logoImg"
+                    height="36"
+                    width="110"
+                    class="coty-logo"
+                    alt="Opera"
+                  />
+                  <div>
+                    <div class="text-caption text-medium-emphasis">
+                      {{ t('home.coty.kicker') }}
+                    </div>
+                    <div class="text-h6 text-md-h5 font-weight-bold">
+                      {{ t('home.coty.title') }}
+                    </div>
+                  </div>
+                </div>
+
+                <VBtn
+                  color="primary"
+                  variant="flat"
+                  to="/colors"
+                >
+                  {{ t('home.coty.cta') }}
+                  <VIcon
+                    icon="tabler-arrow-right"
+                    class="ms-2"
+                  />
+                </VBtn>
+              </VCardText>
+            </VCard>
+          </section>
+      
+
+          <VCardText class="position-relative pa-0 mt-0">
+            <VSlideGroup show-arrows>
+              <template v-if="heroColorsLoading">
+                <VSlideGroupItem
+                  v-for="i in 2"
+                  :key="i"
+                >
+                  <VCard
+                    class="color-tile color-tile--loading"
+                    variant="outlined"
+                  >
+                    <div class="color-tile__swatch color-tile__swatch--loading" />
+
+                    <VCardText class="pt-0 pb-4 px-4">
+                      <div class="color-tile__line color-tile__line--title" />
+                    </VCardText>
+                  </VCard>
+                </VSlideGroupItem>
+              </template>
+
+              <VSlideGroupItem
+                v-for="(c, i) in heroColors"
+                :key="i"
+              >
+                <VCard
+                  hover
+                  variant="outlined"
+                  class="color-tile"
+                  to="/colors"
+                >
+                  <div
+                    class="color-tile__swatch "
+                    :style="{ backgroundColor: `#${c.code}` }"
+                  >
+                    <div class="color-tile__code">
+                      {{ c?.code ? `#${String(c.code).toUpperCase()}` : '—' }}
+                    </div>
+                  </div>
+
+                  <VCardText class="pt-1 pb-4 px-4 bg-background">
+                    <div class="text-subtitle-2 font-weight-medium text-truncate">
+                      {{ c?.name || t('common.unnamed') }}
+                    </div>
+                    <div class="text-caption text-medium-emphasis">
+                      {{ t('home.hero.view_colors') }}
+                    </div>
+                  </VCardText>
+                </VCard>
+              </VSlideGroupItem>
+            </VSlideGroup>
+          </VCardText>
+        </VCard>
+      </section>
+
       <!-- Product Types Section -->
       <section class="home-section">
         <VRow>
@@ -467,46 +523,6 @@ onMounted(() => {
         </VCard>
       </section>
 
-      <!-- Color of the Year 2026 (banner) -->
-      <section class="home-section home-section--compact">
-        <VCard
-          class="coty-banner"
-          variant="flat"
-        >
-          <VCardText class="d-flex flex-wrap align-center justify-space-between gap-4 pa-4 pa-md-5">
-            <div class="d-flex align-center gap-4">
-              <VImg
-                :src="logoImg"
-                height="36"
-                width="110"
-                class="coty-logo"
-                alt="Opera"
-              />
-              <div>
-                <div class="text-caption text-medium-emphasis">
-                  {{ t('home.coty.kicker') }}
-                </div>
-                <div class="text-h6 text-md-h5 font-weight-bold">
-                  {{ t('home.coty.title') }}
-                </div>
-              </div>
-            </div>
-
-            <VBtn
-              color="primary"
-              variant="flat"
-              to="/colors"
-            >
-              {{ t('home.coty.cta') }}
-              <VIcon
-                icon="tabler-arrow-right"
-                class="ms-2"
-              />
-            </VBtn>
-          </VCardText>
-        </VCard>
-      </section>
-
       <!-- Studio Color Section -->
       <section class="home-section">
         <VCard
@@ -603,91 +619,6 @@ onMounted(() => {
         </VCard>
       </section>
 
-      <!-- Colors Preview Section -->
-      <section class="home-section">
-        <VCard
-          class="colors-showcase"
-          variant="flat"
-        >
-          <div class="colors-showcase__bg" />
-
-          <VCardText class="pa-6 pa-md-8 position-relative">
-            <div class="d-flex flex-wrap align-center justify-space-between gap-4">
-              <div>
-                <h2 class="text-h5 font-weight-bold mb-0">
-                  {{ t('home.trend_colors_title') }}
-                </h2>
-              </div>
-
-              <VBtn
-                variant="text"
-                color="primary"
-                to="/colors"
-              >
-                {{ t('home.view_more_colors') }}
-                <VIcon
-                  icon="tabler-arrow-right"
-                  class="ms-2"
-                />
-              </VBtn>
-            </div>
-
-            <VSlideGroup
-              class="mt-5"
-              show-arrows
-            >
-              <template v-if="heroColorsLoading">
-                <VSlideGroupItem
-                  v-for="i in 2"
-                  :key="i"
-                >
-                  <VCard
-                    class="color-tile color-tile--loading"
-                    variant="outlined"
-                  >
-                    <div class="color-tile__swatch color-tile__swatch--loading" />
-
-                    <VCardText class="pt-0 pb-4 px-4">
-                      <div class="color-tile__line color-tile__line--title" />
-                    </VCardText>
-                  </VCard>
-                </VSlideGroupItem>
-              </template>
-
-              <VSlideGroupItem
-                v-for="(c, i) in heroColors"
-                :key="i"
-              >
-                <VCard
-                  hover
-                  variant="outlined"
-                  class="color-tile"
-                  to="/colors"
-                >
-                  <div
-                    class="color-tile__swatch"
-                    :style="{ backgroundColor: c?.code ? `#${c.code}` : 'transparent' }"
-                  >
-                    <div class="color-tile__code">
-                      {{ c?.code ? `#${String(c.code).toUpperCase()}` : '—' }}
-                    </div>
-                  </div>
-
-                  <VCardText class="pt-0 pb-4 px-4">
-                    <div class="text-subtitle-2 font-weight-medium text-truncate">
-                      {{ c?.name || t('common.unnamed') }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      {{ t('home.hero.view_colors') }}
-                    </div>
-                  </VCardText>
-                </VCard>
-              </VSlideGroupItem>
-            </VSlideGroup>
-          </VCardText>
-        </VCard>
-      </section>
-
       <!-- Catalog Section -->
       <section class="home-section">
         <VCard
@@ -743,136 +674,6 @@ onMounted(() => {
                 />
                 {{ t('home.catalog_pdf.updated_at') }}: {{ new Date(homepageCatalog.updatedAt).toLocaleDateString() }}
               </VChip>
-            </div>
-          </VCardText>
-        </VCard>
-      </section>
-
-      <!-- Painters Section -->
-      <section class="home-section">
-        <VCard
-          class="painters-section"
-          variant="tonal"
-        >
-          <VCardText class="pa-6 pa-md-8">
-            <div class="d-flex align-center justify-space-between gap-4 mb-4">
-              <div>
-                <div class="text-overline text-primary mb-1">
-                  {{ t('home.painters.overline') }}
-                </div>
-                <h2 class="text-h5 font-weight-bold mb-0">
-                  {{ t('home.painters.title') }}
-                </h2>
-              </div>
-              <VBtn
-                variant="text"
-                color="primary"
-                to="/painters"
-              >
-                {{ t('home.painters.view_all') }}
-                <VIcon
-                  icon="tabler-arrow-right"
-                  class="ms-2"
-                />
-              </VBtn>
-            </div>
-
-            <p class="text-body-2 text-medium-emphasis mb-6">
-              {{ t('home.painters.description') }}
-            </p>
-
-            <VRow v-if="paintersLoading">
-              <VCol
-                v-for="i in 3"
-                :key="i"
-                cols="12"
-                sm="4"
-              >
-                <VCard
-                  variant="outlined"
-                  class="painter-card"
-                >
-                  <VCardText class="pa-4">
-                    <VSkeletonLoader type="list-item-avatar, text, text" />
-                  </VCardText>
-                </VCard>
-              </VCol>
-            </VRow>
-
-            <VRow v-else-if="featuredPainters.length">
-              <VCol
-                v-for="painter in featuredPainters"
-                :key="painter._id"
-                cols="12"
-                sm="4"
-              >
-                <VCard
-                  hover
-                  variant="outlined"
-                  class="painter-card h-100"
-                  to="/painters"
-                >
-                  <VCardText class="pa-4">
-                    <div class="d-flex align-center gap-3 mb-3">
-                      <VAvatar
-                        :color="painterIsAvailable(painter) ? 'success' : 'grey'"
-                        size="48"
-                      >
-                        <VIcon
-                          icon="tabler-user"
-                          size="24"
-                        />
-                      </VAvatar>
-                      <div class="flex-grow-1">
-                        <div class="text-subtitle-1 font-weight-medium">
-                          {{ painterDisplayName(painter) }}
-                        </div>
-                        <div class="text-caption text-medium-emphasis">
-                          <VIcon
-                            icon="tabler-map-pin"
-                            size="14"
-                            class="me-1"
-                          />
-                          {{ painterLocationLabel(painter) }}
-                        </div>
-                      </div>
-                      <VChip
-                        v-if="painterIsAvailable(painter)"
-                        color="success"
-                        size="small"
-                        variant="tonal"
-                      >
-                        {{ t('home.painters.available') }}
-                      </VChip>
-                    </div>
-                    <div
-                      v-if="painter.experience"
-                      class="text-body-2 text-medium-emphasis"
-                    >
-                      <VIcon
-                        icon="tabler-briefcase"
-                        size="14"
-                        class="me-1"
-                      />
-                      {{ painter.experience }} {{ t('home.painters.years_exp') }}
-                    </div>
-                  </VCardText>
-                </VCard>
-              </VCol>
-            </VRow>
-
-            <div
-              v-else
-              class="text-center py-6"
-            >
-              <VIcon
-                icon="tabler-users"
-                size="48"
-                class="text-medium-emphasis mb-2"
-              />
-              <p class="text-body-2 text-medium-emphasis">
-                {{ t('home.painters.no_painters') }}
-              </p>
             </div>
           </VCardText>
         </VCard>
@@ -1476,11 +1277,10 @@ onMounted(() => {
 }
 
 .color-tile {
-  inline-size: 190px;
+  inline-size: 250px;
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
-  background: rgb(var(--v-theme-surface));
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -1497,14 +1297,13 @@ onMounted(() => {
 
 .color-tile__swatch {
   position: relative;
-  margin: 12px;
   border-radius: 16px;
-  block-size: 92px;
+  block-size: 180px;
   border: 1px solid rgb(var(--v-theme-on-surface) / 10%);
   overflow: hidden;
 }
 
-.color-tile__swatch::after {
+/* .color-tile__swatch::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1518,7 +1317,7 @@ onMounted(() => {
   background:
     linear-gradient(135deg, rgb(255 255 255 / 14%) 0%, transparent 62%),
     radial-gradient(circle at 20% 30%, rgb(255 255 255 / 12%) 0%, transparent 42%);
-}
+} */
 
 .color-tile__code {
   position: absolute;

@@ -49,9 +49,9 @@ export function useNavItems() {
         icon: { icon: 'tabler-brush' },
       },
       {
-        to: { name: 'painters' },
         title: 'nav.painters',
         icon: { icon: 'tabler-users' },
+        href: 'https://play.google.com/store/apps/details?id=com.cliquez.operapeinture'
       },
       {
         to: { name: 'contact' },

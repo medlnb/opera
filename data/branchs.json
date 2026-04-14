@@ -1,380 +1,422 @@
 [
   {
-    "city": "Aflou",
-    "lat": 34.115307,
-    "lng": 2.0965369,
-    "phones": [
-      "+213 662 60 36 49"
-    ]
-  },
-  {
-    "city": "Ain M'Lila",
-    "lat": 36.030663,
-    "lng": 6.576838,
-    "phones": [
-      "+213 661 21 90 36"
-    ]
-  },
-  {
-    "city": "Ain Touta",
-    "lat": 35.37188,
-    "lng": 5.904076,
-    "phones": [
-      "+213 773 79 74 73"
-    ]
-  },
-  {
-    "city": "Akbou",
-    "lat": 36.535202,
-    "lng": 4.605323,
-    "phones": [
-      "+213 775 11 09 25"
-    ]
-  },
-  {
-    "city": "Annaba",
-    "lat": 36.895184,
-    "lng": 7.750899,
-    "phones": [
-      "+213 780 52 41 14"
-    ]
-  },
-  {
-    "city": "Ain Beida",
-    "lat": 35.79815,
-    "lng": 7.383397,
-    "phones": [
-      "+213 550 23 03 94"
-    ]
-  },
-  {
-    "city": "Ain Fakroun",
-    "lat": 35.971546,
-    "lng": 6.873553,
-    "phones": [
-      "+213 555 11 93 54"
-    ]
-  },
-  {
-    "city": "Ain Kercha",
-    "lat": 35.922913,
-    "lng": 6.692882,
-    "phones": [
-      "+213 770 40 82 37"
-    ]
-  },
-  {
-    "city": "Baraki, Alger",
-    "lat": 36.6692,
-    "lng": 3.0930912,
-    "phones": [
-      "+213 557 36 88 78"
-    ]
-  },
-  {
-    "city": "Barika",
-    "lat": 35.3878,
-    "lng": 5.372101,
-    "phones": [
-      "+213 660 74 88 97"
-    ]
-  },
-  {
     "city": "Batna",
-    "lat": 35.537556,
-    "lng": 6.136004,
-    "phones": [
-      "+213 773 88 47 67",
-      "+213 551 12 63 61"
-    ]
-  },
-  {
-    "city": "Biskra",
-    "lat": 34.84508,
-    "lng": 5.724549,
-    "phones": [
-      "+213 770 74 25 33"
-    ]
-  },
-  {
-    "city": "Bou Saada",
-    "lat": 35.207497,
-    "lng": 4.1725,
-    "phones": [
-      "+213 656 28 10 16"
-    ]
-  },
-  {
-    "city": "Bechar",
-    "lat": 31.628933,
-    "lng": -2.200489,
-    "phones": [
-      "+213 662 56 03 03"
-    ]
-  },
-  {
-    "city": "Bejaia",
-    "lat": 36.755695,
-    "lng": 5.04152,
-    "phones": [
-      "+213 661 66 71 47"
-    ]
-  },
-  {
-    "city": "Chechar",
-    "lat": 35.03954,
-    "lng": 7.00108,
-    "phones": [
-      "+213 662 31 48 88"
-    ]
-  },
-  {
-    "city": "Collo",
-    "lat": 36.98724,
-    "lng": 6.559874,
-    "phones": [
-      "+213 552 96 63 91"
-    ]
-  },
-  {
-    "city": "Constantine",
-    "lat": 36.35409,
-    "lng": 6.632472,
-    "phones": [
-      "+213 770 75 27 86"
-    ]
-  },
-  {
-    "city": "Djelfa",
-    "lat": 34.663956,
-    "lng": 3.26028,
-    "phones": [
-      "+213 660 51 09 05"
-    ]
-  },
-  {
-    "city": "Echatt",
-    "lat": 36.82934,
-    "lng": 7.86791,
-    "phones": [
-      "+213 675 20 82 04"
-    ]
-  },
-  {
-    "city": "El Bayadh",
-    "lat": 33.674362,
-    "lng": 1.0260338,
-    "phones": [
-      "+213 554 68 89 96"
-    ]
-  },
-  {
-    "city": "El Omaria",
-    "lat": 36.266525,
-    "lng": 3.02589,
-    "phones": [
-      "+213 780 63 02 64"
-    ]
-  },
-  {
-    "city": "Fkirina",
-    "lat": 35.660934,
-    "lng": 7.295573,
-    "phones": [
-      "+213 671 29 37 75"
-    ]
-  },
-  {
-    "city": "Ghardaia",
-    "lat": 32.49609,
-    "lng": 3.6363847,
-    "phones": [
-      "+213 699 47 70 66"
-    ]
+    "state": "Batna",
+    "location": "G445+275",
+    "phone": "551126361"
   },
   {
     "city": "Guelma",
-    "lat": 36.470222,
-    "lng": 7.4128113,
-    "phones": [
-      "+213 670 00 92 72"
-    ]
+    "state": "Guelma",
+    "location": "FCC8+246",
+    "phone": "670009272"
   },
   {
-    "city": "Jijel",
-    "lat": 36.812717,
-    "lng": 5.751147,
-    "phones": [
-      "+213 556 94 14 08"
-    ]
+    "city": "Bordj Bou Arreridj",
+    "state": "Bordj Bou Arreridj",
+    "location": "3PFW+RP2",
+    "phone": "549057176"
   },
   {
-    "city": "Kais",
-    "lat": 35.492916,
-    "lng": 6.92628,
-    "phones": [
-      "+213 790 35 69 29"
-    ]
-  },
-  {
-    "city": "Khenchela",
-    "lat": 35.425632,
-    "lng": 7.155086,
-    "phones": [
-      "+213 662 43 28 04"
-    ]
-  },
-  {
-    "city": "Khmis miliana",
-    "lat": 36.258205,
-    "lng": 2.227526,
-    "phones": [
-      "+213 790 23 17 15"
-    ]
-  },
-  {
-    "city": "Laghouat",
-    "lat": 33.819733,
-    "lng": 2.864939,
-    "phones": [
-      "+213 699 47 70 20"
-    ]
-  },
-  {
-    "city": "Mila",
-    "lat": 33.819733,
-    "lng": 2.864939,
-    "phones": [
-      "+213 670 37 67 68"
-    ]
-  },
-  {
-    "city": "Mostaganem",
-    "lat": 35.931526,
-    "lng": 0.1023719,
-    "phones": [
-      "+213 541 33 11 12"
-    ]
-  },
-  {
-    "city": "N'Gaous",
-    "lat": 35.551006,
-    "lng": 5.615008,
-    "phones": [
-      "+213 775 73 17 35"
-    ]
-  },
-  {
-    "city": "Oran",
-    "lat": 35.687794,
-    "lng": -0.621476,
-    "phones": [
-      "+213 770 26 77 28"
-    ]
-  },
-  {
-    "city": "Ouargla",
-    "lat": 31.959415,
-    "lng": 5.324775,
-    "phones": [
-      "+213 671 38 45 29"
-    ]
-  },
-  {
-    "city": "Oum el Bouaghi",
-    "lat": 35.871223,
-    "lng": 7.122901,
-    "phones": [
-      "+213 661 28 66 90"
-    ]
-  },
-  {
-    "city": "Sidi Okba",
-    "lat": 34.754745,
-    "lng": 5.907103,
-    "phones": [
-      "+213 671 20 78 60"
-    ]
-  },
-  {
-    "city": "Skikda",
-    "lat": 36.870285,
-    "lng": 6.895018,
-    "phones": [
-      "+213 770 44 17 49"
-    ]
-  },
-  {
-    "city": "Sougueur",
-    "lat": 35.1889,
-    "lng": 1.492147,
-    "phones": [
-      "+213 661 49 81 30"
-    ]
-  },
-  {
-    "city": "Sedrata",
-    "lat": 36.128765,
-    "lng": 7.534685,
-    "phones": [
-      "+213 550 23 03 94"
-    ]
+    "city": "Ain Defla",
+    "state": "Ain Defla",
+    "location": "7X34+94",
+    "phone": "550843807"
   },
   {
     "city": "Tebessa",
-    "lat": 35.415188,
-    "lng": 8.133195,
-    "phones": [
-      "+213 670 26 98 72"
-    ]
+    "state": "Tebessa",
+    "location": "C48P+35C",
+    "phone": "770728284"
+  },
+  {
+    "city": "Salah Bouchaour",
+    "state": "Skikda",
+    "location": "PV45+9VV",
+    "phone": "770133820"
+  },
+  {
+    "city": "El Eulma",
+    "state": "Setif",
+    "location": "5M9M+9CJ",
+    "phone": "542877180"
   },
   {
     "city": "Tiaret",
-    "lat": 35.348,
-    "lng": 1.329708,
-    "phones": [
-      "+213 782 44 64 97"
-    ]
+    "state": "Tiaret",
+    "location": "88XH+6VM",
+    "phone": "661498130"
+  },
+  {
+    "city": "Sougueur",
+    "state": "Tiaret",
+    "location": "5FQR+HV7",
+    "phone": "661498130"
+  },
+  {
+    "city": "Ain Azel",
+    "state": "Setif",
+    "location": "RGC5+WV6",
+    "phone": "775759330"
+  },
+  {
+    "city": "Tighennif",
+    "state": "Mascara",
+    "location": "C88P+327",
+    "phone": "673828664"
+  },
+  {
+    "city": "Belaiba",
+    "state": "M'sila",
+    "location": "G5J2+HX",
+    "phone": "660458908"
+  },
+  {
+    "city": "El Tarf",
+    "state": "El Tarf",
+    "location": "Q87V+6WX",
+    "phone": "559578599"
+  },
+  {
+    "city": "Biskra",
+    "state": "Biskra",
+    "location": "RPWF+2RM",
+    "phone": "770742533"
+  },
+  {
+    "city": "El Grarem",
+    "state": "Mila",
+    "location": "G86G+MJ",
+    "phone": "670376768"
+  },
+  {
+    "city": "Tazoult",
+    "state": "Batna",
+    "location": "F6PW+8J4",
+    "phone": "671665783"
+  },
+  {
+    "city": "Magra",
+    "state": "M'sila",
+    "location": "J37X+M52",
+    "phone": "662691381"
+  },
+  {
+    "city": "Djelfa",
+    "state": "Djelfa",
+    "location": "M775+GW9",
+    "phone": "660510905"
+  },
+  {
+    "city": "Constantine",
+    "state": "Constantine",
+    "location": "7H2M+GV6",
+    "phone": "667344944"
+  },
+  {
+    "city": "Hassi Bahbah",
+    "state": "Djelfa",
+    "location": "32JM+C74",
+    "phone": "664326980"
+  },
+  {
+    "city": "Bou Saada",
+    "state": "M'sila",
+    "location": "655F+G98",
+    "phone": "776236661"
+  },
+  {
+    "city": "Touggourt",
+    "state": "Ouargla",
+    "location": "32VW+X9J",
+    "phone": "699076783"
+  },
+  {
+    "city": "Ain Kercha",
+    "state": "Oum El Bouaghi",
+    "location": "WMCV+HH",
+    "phone": "775877133"
+  },
+  {
+    "city": "Chechar",
+    "state": "Khenchela",
+    "location": "22Q4+J8",
+    "phone": "662314888"
+  },
+  {
+    "city": "Ain Beida",
+    "state": "Oum El Bouaghi",
+    "location": "Q9WH+GW2",
+    "phone": "550230394"
+  },
+  {
+    "city": "Oran",
+    "state": "Oran",
+    "location": "M9QH+4C6",
+    "phone": "770184434"
+  },
+  {
+    "city": "Ain Touta",
+    "state": "Batna",
+    "location": "9WC3+QJ",
+    "phone": "773797473"
+  },
+  {
+    "city": "Ain Dheb",
+    "state": "Tiaret",
+    "location": "RGVX+8JV",
+    "phone": "780368630"
+  },
+  {
+    "city": "Ain Fakroun",
+    "state": "Oum El Bouaghi",
+    "location": "XVCF+JCF",
+    "phone": "661265932"
+  },
+  {
+    "city": "Khenchela",
+    "state": "Khenchela",
+    "location": "C46R+JPM",
+    "phone": "671293775"
   },
   {
     "city": "Tindouf",
-    "lat": 27.680164,
-    "lng": -8.131107,
-    "phones": [
-      "+213 49 38 22 98",
-      "+213 671 33 12 32"
-    ]
+    "state": "Tindouf",
+    "location": "27.68016,-8.13106",
+    "phone": "657616648"
   },
   {
-    "city": "Tizi Ouzou",
-    "lat": 36.70382,
-    "lng": 4.038652,
-    "phones": [
-      "+213 554 81 78 13"
-    ]
+    "city": "Jijel",
+    "state": "Jijel",
+    "location": "RP7Q+PQ2",
+    "phone": "661915806"
   },
   {
-    "city": "Tlemcene",
-    "lat": 34.8794,
-    "lng": -1.3384329,
-    "phones": [
-      "+213 661 32 72 21"
-    ]
+    "city": "Sedrata",
+    "state": "Souk Ahras",
+    "location": "4GHM+GR9",
+    "phone": "663834764"
+  },
+  {
+    "city": "Barika",
+    "state": "Batna",
+    "location": "99V5+G58",
+    "phone": "660748897"
   },
   {
     "city": "Tolga",
-    "lat": 34.728302,
-    "lng": 5.40033,
-    "phones": [
-      "+213 661 37 72 76"
-    ]
+    "state": "Biskra",
+    "location": "P9HQ+JQM",
+    "phone": "553760966"
   },
   {
-    "city": "Tounane",
-    "lat": 35.03757,
-    "lng": -1.893505,
-    "phones": [
-      "+213 794 90 46 24"
-    ]
+    "city": "Sidi Okba",
+    "state": "Biskra",
+    "location": "QW34+VRX",
+    "phone": "555234329"
+  },
+  {
+    "city": "N'Gaous",
+    "state": "Batna",
+    "location": "HJ28+C22",
+    "phone": "663182328"
+  },
+  {
+    "city": "Adrar",
+    "state": "Adrar",
+    "location": "VPH5+9W3",
+    "phone": "661445840"
+  },
+  {
+    "city": "Messaad",
+    "state": "Djelfa",
+    "location": "5F3X+294",
+    "phone": "540245689"
+  },
+  {
+    "city": "Baraki",
+    "state": "Alger",
+    "location": "M36W+5QF",
+    "phone": "553786911"
+  },
+  {
+    "city": "Ras El Aioun",
+    "state": "Batna",
+    "location": "MJGW+PWG",
+    "phone": "672769748"
+  },
+  {
+    "city": "Aflou",
+    "state": "Laghouat",
+    "location": "438W+4MX",
+    "phone": "770769042"
+  },
+  {
+    "city": "Oum El Bouaghi",
+    "state": "Oum El Bouaghi",
+    "location": "V4CF+F5J",
+    "phone": "550123713"
+  },
+  {
+    "city": "Skikda",
+    "state": "Skikda",
+    "location": "VW64+73J",
+    "phone": "542774989"
+  },
+  {
+    "city": "Ain M'lila",
+    "state": "Oum El Bouaghi",
+    "location": "2HJG+CWR",
+    "phone": "778878775"
+  },
+  {
+    "city": "Ouzou",
+    "state": "Bejaia",
+    "location": "J6QW+4FH",
+    "phone": "773257058"
+  },
+  {
+    "city": "Ouzellaguen",
+    "state": "Bejaia",
+    "location": "GJP5+M3W",
+    "phone": "770834100"
+  },
+  {
+    "city": "Laghouat",
+    "state": "Laghouat",
+    "location": "RV76+Q5",
+    "phone": "697996694"
+  },
+  {
+    "city": "Cheria",
+    "state": "Tebessa",
+    "location": "7QC7+MXM",
+    "phone": "550123713"
+  },
+  {
+    "city": "El Madher",
+    "state": "Batna",
+    "location": "J9GC+V9F",
+    "phone": "671531412"
+  },
+  {
+    "city": "Merouana",
+    "state": "Batna",
+    "location": "JWM4+7G",
+    "phone": "554107747"
+  },
+  {
+    "city": "El Kseur",
+    "state": "Bejaia",
+    "location": "MVH6+76Q",
+    "phone": "541709228"
+  },
+  {
+    "city": "Massera",
+    "state": "Mostaganem",
+    "location": "R5Q9+RJF",
+    "phone": ""
+  },
+  {
+    "city": "Tamalous",
+    "state": "Skikda",
+    "location": "RJPJ+CX",
+    "phone": ""
+  },
+  {
+    "city": "Ramdane Djamel",
+    "state": "Skikda",
+    "location": "QV5V+8C",
+    "phone": ""
+  },
+  {
+    "city": "Rjass",
+    "state": "Mila",
+    "location": "",
+    "phone": "793369188"
+  },
+  {
+    "city": "Bouhadjar",
+    "state": "El Tarf",
+    "location": "",
+    "phone": "559578599"
+  },
+  {
+    "city": "El Harrouch",
+    "state": "Skikda",
+    "location": "",
+    "phone": "779122948"
+  },
+  {
+    "city": "Ain Temouchent",
+    "state": "Ain Temouchent",
+    "location": "",
+    "phone": "661498130"
+  },
+  {
+    "city": "Annaba",
+    "state": "Annaba",
+    "location": "",
+    "phone": "663497042"
+  },
+  {
+    "city": "Akbou",
+    "state": "Bejaia",
+    "location": "",
+    "phone": "770074890"
+  },
+  {
+    "city": "Draria",
+    "state": "Alger",
+    "location": "",
+    "phone": "550004703"
+  },
+  {
+    "city": "Bouhmama",
+    "state": "Khenchela",
+    "location": "",
+    "phone": "671531412"
+  },
+  {
+    "city": "Chetouane",
+    "state": "Oran",
+    "location": "",
+    "phone": "561898466"
+  },
+  {
+    "city": "Oued Tlelat",
+    "state": "Oran",
+    "location": "",
+    "phone": "698514559"
+  },
+  {
+    "city": "Souk El Tenine",
+    "state": "Bejaia",
+    "location": "",
+    "phone": "773358901"
+  },
+  {
+    "city": "Chettia",
+    "state": "Chlef",
+    "location": "",
+    "phone": "776184348"
+  },
+  {
+    "city": "Timimoun",
+    "state": "Timimoun",
+    "location": "",
+    "phone": "661445840"
+  },
+  {
+    "city": "Kais",
+    "state": "Khenchela",
+    "location": "",
+    "phone": "671414773"
+  },
+  {
+    "city": "Lghrous",
+    "state": "Biskra",
+    "location": "",
+    "phone": "696601758"
   }
 ]

@@ -358,17 +358,17 @@ async function publishProduct() {
 
   // Manual checks for assets and nested arrays according to schema
   if (!form.imageUrl)
-    snackbar.value = { show: true, text: t('management.products.editor.snackbar.cover_required'), color: 'error' }
+    return snackbar.value = { show: true, text: t('management.products.editor.snackbar.cover_required'), color: 'error' }
 
   if (!form.avatar)
-    snackbar.value = { show: true, text: t('management.products.editor.snackbar.avatar_required'), color: 'error' }
+    return snackbar.value = { show: true, text: t('management.products.editor.snackbar.avatar_required'), color: 'error' }
 
   if (!Array.isArray(form.variances) || form.variances.length === 0)
-    snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_required'), color: 'error' }
+    return snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_required'), color: 'error' }
 
   const invalidVariance = form.variances.find(v => !v.name || !v.price)
   if (invalidVariance)
-    snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_invalid'), color: 'error' }
+    return snackbar.value = { show: true, text: t('management.products.editor.snackbar.variance_invalid'), color: 'error' }
 
   saving.value = true
   try {   
@@ -396,7 +396,7 @@ async function publishProduct() {
       throw new Error('Failed to save product')
 
     snackbar.value = { show: true, text: isEdit.value ? t('management.products.editor.snackbar.updated') : t('management.products.editor.snackbar.created'), color: 'success' }
-    navigateTo('/management')
+    // navigateTo('/management')
   }
   catch (err) {
     snackbar.value = { show: true, text: t('management.products.editor.snackbar.save_failed'), color: 'error' }
@@ -650,7 +650,6 @@ function discard() {
                   v-model="form.densite"
                   :label="t('management.products.editor.technical.density')"
                   :placeholder="t('management.products.editor.placeholders.example', { example: '1.2' })"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -661,7 +660,6 @@ function discard() {
                   v-model="form.rendement"
                   :label="t('management.products.editor.technical.coverage')"
                   :placeholder="t('management.products.editor.placeholders.example', { example: '10m²/L' })"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -672,7 +670,6 @@ function discard() {
                   v-model="form.tempsSachage"
                   :label="t('management.products.editor.technical.drying_time')"
                   :placeholder="t('management.products.editor.placeholders.example', { example: '2h' })"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -690,7 +687,6 @@ function discard() {
                   multiple
                   chips
                   closable-chips
-                  :rules="[arrayRequired]"
                 />
               </VCol>
 
@@ -723,7 +719,6 @@ function discard() {
                   v-model="form.dilution"
                   :label="t('management.products.editor.application.dilution')"
                   :placeholder="t('management.products.editor.placeholders.example', { example: '5-10% eau' })"
-                  :rules="[requiredValidator]"
                 />
               </VCol>
               <VCol
@@ -741,7 +736,6 @@ function discard() {
                   multiple
                   chips
                   closable-chips
-                  :rules="[arrayRequired]"
                 />
               </VCol>
               <VCol
@@ -759,7 +753,6 @@ function discard() {
                   multiple
                   chips
                   closable-chips
-                  :rules="[arrayRequired]"
                 />
               </VCol>
               <VCol

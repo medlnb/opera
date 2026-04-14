@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import branchsData from '@/data/branchs.json'
+import { useI18n } from 'vue-i18n'
 
 const searchQuery = ref('')
 const selectedBranch = ref(null)
@@ -12,17 +12,19 @@ const filteredBranches = computed(() => {
     return branchsData
 
   return branchsData.filter(branch =>
-    branch.city.toLowerCase().includes(searchQuery.value.toLowerCase()),
+    `${branch.city} ${branch.state}`.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 const totalBranches = computed(() => branchsData.length)
 
-const openGoogleMaps = branch => {
-  const url = `https://www.google.com/maps?q=${branch.lat},${branch.lng}`
+const openGoogleMaps = (branch) => {
+  if (!branch.location) return;
 
-  window.open(url, '_blank')
-}
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.location)}`;
+
+  window.open(url, '_blank');
+};
 
 const callPhone = phone => {
   window.open(`tel:${phone.replace(/\s/g, '')}`, '_self')
@@ -192,7 +194,7 @@ const copyPhone = async phone => {
         >
           <VCol
             v-for="branch in filteredBranches"
-            :key="branch.city"
+            :key="branch.phone"
             cols="12"
             sm="6"
             md="4"
@@ -219,15 +221,15 @@ const copyPhone = async phone => {
                   </VAvatar>
                   <div>
                     <h4 class="text-subtitle-1 font-weight-bold">
-                      {{ branch.city }}
+                      {{ branch.state }}
                     </h4>
-                    <span class="text-caption text-medium-emphasis">{{ t('contact.country') }}</span>
+                    <span class="text-caption text-medium-emphasis">{{ branch.city }}</span>
                   </div>
                 </div>
 
                 <VDivider class="mb-3" />
 
-                <div class="mb-3">
+                <div class="mb-3" v-if="branch.phone">
                   <div class="text-caption text-medium-emphasis mb-1">
                     <VIcon
                       icon="tabler-phone"
@@ -237,18 +239,16 @@ const copyPhone = async phone => {
                     {{ t('contact.phone_numbers') }}
                   </div>
                   <div
-                    v-for="phone in branch.phones"
-                    :key="phone"
                     class="d-flex align-center justify-space-between mb-1"
                   >
-                    <span class="text-body-2">{{ phone }}</span>
+                    <span class="text-body-2">+213 {{ branch.phone }}</span>
                     <div>
                       <VBtn
                         icon
                         size="x-small"
                         variant="text"
                         color="success"
-                        @click.stop="callPhone(phone)"
+                        @click.stop="callPhone(`+213${branch.phone}`)"
                       >
                         <VIcon
                           icon="tabler-phone-call"
@@ -266,7 +266,7 @@ const copyPhone = async phone => {
                         size="x-small"
                         variant="text"
                         color="primary"
-                        @click.stop="copyPhone(phone)"
+                        @click.stop="copyPhone(`+213${branch.phone}`)"
                       >
                         <VIcon
                           icon="tabler-copy"
@@ -284,6 +284,7 @@ const copyPhone = async phone => {
                 </div>
 
                 <VBtn
+                  v-if="branch.location"
                   block
                   variant="tonal"
                   color="primary"

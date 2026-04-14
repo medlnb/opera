@@ -13,7 +13,7 @@ const { t, te } = useI18n({ useScope: 'global' })
 
 const productDetails = ref()
 const productLoading = ref(true)
-const panelStatus = ref()
+const panelStatus = ref(1)
 const favoriteLoading = ref(false)
 const addingToCart = ref(false)
 
