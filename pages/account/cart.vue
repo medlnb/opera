@@ -60,11 +60,9 @@ watch(() => checkout.value.state, () => {
 })
 
 onMounted(() => {
-  if (!authStore.token) {
-    navigateTo('/login')
-
-    return
-  }
+  if (!authStore.token) 
+    return navigateTo('/login')
+  
   cartStore.fetchCart()
   fetchSellpoints()
 })

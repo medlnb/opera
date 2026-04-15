@@ -1,8 +1,8 @@
 <script setup>
+import { useApi } from '@/composables/useApi'
 import { debounce } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
-import { useApi } from '@/composables/useApi'
 
 definePageMeta({
   authed: true,
@@ -512,10 +512,10 @@ useHead(() => ({
                   class="color-picker-input"
                   style="width: 80px; height: 40px; cursor: pointer; border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); border-radius: 4px;"
                 >
-                <VChip
-                  :style="{ backgroundColor: colorForm.selectedColor }"
-                  class="px-4"
-                >
+                  <VChip
+                    :style="{ backgroundColor: colorForm.selectedColor }"
+                    class="px-4"
+                  >
                   {{ colorForm.selectedColor }}
                 </VChip>
               </div>

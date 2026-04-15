@@ -3,6 +3,7 @@ import { useNavItems } from '@/navigation/horizontal'
 import { themeConfig } from '@themeConfig'
 
 // Components
+import CartIcon from '@/layouts/components/CartIcon.vue'
 import Footer from '@/layouts/components/Footer.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import NavBarI18n from '@core/components/I18n.vue'
@@ -33,6 +34,7 @@ const navItems = useNavItems()
         :languages="themeConfig.app.i18n.langConfig"
       />
 
+      <CartIcon />
       <UserProfile />
     </template>
 

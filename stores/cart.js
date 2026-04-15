@@ -69,6 +69,7 @@ export const useCartStore = defineStore('cart', {
         const data = await res.json()
 
         this.items = data.data?.items || []
+        // console.log(this.items.length)
 
         return true
       }

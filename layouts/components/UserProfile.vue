@@ -33,98 +33,89 @@ const logout = () => {
   </template>
 
   <!-- Show user profile menu when logged in -->
-  <VBadge
-    v-else
-    dot
-    location="bottom right"
-    offset-x="3"
-    offset-y="3"
-    bordered
-    color="success"
+  <VAvatar
+    class="cursor-pointer mx-2"
+    color="primary"
+    variant="tonal"
   >
-    <VAvatar
-      class="cursor-pointer"
-      color="primary"
-      variant="tonal"
+    <VImg
+      :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`"
+      cover
+    />
+    <!-- SECTION Menu -->
+    <VMenu
+      activator="parent"
+      width="230"
+      location="bottom end"
+      offset="14px"
     >
-      <VImg
-        :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`"
-        cover
-      />
-      <!-- SECTION Menu -->
-      <VMenu
-        activator="parent"
-        width="230"
-        location="bottom end"
-        offset="14px"
-      >
-        <VList>
-          <!-- 👉 User Avatar & Name -->
-          <VListItem>
-            <template #prepend>
-              <VListItemAction start>
-                <VBadge
-                  dot
-                  location="bottom right"
-                  offset-x="3"
-                  offset-y="3"
-                  color="success"
+      <VList>
+        <!-- 👉 User Avatar & Name -->
+        <VListItem>
+          <template #prepend>
+            <VListItemAction start>
+              <VBadge
+                dot
+                location="bottom right"
+                offset-x="3"
+                offset-y="3"
+                color="success"
+              >
+                <VAvatar
+                  color="primary"
+                  variant="tonal"
                 >
-                  <VAvatar
-                    color="primary"
-                    variant="tonal"
-                  >
-                    <VImg :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`" />
-                  </VAvatar>
-                </VBadge>
-              </VListItemAction>
-            </template>
+                  <VImg :src="authStore.user?.avatar || `https://dummyimage.com/100x100/000/fff&text=${authStore.user?.firstName?.charAt(0) || ''}${authStore.user?.lastName?.charAt(0) || ''}`" />
+                </VAvatar>
+              </VBadge>
+            </VListItemAction>
+          </template>
 
-            <VListItemTitle class="font-weight-semibold">
-              {{ `${authStore.user?.firstName || ''} ${authStore.user?.lastName || ''}` }}
-            </VListItemTitle>
-            <VListItemSubtitle v-if="authStore.user?.phone">
-              <bdi dir="ltr">{{ `${authStore.user.phone.slice(0, 4)} ${authStore.user.phone.slice(4, 20)}` }}</bdi>
-            </VListItemSubtitle>
-          </VListItem>
+          <VListItemTitle class="font-weight-semibold">
+            {{ `${authStore.user?.firstName || ''} ${authStore.user?.lastName || ''}` }}
+          </VListItemTitle>
+          <VListItemSubtitle v-if="authStore.user?.phone">
+            <bdi dir="ltr">{{ `${authStore.user.phone.slice(0, 4)} ${authStore.user.phone.slice(4, 20)}` }}</bdi>
+          </VListItemSubtitle>
+        </VListItem>
 
-          <VDivider class="my-2" />
+        <VDivider class="my-2" />
 
-          <VListItem
-            v-for="item in items"
-            :key="item.to.name"
-            link
-            :to="item.to.name"
-          >
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                :icon="item.icon.icon"
-                size="22"
-              />
-            </template>
+        <VListItem
+          v-for="item in items"
+          :key="item.to.name"
+          link
+          :to="item.to.name"
+        >
+          <template #prepend>
+            <VIcon
+              class="me-2"
+              :icon="item.icon.icon"
+              size="22"
+            />
+          </template>
 
-            <VListItemTitle>{{ t(item.title) }}</VListItemTitle>
-          </VListItem>
+          <VListItemTitle>{{ t(item.title) }}</VListItemTitle>
+        </VListItem>
 
-          <!-- Divider -->
-          <VDivider class="my-2" />
+        <!-- Divider -->
+        <VDivider class="my-2" />
 
-          <!-- 👉 Logout -->
-          <VListItem @click="logout">
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="tabler-logout"
-                size="22"
-              />
-            </template>
+        <!-- 👉 Logout -->
+        <VListItem @click="logout">
+          <template #prepend>
+            <VIcon
+              class="me-2"
+              icon="tabler-logout"
+              size="22"
+            />
+          </template>
 
-            <VListItemTitle>{{ t('user.logout') }}</VListItemTitle>
-          </VListItem>
-        </VList>
-      </VMenu>
-      <!-- !SECTION -->
-    </VAvatar>
-  </VBadge>
+          <VListItemTitle>{{ t('user.logout') }}</VListItemTitle>
+        </VListItem>
+      </VList>
+    </VMenu>
+    <!-- !SECTION -->
+  </VAvatar>
+
 </template>
