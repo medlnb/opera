@@ -34,6 +34,7 @@ const logout = () => {
 
   <!-- Show user profile menu when logged in -->
   <VAvatar
+    v-if="authStore.token"
     class="cursor-pointer mx-2"
     color="primary"
     variant="tonal"
