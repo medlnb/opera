@@ -1,6 +1,6 @@
 import type { ThemeDefinition } from 'vuetify'
 
-export const staticPrimaryColor = '#f9bf29'
+export const staticPrimaryColor = '#57585a'
 
 export const themes: Record<string, ThemeDefinition> = {
   light: {
@@ -18,7 +18,7 @@ export const themes: Record<string, ThemeDefinition> = {
       'on-warning': '#fff',
       'error': '#EA5455',
       'background': '#F8F7FA',
-      'on-background': '#2F2B3D',
+      'on-background': '#fff',
       'on-surface': '#2F2B3D',
       'grey-50': '#FAFAFA',
       'grey-100': '#F5F5F5',
@@ -64,7 +64,7 @@ export const themes: Record<string, ThemeDefinition> = {
     dark: true,
     colors: {
       'primary': staticPrimaryColor,
-      'on-primary': '#fff',
+      'on-primary': '#57585a49',
       'secondary': '#A8AAAE',
       'on-secondary': '#fff',
       'success': '#28C76F',
@@ -74,10 +74,10 @@ export const themes: Record<string, ThemeDefinition> = {
       'warning': '#FF9F43',
       'on-warning': '#fff',
       'error': '#EA5455',
-      'background': '#25293C',
+      'background': '#fff',
       'on-background': '#D0D4F1',
-      'surface': '#2F3349',
-      'on-surface': '#D0D4F1',
+      'surface': '#3e3e3f',
+      'on-surface': 'rgba(208, 212, 241, 0.33)',
       'grey-50': '#26293A',
       'grey-100': '#2F3349',
       'grey-200': '#26293A',
@@ -88,7 +88,7 @@ export const themes: Record<string, ThemeDefinition> = {
       'grey-700': '#B6BEE3',
       'grey-800': '#CFD3EC',
       'grey-900': '#E7E9F6',
-      'perfect-scrollbar-thumb': '#4A5072',
+      'perfect-scrollbar-thumb': '#A8AAAE',
       'skin-bordered-background': '#2f3349',
       'skin-bordered-surface': '#2f3349',
     },

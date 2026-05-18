@@ -776,6 +776,26 @@
         "showing_branches": "Affichage de {shown} sur {total} agences"
     },
     "home": {
+        "bannerDesc1": "Découvrez le charme",
+        "bannerDesc2": "au quotidien",
+        "yearColor": "Couleur de l'année 2026",
+        "moonStars": "Découvrir Moon & Stars",
+        "moreColors": "Explorer les Couleurs",
+        "findProducts": "Trouver un Produit",
+        "trendColorsThisYear": "Couleurs Tendances 2026",
+        "seeMore": "Découvrir plus",
+        "studioColorAlt": "Faites parler votre savoir-faire en couleurs",
+        "studioColorTitle": "Studio Color",
+        "studioColorDesc": "Opéra Peinture a développé une série d’outils incontournables à votre disposition pour vous accompagner durant tous vos projets. Avec comme promesse : fiabilité, simplicité et tendance. Opéra Peinture Color Studio offre une expérience couleur qui vous émerveillera jour après jour.",
+        "see": "Découvrir",
+        "catTitle": "Catalogue Opéra Peinture",
+        "catDesc": "Retrouvez tous nos produits dans notre catalogue Sikkens téléchargeable !",
+        "catBtn": "Voir le Catalogue",
+        "catProTitle": "Nouveau Catalogue Professionnel",
+        "catPro1": "Peintures Extérieures / Intérieures",
+        "catPro2": "Peintures Décoratives",
+        "catPro3": "Revêtements de façades",
+        "catPro4": "Protection et décoration Bois / Métaux",
         "hero": {
             "title_prefix": "Travaillez avec un produit",
             "title_highlight": "Excellent",
@@ -810,12 +830,6 @@
             "resistance_description": "Face aux intempéries, aux UV ou aux taches, nos peintures sont conçues pour durer et protéger vos murs.",
             "satisfaction_title": "Satisfaction client",
             "satisfaction_description": "Votre satisfaction est notre priorité. Nous vous accompagnons à chaque étape pour garantir un résultat final au-delà de vos attentes."
-        },
-        "cta": {
-            "title": "Prêt à transformer votre espace ?",
-            "title": "Découvrez le charme au quotidien",
-            "shop_now": "Acheter maintenant",
-            "get_inspired": "S'inspirer"
         },
         "catalog": {
             "badge_title": "Catalogue",
