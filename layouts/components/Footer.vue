@@ -43,7 +43,7 @@ const year = new Date().getFullYear()
             sm="6"
             md="3"
           >
-            <div class="text-subtitle-1 font-weight-bold mb-4">
+            <div class="text-subtitle-1 font-weight-bold mb-4 text-on-surface">
               {{ t('footer.columns.brand') }}
             </div>
 
@@ -75,7 +75,7 @@ const year = new Date().getFullYear()
             sm="6"
             md="3"
           >
-            <div class="text-subtitle-1 font-weight-bold mb-4">
+            <div class="text-subtitle-1 font-weight-bold mb-4 text-on-surface">
               {{ t('footer.columns.tools') }}
             </div>
 
@@ -104,14 +104,14 @@ const year = new Date().getFullYear()
             cols="12"
             md="2"
           >
-            <div class="text-subtitle-1 font-weight-bold mb-4">
+            <div class="text-subtitle-1 font-weight-bold mb-4 text-on-surface">
               {{ t('footer.columns.follow') }}
             </div>
 
             <div class="d-flex align-center gap-2">
               <VBtn
                 icon
-                variant="text"
+                variant="flat"
                 class="app-footer__icon-btn"
                 href="https://www.facebook.com/operapeintureofficiel"
                 target="_blank"
@@ -123,7 +123,7 @@ const year = new Date().getFullYear()
 
               <VBtn
                 icon
-                variant="text"
+                variant="flat"
                 class="app-footer__icon-btn"
                 href="https://www.instagram.com/opera.peinture.hbb/"
                 target="_blank"
@@ -135,7 +135,7 @@ const year = new Date().getFullYear()
 
               <VBtn
                 icon
-                variant="text"
+                variant="flat"
                 class="app-footer__icon-btn"
                 href="https://www.youtube.com/@operapeinture3399"
                 target="_blank"
@@ -193,6 +193,7 @@ const year = new Date().getFullYear()
   inline-size: 100%;
 }
 
+
 .text-on-surface {
   color: rgb(var(--v-theme-on-surface));
 }
@@ -211,6 +212,7 @@ const year = new Date().getFullYear()
 }
 
 .app-footer__icon-btn {
-  color: rgb(var(--v-theme-on-surface));
+  color: white;
+  background-color: white;
 }
 </style>
