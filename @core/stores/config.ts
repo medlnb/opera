@@ -20,7 +20,7 @@ export const useConfigStore = defineStore('config', () => {
 
   const theme = cookieRef('theme', themeConfig.app.theme)
   // Force dark theme always (overrides any previously stored preference).
-  theme.value = 'dark'
+  // theme.value = 'dark'
 
   // 👉 isVerticalNavSemiDark
   const isVerticalNavSemiDark = cookieRef('isVerticalNavSemiDark', themeConfig.verticalNav.isVerticalNavSemiDark)
@@ -65,17 +65,40 @@ export const initConfigStore = () => {
   const configStore = useConfigStore()
 
   // Force dark theme globally.
-  configStore.theme = 'dark'
-  vuetifyTheme.global.name.value = 'dark'
+  configStore.theme = 'light'
+  vuetifyTheme.global.name.value = 'light'
 
   watch(
     [() => configStore.theme, userPreferredColorScheme],
     () => {
-      vuetifyTheme.global.name.value = 'dark'
+      vuetifyTheme.global.name.value = 'light'
     })
 
   onMounted(() => {
-    vuetifyTheme.global.name.value = 'dark'
+    vuetifyTheme.global.name.value = 'light'
   })
 }
 // !SECTION
+
+// // SECTION Init
+// export const initConfigStore = () => {
+//   const userPreferredColorScheme = usePreferredColorScheme()
+//   const vuetifyTheme = useTheme()
+//   const configStore = useConfigStore()
+
+//   watch(
+//     [() => configStore.theme, userPreferredColorScheme],
+//     () => {
+//       vuetifyTheme.global.name.value = configStore.theme === 'system'
+//         ? userPreferredColorScheme.value === 'dark'
+//           ? 'dark'
+//           : 'light'
+//         : configStore.theme
+//     })
+
+//   onMounted(() => {
+//     if (configStore.theme === 'system')
+//       vuetifyTheme.global.name.value = userPreferredColorScheme.value
+//   })
+// }
+// // !SECTION

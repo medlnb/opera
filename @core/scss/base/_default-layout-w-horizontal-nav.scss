@@ -31,7 +31,7 @@
   .layout-footer {
     @at-root {
       .layout-footer-sticky#{&} {
-        background-color: rgb(var(--v-theme-surface));
+        background-color: rgb(var(--v-theme-error));
 
         @include mixins.elevation(3);
       }

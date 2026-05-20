@@ -147,10 +147,10 @@ onMounted(() => {
       <div
         class="banner--buttons d-flex gap-4"
       >
-        <VBtn class="btn text-white" to="/colors" color="grey-darken-2">
+        <VBtn class="btn" to="/colors" color="grey-darken-2">
           {{ t("home.moreColors") }}
         </VBtn>
-        <VBtn class="btn text-white" to="/colors" color="grey-darken-2">
+        <VBtn class="btn" to="/colors" color="grey-darken-2">
           {{ t("home.findProducts") }}
         </VBtn>        
       </div>
@@ -169,7 +169,6 @@ onMounted(() => {
             <VCard
               hover
               rounded="0"
-              style="background: #bcbdc0;"
               class="shadow-none"
               :to="{ name: 'products-type', params: { type: item.type } }"
             >
@@ -181,14 +180,13 @@ onMounted(() => {
                 class="type-card-media"
               />
               <VCardText class="d-flex align-center gap-4 py-2">
-                <div class="text-subtitle-1 font-weight-medium" style="color: black;">
+                <div class="text-subtitle-1 font-weight-medium text-white">
                   {{ productTypeLabel(item.type) }}
                 </div>
 
                 <VSpacer />
                 <VIcon
                   icon="tabler-arrow-right"
-                  style="color: black;"
                 />
               </VCardText>
             </VCard>
@@ -199,8 +197,8 @@ onMounted(() => {
       <!-- Colors Preview Section -->
       <section class="home-section mt-0 px-0 py-6">
 
-        <h2 style="color: black;" class="py-3">{{ t("home.trendColorsThisYear") }}</h2>
-        <VBtn class="btn text-white mb-8" to="/colors" color="grey-darken-2">
+        <h2 class="py-3">{{ t("home.trendColorsThisYear") }}</h2>
+        <VBtn class="btn mb-8" to="/colors" color="grey-darken-2">
           {{ t("home.seeMore") }}
         </VBtn>
         <VCard
@@ -287,11 +285,11 @@ onMounted(() => {
 
           <!-- RIGHT -->
           <VCol cols="12" md="6" class="right-side pa-10 d-flex flex-column justify-center">
-            <h2 class="title mb-4" style="color: black;">{{t("home.studioColorTitle")}}</h2>
+            <h2 class="title mb-4">{{t("home.studioColorTitle")}}</h2>
 
             <p class="text mb-6">{{t("home.studioColorDesc")}}</p>
 
-            <VBtn class="btn text-white" color="grey-darken-2" to="/room-painter">
+            <VBtn class="btn" color="grey-darken-2" to="/room-painter">
               {{t("home.see")}}
             </VBtn>
           </VCol>
@@ -305,14 +303,14 @@ onMounted(() => {
 
           <!-- LEFT -->
           <VCol cols="12" md="6" class="left-side d-flex flex-column justify-center pa-8">
-            <h2 class="title mb-4" style="color: black;">{{t("home.catTitle")}}</h2>
+            <h2 class="title mb-4">{{t("home.catTitle")}}</h2>
 
             <p class="text mb-6">
               {{t("home.catDesc")}}
             </p>
 
             <VBtn 
-              class="cta-btn text-white" color="grey-darken-2"                
+              class="cta-btn" color="grey-darken-2"                
               :href="homepageCatalogHref"
               target="_blank"
               rel="noopener noreferrer"
@@ -377,9 +375,9 @@ onMounted(() => {
           }"
         >
           <SwiperSlide v-for="n in 5" :key="n">
-            <VCard flat rounded="0" style="background: #bcbdc0;">
+            <VCard flat rounded="0">
               <img :src="roomImg1" height="250"/>
-              <p style="color: black;" class="text-center">Peinture petite chambre : comment agrandir une pièce avec de la peinture</p>
+              <p class="text-center">Peinture petite chambre : comment agrandir une pièce avec de la peinture</p>
             </VCard>
           </SwiperSlide>
         </Swiper>

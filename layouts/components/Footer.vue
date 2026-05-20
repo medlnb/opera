@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import logoV2 from '@images/logo-v2.svg'
+import logoV2 from '@images/logo-v2.svg';
+import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -172,7 +172,6 @@ const year = new Date().getFullYear()
 
 <style scoped>
 .app-footer {
-  background: transparent;
   inline-size: 100%;
   padding: 0;
   display: flex;

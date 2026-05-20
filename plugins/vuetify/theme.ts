@@ -8,18 +8,27 @@ export const themes: Record<string, ThemeDefinition> = {
     colors: {
       'primary': staticPrimaryColor,
       'on-primary': '#fff',
-      'secondary': '#A8AAAE',
+
+      'secondary': '#ff0000',
       'on-secondary': '#fff',
+
       'success': '#28C76F',
       'on-success': '#fff',
+
       'info': '#00CFE8',
       'on-info': '#fff',
+
       'warning': '#FF9F43',
       'on-warning': '#fff',
+
       'error': '#EA5455',
+
       'background': '#F8F7FA',
-      'on-background': '#fff',
-      'on-surface': '#2F2B3D',
+      'on-background': '#000',
+
+      "surface": '#3e3e3f',
+      'on-surface': '#fff',
+
       'grey-50': '#FAFAFA',
       'grey-100': '#F5F5F5',
       'grey-200': '#EEEEEE',

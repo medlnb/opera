@@ -24,7 +24,7 @@ const logout = () => {
   <template v-if="!authStore.token">
     <VBtn
       variant="text"
-      color="primary"
+      color="error"
       to="/login"
       prepend-icon="tabler-user"
     >

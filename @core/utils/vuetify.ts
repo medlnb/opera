@@ -1,3 +1,12 @@
+
 export const resolveVuetifyTheme = (): 'light' | 'dark' => {
-  return 'dark'
+  // const cookieColorScheme = cookieRef<'light' | 'dark'>('color-scheme', usePreferredDark().value ? 'dark' : 'light')
+  // const storedTheme = cookieRef('theme', themeConfig.app.theme).value
+
+  // return storedTheme === 'system'
+  //   ? cookieColorScheme.value === 'dark'
+  //     ? 'dark'
+  //     : 'light'
+  //   : storedTheme as 'light' | 'dark'
+  return "light"
 }
